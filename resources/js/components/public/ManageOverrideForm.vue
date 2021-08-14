@@ -135,7 +135,7 @@
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" v-validate="'required'" type="text" class="form-field__input" name="PO/SO" >
+                            <input :disabled="$parent.disabledinput" v-validate="'required'" type="text" v-model="po_so" class="form-field__input" name="PO/SO" >
                             <label class="form-field__label">PO/SO</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -643,6 +643,16 @@
 <script>
 let leavetype = ['Sick Leave', 'Birthday Leave', 'Leave w/o Pay', 'Bereavement Leave', 'Vacation Leave', 'Others'];
 let status = ['Pending', 'Approved', 'Rejected'];
+let excludeBody = [
+            'compRows',
+            'divRows',
+            'branchRows',
+            'check_fields',
+            'overdue_fields',
+            'reciever_emails',
+            'isDisable'
+        ];
+
 export default {
     props: ['userinfo', 'selected'],
     data() {
@@ -713,18 +723,31 @@ export default {
     methods:{
         addOverride(){
             if(this.isFormValid){
-                console.log(this.$data);
+                
                 this.isDisable = true;
-                let params = this.$data;
-                delete params.compRows;
-                delete params.divRows;
-                delete params.branchRows;
-                delete params.check_fields;
-                delete params.overdue_fields;
-                // params['reciever_emails'] = this.$parent.reciever_emails;
-                axios.post('api/addoverride', params).then((response)=>{
+                let params = {};
+                
+                for (const key in this.$data) {
+                    if (!excludeBody.includes(key)) {
+                        if(key == 'overdue_tbl' || key == 'check_tbl'){
+                            params[key] = JSON.stringify(this.$data[key]);
+                        } else if(key=='check_type') {
+                            params[key] = this.$data[key].toString();
+                        }else {
+                            params[key] = this.$data[key];
+                        }
+                        
+                    }
+                }
+                
+                
+                params['reciever_emails'] = this.$parent.reciever_emails;
+                
+                axios.post('api/addoverride', params).then(({data})=>{
                 //     this.$parent.addRow(response.data);
-                    this.isDisable = false;
+                    console.log(data);
+                    // this.isDisable = false;
+                    // $("#myModal").modal("hide");
                 }).catch((err)=>{console.log(err);});
             }
         },

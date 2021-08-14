@@ -188,12 +188,12 @@ export default {
             $("#undertimeform tbody").on('click', 'tr', function() {
                 var tr = $(this).closest('tr');
                 var row = table.row( tr );
-                if(row.data().status.toLowerCase() == 'approved' ||
-                   row.data().status.toLowerCase() == 'rejected')
-                {
+                // if(row.data().status.toLowerCase() == 'approved' ||
+                //    row.data().status.toLowerCase() == 'rejected')
+                // {
                     self.disabledinput = true;
                     // return;
-                }
+                // }
 
                 let dataforedit = row.data();
                 self.selected = row.data();
@@ -210,31 +210,31 @@ export default {
         });
 
         // APPROVERS
-        axios.get('api/getUndertimeApprover').then((response)=>{
+        axios.get('api/getOverrideApprover').then((response)=>{
             this.approvers =  response.data;
         })
         .catch((err)=>{});
 
         let columnDefs = [
             {
-            title: "Undertime ID", data: 'undertimeID', visible: false,
+            title: "Override ID", data: 'overrideID', visible: false,
         },
-        // {
-        //     title: "Employee ID", data: 'empID_'
-        // },
         {
-            title: "Date Override", data: 'datefiled'
-        }, {
-            title: "Date Undertime", data: 'date_undertime'
-        }, {
-            title: "Start Time", data: 'starttime'
-        },{
-            title: "End Time", data: 'endtime'
-        },{
-            title: "Total(hrs)", data: 'totalhrs'
-        },{
-            title: "Reason", data: 'reason', className: "row-limit"
-        },{
+            title: "Date Override", data: 'dateoverride',
+        },
+        {
+            title: "Customer Name", data: 'customer_name'
+        },
+        {
+            title: "Sales Employee", data: 'sales_employee'
+        },
+        {
+            title: "Sales Manager", data: 'sales_manager'
+        },
+        {
+            title: 'Mode', data: 'mode'
+        },
+        {
             title: "Status", data: 'status'
         }];
 

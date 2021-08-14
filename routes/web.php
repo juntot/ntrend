@@ -251,6 +251,7 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
 
             // OVERRIDE FORM
             Route::get('/api/getoverride', 'OverrideController@getOverride');
+            Route::get('/api/getOverrideApprover', 'OverrideController@getOverrideApprover');
             Route::post('/api/addoverride', 'OverrideController@addOverride');
 
             // FORM APPROVERS ===========================================================================

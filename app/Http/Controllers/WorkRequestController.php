@@ -60,7 +60,8 @@ class WorkRequestController extends Controller
 
         
         // mail notification
-        return MailServices::getApproverEmail('workID', 360, 'formworkrequest', 'Work0Request');
+        // return MailServices::getApproverEmail('workID', 360, 'formworkrequest', 'Work0Request');
+        
         MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'WORK REQUEST');
         MailServices::formNotify(request('reciever_emails'), request('empID_'), 'work request request', $data, 'workreq');
         return $response;

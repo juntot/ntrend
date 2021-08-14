@@ -24,6 +24,20 @@ class OverrideController extends Controller
     // Add override
     function addOverride(){
         date_default_timezone_set("Asia/Hong_Kong");
+        $now = Carbon::now();
+        request()->merge([
+            'dateoverride' => $now,
+            'empID_' => UserSession::getSessionID(),
+            'commited_date' => UserSession::formatDate(request()->commited_date)
+        ]);
+        
+        $id = DB::table('formoverride')->insertGetId(request()->except(['reciever_emails']));
+        request()->merge(['overrideID' => $id]);
+        // mail notification
+        // MailServices::sendNotify(request('reciever_emails'), UserSession::getSessionID(), 'OVERRIDE REQUEST');
+        // MailServices::formNotify(request('reciever_emails'), UserSession::getSessionID(), 'override request', $id, 'leave');        
+        return request()->all();
+        
 
     }
     
@@ -33,10 +47,10 @@ class OverrideController extends Controller
     // delete override
 
     // FOR APPPROVERS =====================================================================================
-    // GET LEAVE FORM EMPLOYEE APPROVERS
+    // GET  APPROVERS LIST NAME AND EMAIL
     public function getOverrideApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformapprover eform right join employee emp on eform.empID_ = emp.empID where eform.Leave0Form = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Leave0Form = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Override0Form = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
         return $data;
     }
 
