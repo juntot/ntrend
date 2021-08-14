@@ -1,0 +1,27 @@
+html{
+    overflow-y: auto !important;
+}
+html, body{
+    margin: 0;
+    padding: 0;
+}
+
+.vdp-datepicker__calendar{
+    position: fixed !important;
+
+}
+.datePicker{
+    background-color: white !important;
+}
+
+.row .form-group
+{
+    padding-bottom: 0;
+}
+
+.v-menu__content--fixed {
+    position: fixed !important;
+    left: auto !important;
+    right: 32px !important;
+    background-color: orange;
+}

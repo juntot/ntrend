@@ -1,0 +1,136 @@
+@media only screen and (max-width: 991px) {
+  .dflex.block-mobile{
+    display: block;
+  }
+  .dflex.block-mobile > .gallery {
+      width: 100%;
+      padding: 6px;
+      border-radius: 4px;
+  }
+}
+
+@media only screen and (max-width: 767px) {
+  .loader-fixed{
+    left: 50%;
+  }
+  .login-form{
+    max-width: 284px;
+    transform: translate(50%,20%);
+  }
+  .login-body{
+    padding: 0px 36px 40px;
+  }
+  body.hide-backdrop .modal-backdrop{
+    display: none;
+  }
+
+  /* .modal-backdrop{
+    display: none;
+  } */
+  .close-mobile-nav{
+    display: block;
+    position: absolute;
+    background: #3f51b5;
+    top: 4px;
+    right: 0px;
+    z-index: 1;
+    border: 1px solid rgba(255,255,255,.5);
+  }
+
+  article section.relative-pos{
+    max-width: 100%;
+  }
+
+  .left-Side-Bar{
+    /* display: none; */
+    position: fixed;
+    height:100%;
+    width: 100%;
+    max-width: 350px;
+    overflow-y: auto;
+    padding:0;
+    z-index: 10;
+    left: -1000px;
+    top: 0;
+    transition: 1s;
+  }
+
+  body.modal-open .left-Side-Bar{
+    overflow-y: hidden;
+  }
+  .left-Side-Bar-show:before{
+    content:"";
+    background: rgba(0, 0, 0, .6);
+    position: fixed;
+    width: 100%;
+    overflow-y: auto;
+    bottom:0;
+    padding:0;
+    left:0px;
+    top: 0;
+
+  }
+
+  .left-Side-Bar-show{
+    transition: 1s;
+    left: 0px;
+  }
+  .left-SideBar-show:before{
+    left: 0px;
+    transition: 3s;
+  }
+
+  /* datatable */
+  div.dataTables_wrapper div.dataTables_filter {
+    text-align: left;
+  }
+  .col-lg-6.col-md-6.with-margin-bottom.nopadding .btn{
+    margin-top: 8px;
+  }
+}
+
+
+/* POST TEXTAREA */
+/* .textarea-post::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+.textarea-post::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+
+.textarea-post::-webkit-scrollbar-thumb {
+background-color: #3f51b5;
+  outline: 1px solid slategrey;
+  border-radius: 10px !important;
+} */
+
+
+
+/* LEFT SIDEBAR */
+.left-Side-Bar::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+.left-Side-Bar::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+
+.left-Side-Bar::-webkit-scrollbar-thumb {
+background-color: #3f51b5;
+  outline: 1px solid slategrey;
+  border-radius: 10px !important;
+}
+
+
+
+@media only screen
+and (min-device-width : 768px)
+and (max-device-width : 1024px)
+and (orientation : landscape) {
+
+
+}
+
