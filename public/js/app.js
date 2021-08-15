@@ -6703,7 +6703,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         if (index != 'status' && index != 'formID' && index != 'navname' && index != 'td') {
           if (index == 'formtitle') {
             header.unshift({
-              title: column[index],
+              title: 'E-FORMS',
               data: index
             });
           } else {

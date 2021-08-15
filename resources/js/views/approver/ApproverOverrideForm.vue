@@ -7,9 +7,7 @@
 			{{formtitle}}
 		</div>
         <div class="col-lg-12 margin-15">
-            <div class="col-lg-6 col-md-6  with-margin-bottom nopadding">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">ADD NEW</button>
-            </div>
+            <!--  -->
             <table id="overrideform" class="mdl-data-table" style="width:100%"></table>
 
             <!-- Modal -->
@@ -113,11 +111,11 @@ export default {
     mounted(){
 
 
-        // this.forapprover = ((this.$route.path).slice(1)).toLowerCase().split('-')[];
+        this.forapprover = ((this.$route.path).slice(1)).toLowerCase().split('-')[0];
         // this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
         this.formtitle = this.$route.name;
         
-        axios.get('api/getoverride').then((response)=>{
+        axios.get('api/approvalOverrideForm').then((response)=>{
             this.loader = false;
             this.rows=response.data;
 
@@ -158,6 +156,7 @@ export default {
             "scrollX": true,
             "order": [[ 0, "desc" ]],
             "rowCallback": function(row, data, index) {
+                
                 var cellValue = data.status;
                     if (cellValue==0) {
                        $(row).addClass("tr-pending");
@@ -182,17 +181,15 @@ export default {
             $("#overrideform tbody").on('click', 'tr', function() {
                 var tr = $(this).closest('tr');
                 var row = table.row( tr );
-                if(
-                    row.data().status == 1 ||
-                   row.data().status == 2 ||
-                   row.data().status == 3)
-                {
+                // if(row.data().status == 2 ||
+                //    row.data().status == 3)
+                // {
                     self.disabledinput = true;
                     // return;
-                }
+                // }
                 let dataforedit = row.data();
                 self.selected = row.data();
-
+                
                 self.setUpdate(dataforedit);
 
             });

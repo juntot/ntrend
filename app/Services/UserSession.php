@@ -21,9 +21,9 @@ class UserSession{
             ]);
     }
 
-    public static function formatDate($str_date)
+    public static function formatDate($str_date, $format = "Y-m-d")
     {
-        return date("Y-m-d", strtotime($str_date));
+        return date($format, strtotime($str_date));
     }
 
     public static function delAttachment($path){

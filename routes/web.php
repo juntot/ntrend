@@ -250,9 +250,11 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/api/getSupplierAccreditationApprover', 'SupplierAccreditationController@getSupplierAccreditationApprover'); // get approvers
 
             // OVERRIDE FORM
+            Route::post('/api/addoverride', 'OverrideController@addOverride');
+            Route::post('/api/updateoverride', 'OverrideController@updateOverride');
+            Route::post('/api/deleteoverride/{overrideID?}', 'OverrideController@deleteOverride');
             Route::get('/api/getoverride', 'OverrideController@getOverride');
             Route::get('/api/getOverrideApprover', 'OverrideController@getOverrideApprover');
-            Route::post('/api/addoverride', 'OverrideController@addOverride');
 
             // FORM APPROVERS ===========================================================================
             // LEAVE
@@ -334,7 +336,9 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             // PRS
             Route::get('/api/approvalPRSRequest', 'PRSController@approvalPRSRequest');
 
-
+            // OVERRIDE
+            Route::get('/api/approvalOverrideForm', 'OverrideController@approvalOverrideForm');
+            Route::post('/api/actionformOverride', 'OverrideController@actionFormOverride');
 
 
             // =============================  API  ==============================

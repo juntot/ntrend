@@ -129,7 +129,7 @@ export default {
                 {
                     if(index == 'formtitle')
                     {
-                        header.unshift({ title: column[index], data: index });
+                        header.unshift({ title: 'E-FORMS', data: index });
                     }else{
                         header.push(
                             {

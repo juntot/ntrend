@@ -44,6 +44,7 @@ import ApproverTravelForm from './views/approver/ApproverTravelForm';
 import ApproverUrgentCheck from './views/approver/ApproverUrgentCheck';
 import ApproverSupplierAccreditation from './views/approver/ApproverSupplierAccreditation';
 import ApproverPRS from './views/Approver/ApproverPRS';
+import ApproverOverrideForm from './views/Approver/ApproverOverrideForm';
 
 // REPORTS
 import Reports from './views/public/Reports'
@@ -333,6 +334,12 @@ export default{
             path: '/approval-prs',
             component: ApproverPRS,
             name: 'Approval Purchase Receiving Slip',
+        },
+        // Overtime Form
+        {
+            path: '/approval-override-form',
+            component: ApproverOverrideForm,
+            name: 'Approval Override Request Form'
         },
         // ============================================ REPORTS =====================================================
         {
