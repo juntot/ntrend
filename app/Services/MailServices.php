@@ -125,7 +125,7 @@ class MailServices{
 
 
 
-    // GET EMAIL RECIPIENTS FOR DELETE
+    // GET APPORVERS EMAILS
     public static function getApproverEmail($id, $idVal, $form, $colName) { 
         $result = DB::select('select emp.email from employee emp
         right join eformapproverbyemp eform
@@ -141,5 +141,18 @@ class MailServices{
             $emails[] = $value->email;
         }
         return $emails;
+    }
+
+    // GET REQUESTOR EMAIL
+    public static function getRequestorEmail($id, $idVal, $form) {
+        $result = DB::select('select emp.email from employee emp
+        join '.$form.' form
+        on form.empID_ = emp.empID
+        where form.'.$id.' = :id'
+        [$idVal]);
+
+        if($result) {
+            return $result[0]->email;
+        }
     }
 }

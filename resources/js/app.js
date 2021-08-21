@@ -12,6 +12,7 @@ Vue.directive('mask', VueMask.VueMaskDirective);
 
 window.bus = new Vue;
 Vue.use(VueRouter);
+window.SAP ='http://project.northtrend.com:999';
 
 const app = new Vue({
     vuetify : new Vuetify(),

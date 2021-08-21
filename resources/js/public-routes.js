@@ -217,7 +217,7 @@ export default{
         // Supplementary
         // witness supp
         {
-            path: '/supplemenentary-witness',
+            path: '/supplementary-witness',
             component:  ApproverSupplementaryWitness,
         },
         // approver supp

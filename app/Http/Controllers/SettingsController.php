@@ -417,7 +417,7 @@ class SettingsController extends Controller
             ->select('json')
             ->where('type', request('type'))
             ->get();
-
+        
         if($getData) {
             // return $getData[0]->json;
             $arr = json_decode($getData[0]->json, true);
@@ -450,6 +450,10 @@ class SettingsController extends Controller
             foreach($arr as $item) { //foreach element in $arr
                 if($item['id'] == request('id')) {
                     $item['name'] = request('name');
+                    if(request('type') == 'company'){
+                        $item['user'] = request('user');
+                        $item['pwd'] = request('pwd');
+                    }
                     $temp[] = $item;
                 }else{
                     $temp[] = $item;

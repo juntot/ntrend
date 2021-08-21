@@ -111,26 +111,30 @@ class AnnouncementController extends Controller
     }
 
 
+    // POST METHOD ANNOUNCEMENT
     // search employee
-    public function searchEmp($searchkey = ''){
-        $data = DB::select('select empID,  CONCAT(fname," ",lname) as fullname from employee where (fname like :search OR lname like :search2) and empID <> :empID order by fname limit 30',
-                [$searchkey.'%', $searchkey.'%', UserSession::getSessionID()]);
+    public function searchEmp(){
+        $data = DB::select('select empID,  CONCAT(fname," ",lname) as fullname from employee where (fname like :search OR lname like :search2) 
+        and empID not IN( :empID, "00001" )
+        AND status = 1
+        order by fname limit 30',
+                [request('keyword').'%', request('keyword').'%', UserSession::getSessionID()]);
         return $data;
     }
 
     // search department
-    public function searchDept($searchkey = ''){
+    public function searchDept(){
         $active_user = UserSession::getEmpKey();
         $data = DB::select('select deptID,  deptname from department where deptname like :search and deptID <> :deptID order by deptname limit 30',
-                [$searchkey.'%', $active_user[0]->deptID_]);
+                [request('keyword').'%', $active_user[0]->deptID_]);
         return $data;
     }
 
     // search company
-    public function searchComp($searchkey = ''){
+    public function searchComp(){
         $active_user = UserSession::getEmpKey();
         $data = DB::select('select compID,  compname from companytbl where compname like :search order by compname limit 30',
-                [$searchkey.'%']);
+                [request('keyword').'%']);
         return $data;
     }
 }

@@ -175,12 +175,7 @@
             </div>
             <div class="clearfix"></div> -->
             <div class="modal-footer">
-                    <!-- <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addCard" :disabled="isDisable || !isFormValid || !isBtnValid" v-if="submitBtn">
-                    <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateCard" :disabled="isDisable || !isFormValid || !isBtnValid" v-if="updateDeleteBtn">
-                    <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteCard" :disabled="isDisable" v-if="updateDeleteBtn">
-                    <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionCard(1)" v-if="approveRejecBtn">
-                    <input type="submit" class="btn btn-primary" value="Reject" @click.prevent="requestActionCard(2)" v-if="approveRejecBtn">
-                    <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionCard(0)" v-if="cancelBtn"> -->
+                    
             </div>
         </form>
 

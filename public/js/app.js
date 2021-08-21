@@ -10170,9 +10170,56 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var exclude = ['selected'];
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
+      loader: false,
+      errMsg: "Please wait while checking your credentials",
+      selected: {
+        name: '',
+        user: 'test',
+        pwd: 'test'
+      },
       compRows: [{
         id: 1,
         name: 'aw'
@@ -10183,27 +10230,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       divRows: [],
       branchRows: [],
       overrideFields: {
-        name: ''
+        name: '',
+        user: '',
+        pwd: ''
       },
       type: 'company',
       isUpdate: false
     };
   },
   watch: {
-    rows: function rows(val, old) {// let row = val;
-      // row.forEach((item, index)=>{
-      //     // if(!isNaN(item.leavetype) && !isNaN(item.status)){
-      //         row[index]['formtype'] = this.selected_type.formtitle;
-      //     // }
-      // });
-      // this.dtHandle.clear();
-      // this.dtHandle.rows.add(row);
-      // this.dtHandle.draw();
-    }
+    rows: function rows(val, old) {}
   },
   filters: {
     capitalize: function capitalize(value) {
       return value.charAt(0).toUpperCase() + value.slice(1);
+    },
+    filterPass: function filterPass(val) {
+      return val.split("").reduce(function (acc, val) {
+        return acc += '*';
+      }, '');
     }
   },
   computed: {
@@ -10235,6 +10280,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         type: this.type
       });
 
+      if (this.type == 'division') {
+        delete data.user;
+        delete data.pwd;
+      }
+
       axios.post('api/add-override-company', data).then(
       /*#__PURE__*/
       function () {
@@ -10248,7 +10298,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                 case 0:
                   data = _ref.data;
                   _context.next = 3;
-                  return _objectSpread({}, _this2.overrideFields, {
+                  return _objectSpread({}, data, {
                     id: data.id
                   });
 
@@ -10273,18 +10323,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                   return _this2.divRows.push(newRec);
 
                 case 10:
-                  if (!(_this2.type == 'branch')) {
-                    _context.next = 13;
-                    break;
-                  }
-
-                  _context.next = 13;
-                  return _this2.branchRows.push(newRec);
-
-                case 13:
                   $('.modal').modal('hide');
 
-                case 14:
+                case 11:
                 case "end":
                   return _context.stop();
               }
@@ -10304,7 +10345,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
       var data = _objectSpread({}, this.overrideFields, {
         type: this.type
-      }); // mange update
+      }); // const data = {...this.overrideFields, type: this.type};
+
+
+      if (this.type == 'division') {
+        delete data.user;
+        delete data.pwd;
+      } // mange update
 
 
       var inputData = this.overrideFields;
@@ -10320,6 +10367,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
             if (iterator.id == inputData.id) {
               iterator.name = inputData.name;
+              iterator.user = inputData.user;
+              iterator.pwd = inputData.pwd;
             }
           }
         } catch (err) {
@@ -10360,13 +10409,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
                     updateRow('divRows');
                   }
 
-                  if (_this3.type == 'branch') {
-                    updateRow('branchRows');
-                  }
-
                   $('.modal').modal('hide');
 
-                case 5:
+                case 4:
                 case "end":
                   return _context2.stop();
               }
@@ -10405,22 +10450,53 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
             _this4.divRows = _rows;
           }
-
-          if (obj.type == 'branch') {
-            var _rows2 = _this4.branchRows.filter(function (data) {
-              return data.id != obj.id;
-            });
-
-            _this4.branchRows = _rows2;
-          }
         });
       }
     },
-    setUpdate: function setUpdate(data, type) {
-      this.overrideFields = data;
-      this.type = type;
-      $('#myModal').modal('show');
-      this.MDBINPUT();
+    setUpdate: function () {
+      var _setUpdate = _asyncToGenerator(
+      /*#__PURE__*/
+      _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3(data, type) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                this.overrideFields['name'] = this.selected.name;
+                this.type = type;
+                this.overrideFields['id'] = this.selected.id;
+                this.overrideFields['user'] = type == 'company' ? this.selected.user : 'test';
+                this.overrideFields['pwd'] = type == 'company' ? this.selected.pwd : 'test';
+                $('#myModal').modal('show');
+                this.MDBINPUT();
+
+              case 7:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function setUpdate(_x3, _x4) {
+        return _setUpdate.apply(this, arguments);
+      }
+
+      return setUpdate;
+    }(),
+    testConnection: function testConnection() {
+      var _this5 = this;
+
+      this.loader = true;
+      $('#myModal2').modal('show');
+      axios.get(SAP + '/login', {
+        company: this.selected.name || '',
+        user: this.selected.user || '',
+        pwd: this.selected.pwd || ''
+      }).then(function () {
+        _this5.loader = false;
+      }).catch(function (er) {
+        _this5.errMsg = "Network connection error. Please check SAP API Server if you are connected";
+      });
     },
     MDBINPUT: function MDBINPUT() {
       this.$nextTick(function () {
@@ -10447,14 +10523,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     closeModal: function closeModal() {
       this.overrideFields = {
         name: '',
-        id: ''
+        user: '',
+        pwd: ''
       };
+      this.loader = false;
+      this.errMsg = '';
       this.isUpdate = false;
     }
   },
   beforeDestory: function beforeDestory() {},
   mounted: function mounted() {
-    var _this5 = this;
+    var _this6 = this;
 
     this.MDBINPUT();
     $('.modal').on("hidden.bs.modal", this.closeModal);
@@ -10462,11 +10541,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var data = _ref5.data;
       data.forEach(function (val) {
         if (val.type == 'company') {
-          _this5.compRows = JSON.parse(val.json);
+          _this6.compRows = JSON.parse(val.json);
         } else if (val.type == 'division') {
-          _this5.divRows = JSON.parse(val.json);
-        } else {
-          _this5.branchRows = JSON.parse(val.json);
+          _this6.divRows = JSON.parse(val.json);
         }
       });
     });
@@ -10482,16 +10559,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       });
       isremove = true;
     });
+    $("tbody").on('click', 'button.retest-connection', function () {
+      var data = $(this).closest("tr") // Finds the closest row <tr> 
+      .find("td").siblings(":last");
+      self.testConnection();
+      isremove = true;
+    });
     $("tbody").on('click', 'tr', function () {
       if (!isremove) {
         self.isUpdate = true;
         var data = $(this).closest("tr") // Finds the closest row <tr> 
-        .find("td").siblings(":last");
+        .find("td").siblings(":last"); // console.log(data.attr('id'), data.data('type'));
+
         self.setUpdate({
           id: data.attr('id'),
           name: data.text()
         }, data.data('type'));
       }
+
+      isremove = false;
     });
   }
 });
@@ -22546,7 +22632,7 @@ var render = function() {
     _vm._v(" "),
     _c("div", { staticClass: "clearfix" }),
     _vm._v(" "),
-    _c("div", { staticClass: "col-md-6 nopadding-left" }, [
+    _c("div", { staticClass: "col-md-12 nopadding" }, [
       _c("br"),
       _vm._v(" "),
       _c("div", { staticClass: "col-md-12 bgc-white" }, [
@@ -22582,13 +22668,30 @@ var render = function() {
             _c(
               "tbody",
               _vm._l(_vm.compRows, function(val, index) {
-                return _c("tr", { key: index }, [
-                  _c("td", { attrs: { id: val.id, "data-type": "company" } }, [
-                    _vm._v(_vm._s(val.name))
-                  ]),
-                  _vm._v(" "),
-                  _vm._m(2, true)
-                ])
+                return _c(
+                  "tr",
+                  {
+                    key: index,
+                    on: {
+                      click: function($event) {
+                        _vm.selected = val
+                      }
+                    }
+                  },
+                  [
+                    _c("td", [_vm._v(_vm._s(val.name))]),
+                    _vm._v(" "),
+                    _c("td", [_vm._v("user")]),
+                    _vm._v(" "),
+                    _c(
+                      "td",
+                      { attrs: { id: val.id, "data-type": "company" } },
+                      [_vm._v(_vm._s(_vm._f("filterPass")("12345")))]
+                    ),
+                    _vm._v(" "),
+                    _vm._m(2, true)
+                  ]
+                )
               }),
               0
             )
@@ -22599,7 +22702,7 @@ var render = function() {
       ])
     ]),
     _vm._v(" "),
-    _c("div", { staticClass: "col-md-6 nopadding-right" }, [
+    _c("div", { staticClass: "col-md-12 nopadding" }, [
       _c("br"),
       _vm._v(" "),
       _c("div", { staticClass: "col-md-12 bgc-white" }, [
@@ -22614,7 +22717,9 @@ var render = function() {
               on: {
                 click: function($event) {
                   $event.preventDefault()
-                  _vm.type = "division"
+                  ;(_vm.type = "division"),
+                    (_vm.overrideFields.user = "test"),
+                    (_vm.overrideFields.pwd = "test")
                 }
               }
             },
@@ -22635,13 +22740,26 @@ var render = function() {
             _c(
               "tbody",
               _vm._l(_vm.divRows, function(val, index) {
-                return _c("tr", { key: index }, [
-                  _c("td", { attrs: { id: val.id, "data-type": "division" } }, [
-                    _vm._v(_vm._s(val.name))
-                  ]),
-                  _vm._v(" "),
-                  _vm._m(4, true)
-                ])
+                return _c(
+                  "tr",
+                  {
+                    key: index,
+                    on: {
+                      click: function($event) {
+                        _vm.selected = val
+                      }
+                    }
+                  },
+                  [
+                    _c(
+                      "td",
+                      { attrs: { id: val.id, "data-type": "division" } },
+                      [_vm._v(_vm._s(val.name))]
+                    ),
+                    _vm._v(" "),
+                    _vm._m(4, true)
+                  ]
+                )
               }),
               0
             )
@@ -22656,68 +22774,13 @@ var render = function() {
     _vm._v(" "),
     _c("br"),
     _vm._v(" "),
-    _c("div", { staticClass: "col-md-12 bgc-white" }, [
-      _c("div", { staticClass: "bgc-white" }, [
-        _c("p", { staticClass: "orange-text" }, [_vm._v("Branch")]),
-        _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "col-lg-6 col-md-6  with-margin-bottom nopadding" },
-          [
-            _c(
-              "button",
-              {
-                staticClass: "btn btn-primary",
-                attrs: { "data-toggle": "modal", "data-target": "#myModal" },
-                on: {
-                  click: function($event) {
-                    $event.preventDefault()
-                    _vm.type = "branch"
-                  }
-                }
-              },
-              [_vm._v("Add New")]
-            )
-          ]
-        ),
-        _vm._v(" "),
-        _c(
-          "table",
-          {
-            staticClass: "mdl-data-table",
-            staticStyle: { width: "100%" },
-            attrs: { id: "override-branch-tbl" }
-          },
-          [
-            _vm._m(5),
-            _vm._v(" "),
-            _c(
-              "tbody",
-              _vm._l(_vm.branchRows, function(val, index) {
-                return _c("tr", { key: index }, [
-                  _c("td", { attrs: { id: val.id, "data-type": "branch" } }, [
-                    _vm._v(_vm._s(val.name))
-                  ]),
-                  _vm._v(" "),
-                  _vm._m(6, true)
-                ])
-              }),
-              0
-            )
-          ]
-        ),
-        _vm._v(" "),
-        _c("br")
-      ])
-    ]),
-    _vm._v(" "),
     _c(
       "div",
       { staticClass: "modal fade", attrs: { id: "myModal", role: "dialog" } },
       [
         _c("div", { staticClass: "modal-dialog" }, [
           _c("div", { staticClass: "modal-content" }, [
-            _vm._m(7),
+            _vm._m(5),
             _vm._v(" "),
             _c("div", { staticClass: "modal-body" }, [
               _c("div", { staticClass: "col-md-12" }, [
@@ -22768,6 +22831,132 @@ var render = function() {
                 ])
               ]),
               _vm._v(" "),
+              _c(
+                "div",
+                {
+                  directives: [
+                    {
+                      name: "show",
+                      rawName: "v-show",
+                      value: _vm.type == "company",
+                      expression: "type == 'company'"
+                    }
+                  ],
+                  staticClass: "col-md-12"
+                },
+                [
+                  _c("div", { staticClass: "mdb-form-field" }, [
+                    _c("div", { staticClass: "form-field__control" }, [
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "validate",
+                            rawName: "v-validate",
+                            value: "required",
+                            expression: "'required'"
+                          },
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.overrideFields.user,
+                            expression: "overrideFields.user"
+                          }
+                        ],
+                        staticClass: "form-field__input",
+                        attrs: { type: "text", name: "user" },
+                        domProps: { value: _vm.overrideFields.user },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.overrideFields,
+                              "user",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("label", { staticClass: "form-field__label" }, [
+                        _vm._v("User Name")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-field__bar" })
+                    ]),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "errors" }, [
+                      _vm._v(_vm._s(_vm.errors.first("user")))
+                    ])
+                  ])
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  directives: [
+                    {
+                      name: "show",
+                      rawName: "v-show",
+                      value: _vm.type == "company",
+                      expression: "type == 'company'"
+                    }
+                  ],
+                  staticClass: "col-md-12"
+                },
+                [
+                  _c("div", { staticClass: "mdb-form-field" }, [
+                    _c("div", { staticClass: "form-field__control" }, [
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "validate",
+                            rawName: "v-validate",
+                            value: "required",
+                            expression: "'required'"
+                          },
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.overrideFields.pwd,
+                            expression: "overrideFields.pwd"
+                          }
+                        ],
+                        staticClass: "form-field__input",
+                        attrs: { type: "text", name: "password" },
+                        domProps: { value: _vm.overrideFields.pwd },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.overrideFields,
+                              "pwd",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("label", { staticClass: "form-field__label" }, [
+                        _vm._v("Password")
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-field__bar" })
+                    ]),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "errors" }, [
+                      _vm._v(_vm._s(_vm.errors.first("password")))
+                    ])
+                  ])
+                ]
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "clearfix" }),
+              _vm._v(" "),
               _c("div", { staticClass: "col-lg-12 modal-footer" }, [
                 !_vm.isUpdate
                   ? _c("input", {
@@ -22809,6 +22998,64 @@ var render = function() {
           ])
         ])
       ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "modal fade", attrs: { id: "myModal2", role: "dialog" } },
+      [
+        _c("div", { staticClass: "modal-dialog" }, [
+          _c("div", { staticClass: "modal-content" }, [
+            _vm._m(6),
+            _vm._v(" "),
+            _c("div", { staticClass: "modal-body text-center" }, [
+              _vm.loader
+                ? _c(
+                    "p",
+                    {
+                      staticClass: "text-center",
+                      staticStyle: { color: "orange", "padding-bottom": "25px" }
+                    },
+                    [
+                      _c("i", {
+                        staticClass: "fas fa-spinner fa-spin",
+                        staticStyle: { "font-size": "4em" }
+                      })
+                    ]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              !_vm.loader
+                ? _c(
+                    "p",
+                    {
+                      staticClass: "text-center",
+                      staticStyle: { color: "orange", "padding-bottom": "25px" }
+                    },
+                    [
+                      _c("i", {
+                        staticClass: "fas fa-plane-departure",
+                        staticStyle: { "font-size": "4em" }
+                      })
+                    ]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _c("h5", [
+                _vm._v(
+                  "\n                            " +
+                    _vm._s(_vm.errMsg) +
+                    "\n                        "
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "clearfix" })
+            ]),
+            _vm._v(" "),
+            _vm._m(7)
+          ])
+        ])
+      ]
     )
   ])
 }
@@ -22829,6 +23076,10 @@ var staticRenderFns = [
       _c("tr", [
         _c("th", [_vm._v("Company Name")]),
         _vm._v(" "),
+        _c("th", [_vm._v("User")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Password")]),
+        _vm._v(" "),
         _c("th", [_vm._v("Operation")])
       ])
     ])
@@ -22838,6 +23089,15 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("td", [
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-primary retest-connection",
+          attrs: { type: "button" }
+        },
+        [_vm._v("Test Connection")]
+      ),
+      _vm._v(" "),
       _c(
         "button",
         {
@@ -22879,26 +23139,14 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("Branch Name")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Operation")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("td", [
+    return _c("div", { staticClass: "modal-header" }, [
       _c(
         "button",
         {
-          staticClass: "btn btn-danger remove-override",
-          attrs: { type: "button" }
+          staticClass: "close",
+          attrs: { type: "button", "data-dismiss": "modal" }
         },
-        [_vm._v("Delete")]
+        [_vm._v("×")]
       )
     ])
   },
@@ -22916,6 +23164,28 @@ var staticRenderFns = [
         [_vm._v("×")]
       )
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "div",
+      {
+        staticClass: "modal-footer",
+        staticStyle: { "padding-bottom": "15px" }
+      },
+      [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-default",
+            attrs: { type: "button", "data-dismiss": "modal" }
+          },
+          [_vm._v("Close")]
+        )
+      ]
+    )
   }
 ]
 render._withStripped = true
@@ -84048,6 +84318,7 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('Datepicker', vuejsDatepick
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.directive('mask', VueMask.VueMaskDirective);
 window.bus = new vue__WEBPACK_IMPORTED_MODULE_0___default.a();
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_router__WEBPACK_IMPORTED_MODULE_1__["default"]);
+window.SAP = 'http://project.northtrend.com:999';
 var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
   vuetify: new vuetify__WEBPACK_IMPORTED_MODULE_4___default.a(),
   store: _Store__WEBPACK_IMPORTED_MODULE_3__["store"],

@@ -197,15 +197,15 @@ class LeaveController extends Controller
         // MAIL NOTIFICATION
         if(request('status') == 1)
         {
-            // MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'LEAVE REQUEST', 'APPROVED');
+            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'LEAVE REQUEST', 'APPROVED');
             MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'leave request', 'approved', request('leaveID'), 'leave');
         }
         elseif(request('status') == 2){
-            // MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'LEAVE REQUEST', 'REJECTED');
+            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'LEAVE REQUEST', 'REJECTED');
             MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'leave request', 'rejected', request('leaveID'), 'leave');
         }
         else{
-            // MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'LEAVE REQUEST', 'CANCELLED');
+            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'LEAVE REQUEST', 'CANCELLED');
             MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'leave request', 'cancelled', request('leaveID'), 'leave');
         }
         return request()->all();

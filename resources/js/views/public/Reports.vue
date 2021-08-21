@@ -128,9 +128,16 @@ import ReportUrgentCheck                from './reports/ReportUrgentCheck';
 import ReportOffset                     from './reports/ReportOffset';
 import ReportWorkRequest                from './reports/ReportWorkRequest';
 import ReportOvertimeRequest            from './reports/ReportOvertimeRequest';
+import ReportOverrideForm               from './reports/ReportOverrideForm';
 
 // let brand = ['NTMC', 'APBW', 'PHILCREST', 'TYREPLUS'];
 // let status = ['Pending', 'Approved', 'Rejected'];
+
+/*
+    BUS report for request list
+    add prefix - Report for bus event in component
+*/
+
 let typeofReportBus = {
                 supplementary:          'initSup',          callingcardrequest:     'initCallCard',         clearanceform:      'initClearance',
                 companyloan:            'initLoan',         financialadvance:       'initFA',               incidentreport:     'initIR',
@@ -138,7 +145,7 @@ let typeofReportBus = {
                 prs:                    'initPRS',          prf:                    'initPRF',              canvas:             'initCanvas',
                 salarydiscrepancy:      'initSalDis',       supplieraccreditation:  'initSupAccre',         travelform:         'initTravel',
                 undertimerequest:       'initUndertime',    urgentcheck:            'initUrgentCheck',      offset:             'initOffset',
-                workrequest:            'initWorkRequest',  overtimerequest:        'initOvertime'
+                workrequest:            'initWorkRequest',  overtimerequest:        'initOvertime',         overrideform:       'initOverride'
             };
 
 export default {
@@ -161,7 +168,8 @@ export default {
         ReportUrgentCheck,
         ReportOffset,
         ReportWorkRequest,
-        ReportOvertimeRequest
+        ReportOvertimeRequest,
+        ReportOverrideForm
     },
     data(){
         return{
@@ -204,14 +212,19 @@ export default {
                 // salarydiscrepancy:      'ReportSalaryDiscrepancy',      supplieraccreditation:  'ReportSupplierAccreditation',      travelform:         'ReportTravelForm',
                 // undertimerequest:       'ReportUndertimeRequest',       urgentcheck:            'ReportUrgentCheck',                offset:             'ReportOffset',
                 // workrequest:            'ReportWorkRequest'
-
+                
+                /*
+                    //DEFINATION ===================================================================================
+                    index = componentname
+                    value =  selectype value
+                */
                 ReportSupplementary:        'supplementary',          ReportCallingCardRequest:     'callingcardrequest',         ReportClearance:          'clearanceform',
                 ReportCompanyLoan:          'companyloan',            ReportFinancialAdvantage:     'financialadvance',           ReportIncidentReport:     'incidentreport',
                 ReportLaptopAgreement:      'laptopform',             ReportLeaveForm:              'leaveform',                  ReportMIIS:               'miis',
                 ReportPRS:                  'prs',                    ReportPRF:                    'prf',                        ReportCanvas:             'canvas',
                 ReportSalaryDiscrepancy:    'salarydiscrepancy',      ReportSupplierAccreditation:  'supplieraccreditation',      ReportTravelForm:         'travelform',
                 ReportUndertimeRequest:     'undertimerequest',       ReportUrgentCheck:            'urgentcheck',                ReportOffset:             'offset',
-                ReportWorkRequest:          'workrequest',            ReportOvertimeRequest:         'overtimerequest',
+                ReportWorkRequest:          'workrequest',            ReportOvertimeRequest:        'overtimerequest',            ReportOverrideForm:       'overrideform'
             },
         }
     },
@@ -280,6 +293,16 @@ export default {
                     {label: 'Pending', title: 'Pending', value: 0},
 
                 ];
+            }else if(el.target.value == "overrideform"){
+
+                options =  [
+                    {label: 'Endorsed', title: 'Endored', value: 1},
+                    {label: 'Approved', title: 'Approved', value: 2},
+                    {label: 'Rejected', title: 'Rejected', value:3},
+                    {label: 'Pending', title: 'Pending', value: 0},
+
+                ];
+
             }else{
                 options =  [
                     {label: 'Approved', title: 'Approved', value: 1},
@@ -336,9 +359,9 @@ export default {
             this.disabledBtn = true;
             this.ishiddenComponent = false;
             // console.log(`api/getreport/${this.datefrom}/${this.dateto}/${this.selectedRepType}/${this.selectedBranch}/${this.selectedStatus}`);
-            axios.get(`api/getreport/${this.datefrom}/${this.dateto}/${this.selectedRepType}/${this.selectedBranch}/${this.selectedStatus}/${this.selectedCompany}`)
+           
+           axios.get(`api/getreport/${this.datefrom}/${this.dateto}/${this.selectedRepType}/${this.selectedBranch}/${this.selectedStatus}/${this.selectedCompany}`)
             .then(res=>{
-                // this.rows = res.data;
                 bus.$emit(`${typeofReportBus[this.selectedRepType]}Report`, res.data, this.status || '');
                 this.disabledBtn = false;
             })

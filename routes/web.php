@@ -250,6 +250,7 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/api/getSupplierAccreditationApprover', 'SupplierAccreditationController@getSupplierAccreditationApprover'); // get approvers
 
             // OVERRIDE FORM
+            Route::post('/api/search-override-emp', 'OverrideController@searchEmp');
             Route::post('/api/addoverride', 'OverrideController@addOverride');
             Route::post('/api/updateoverride', 'OverrideController@updateOverride');
             Route::post('/api/deleteoverride/{overrideID?}', 'OverrideController@deleteOverride');
@@ -421,9 +422,13 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/api/delAnnouncementLogical/{postID?}', 'AnnouncementController@delAnnouncementLogical');
 
                 // TAGGING
-            Route::get('/api/search-emp/{searchkey?}', 'AnnouncementController@searchEmp');
-            Route::get('/api/search-dept/{searchkey?}', 'AnnouncementController@searchDept');
-            Route::get('/api/search-comp/{searchkey?}', 'AnnouncementController@searchComp');
+            // Route::get('/api/search-emp/{searchkey?}', 'AnnouncementController@searchEmp');
+            // Route::get('/api/search-dept/{searchkey?}', 'AnnouncementController@searchDept');
+            // Route::get('/api/search-comp/{searchkey?}', 'AnnouncementController@searchComp');
+            
+            Route::post('/api/search-emp', 'AnnouncementController@searchEmp');
+            Route::post('/api/search-dept', 'AnnouncementController@searchDept');
+            Route::post('/api/search-comp', 'AnnouncementController@searchComp');
 
                 // COMMENTS
             Route::post('/api/addComment', 'CommentController@addComment');

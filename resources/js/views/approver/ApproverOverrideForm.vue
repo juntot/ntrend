@@ -20,7 +20,7 @@
                             <!-- <h4 class="modal-title">Modal Header</h4> -->
                         </div>
                         <div class="modal-body">
-                            <ManageOverrideForm :userinfo="$root.userinfo" :selected="selected"></ManageOverrideForm>
+                            <ManageOverrideForm :userinfo="$root.userinfo" :selected="selected" ></ManageOverrideForm>
                         </div>
                     </div>
                 </div>
@@ -129,7 +129,8 @@ export default {
                         var month = parseInt(dateA[0], 10);
                         var year = parseInt(dateA[2], 10);
                         var date = new Date(year, month - 1, day)
-                        x = date.getTime();
+                        // x = date.getTime();
+                        x = moment(a).valueOf();
                     }
                     catch (err) {
                         x = new Date().getTime();
@@ -147,7 +148,7 @@ export default {
                 }
             });
             this.dtHandle=$('#overrideform').DataTable({
-            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [0] }],
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [2] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
@@ -207,7 +208,9 @@ export default {
 
         let columnDefs = [
             {
-            title: "Override ID", data: 'overrideID', visible: false,
+            title: "Override #", data: 'overrideID', visible: true,
+        },{
+            title: "Division", data: 'division'
         },
         {
             title: "Date Override", data: 'dateoverride',
@@ -216,13 +219,10 @@ export default {
             title: "Customer Name", data: 'customer_name'
         },
         {
-            title: "Sales Employee", data: 'sales_employee'
+            title: "Creator", data: 'fullname'
         },
         {
-            title: "Sales Manager", data: 'sales_manager'
-        },
-        {
-            title: 'Mode', data: 'mode'
+            title: 'Amount of order', data: 'mode'
         },
         {
             title: "Status", data: 'status',

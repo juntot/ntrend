@@ -10,10 +10,22 @@ use Carbon\Carbon;
 
 class OverrideController extends Controller
 {
+
+    // get employee lsiting
+    public function searchEmp(){
+        $data = DB::select('select empID,  CONCAT(fname,", ",lname) as fullname 
+        from employee where (fname like :search OR lname like :search2) 
+        AND empID not IN( :empID, "00001" )
+        AND status = 1
+        order by fname limit 30',
+                [request('keyword').'%', request('keyword').'%', UserSession::getSessionID()]);
+        return $data;
+    }
     // get override
     function getOverride() {
+        
         $data = DB::select('select form.*,
-        DATE_FORMAT(form.dateoverride, "%m/%d/%Y") as dateoverride,
+        DATE_FORMAT(form.dateoverride, "%m/%d/%Y %h:%i %p") as dateoverride,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formoverride form 
         left join employee emp on
         form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
@@ -21,21 +33,33 @@ class OverrideController extends Controller
         $response = [];
         foreach ($data as $value) {
             // return $value->endorsedby_;
-            $endorsedId = $value->endorsedby_ ? $value->endorsedby_ : 'Null';
+            $endorsedId = explode(",", ($value->endorsedby_ ? $value->endorsedby_ : 'Null'));
             
-            $sql = 'select CONCAT(fname," ",lname) as endorser 
-            from employee
-                where empID IN ('.$endorsedId.')';
-            
-            $empname = DB::select($sql);
-            
-            if($empname){
+            if($endorsedId){
                 // $response[] = $empname;
                 $temp = [];
-                foreach ($empname as $emp) {
-                    $temp[] = $emp->endorser;
+                foreach ($endorsedId as $id) {
+                    $sql = 'select CONCAT(fname," ",lname) as endorser 
+                                from employee
+                            where empID = "'.$id.'"';
+                    
+                    $empname = DB::select($sql);
+                    if($empname) {
+                        $temp[] = $empname[0]->endorser;
+                    }
                 }
                 $value->endorsedby_  = implode(", ",$temp);
+
+            }
+
+            // get approver names
+            $sql = 'select CONCAT(fname," ",lname) as approvedby
+            from employee
+                where empID = :approver';
+            $approver = DB::select($sql, [$value->approvedby]);
+            
+            if($approver) {
+                $value->approvedby = $approver[0]->approvedby;
             }
             $response[] = $value;
             
@@ -50,11 +74,14 @@ class OverrideController extends Controller
         request()->merge([
             'dateoverride' => $now,
             'empID_' => UserSession::getSessionID(),
-            'commited_date' => UserSession::formatDate(request()->commited_date)
+            'commited_date' => UserSession::formatDate(request()->commited_date),
+            'status' => 0,
+            'recstat' => 0,
         ]);
         
         $id = DB::table('formoverride')->insertGetId(request()->except(['reciever_emails']));
-        request()->merge(['overrideID' => $id, 'status' => 0, 'dateoverride' => UserSession::formatDate($now, 'm/d/Y')]);
+        
+        request()->merge(['overrideID' => $id, 'status' => 0, 'dateoverride' => UserSession::formatDate($now, 'm/d/Y h:m A')]);
         
         // mail notification
         MailServices::sendNotify(request('reciever_emails'), UserSession::getSessionID(), 'OVERRIDE REQUEST');
@@ -67,11 +94,13 @@ class OverrideController extends Controller
 
     // update override
     public function updateOverride(){
+        date_default_timezone_set("Asia/Hong_Kong");
+        $now = Carbon::now();
         // SESSION ID
         request()->merge(['empID_' => UserSession::getSessionID(), 'status' => 0]);
-        $response = request()->except(['ísDisable']);
+        // $response = request()->except(['ísDisable']);
         request()->merge([
-            'dateoverride' => UserSession::formatDate(request()->dateoverride),
+            'dateoverride' => $now,
             'commited_date' => UserSession::formatDate(request()->commited_date),
         ]);
         
@@ -81,9 +110,13 @@ class OverrideController extends Controller
             ->where('status', 0)
             ->update(request()->except([
                 'overrideID', 'remarks', 
-                'approvedby', 'empID_', 'status'
+                'approvedby', 'empID_', 
+                'status', 'recstat'
             ]));
-        return $response;
+        request()->merge([
+            'dateoverride' => UserSession::formatDate($now, 'm/d/Y h:m A')
+        ]);
+        return request()->all();
     }
     // delete override
     public function deleteOverride($leaveID  = null){
@@ -101,7 +134,8 @@ class OverrideController extends Controller
     // GET  APPROVERS LIST NAME AND EMAIL
     public function getOverrideApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformapprover eform right join employee emp on eform.empID_ = emp.empID where eform.Leave0Form = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Override0Form = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Override0Form = 1 and eform.empID_ = :empiD', 
+        [UserSession::getSessionID()]);
         return $data;
     }
 
@@ -109,7 +143,7 @@ class OverrideController extends Controller
     public function approvalOverrideForm(){
 
         $data = DB::select('select eleave.*,
-                            DATE_FORMAT(eleave.dateoverride, "%m/%d/%Y") as dateoverride,
+                            DATE_FORMAT(eleave.dateoverride, "%m/%d/%Y %h:%i %p") as dateoverride,
                             CONCAT(emp.fname," ",emp.lname) as fullname, emp.email,
                             branch.branchname, pos.posname
                             from formoverride eleave left join eformapproverbyemp eform
@@ -126,23 +160,23 @@ class OverrideController extends Controller
                             [UserSession::getSessionID()]);
         $response = [];
         foreach ($data as $value) {
-            // return $value->endorsedby_;
-            $endorsedId = $value->endorsedby_ ? $value->endorsedby_ : 'Null';
+            $endorsedId = explode(",", ($value->endorsedby_ ? $value->endorsedby_ : 'Null'));
             
-            // get enderser names
-            $sql = 'select CONCAT(fname," ",lname) as endorser 
-            from employee
-                where empID IN ('.$endorsedId.')';
-            
-            $empname = DB::select($sql);
-            
-            if($empname){
+            if($endorsedId){
                 // $response[] = $empname;
                 $temp = [];
-                foreach ($empname as $emp) {
-                    $temp[] = $emp->endorser;
+                foreach ($endorsedId as $id) {
+                    $sql = 'select CONCAT(fname," ",lname) as endorser 
+                                from employee
+                            where empID = "'.$id.'"';
+                    
+                    $empname = DB::select($sql);
+                    if($empname) {
+                        $temp[] = $empname[0]->endorser;
+                    }
                 }
                 $value->endorsedby_  = implode(", ",$temp);
+
             }
 
             // get approver names
@@ -154,8 +188,6 @@ class OverrideController extends Controller
             if($approver) {
                 $value->approvedby = $approver[0]->approvedby;
             }
-            // dd($approver);   
-            // $response[] = $approver;
             $response[] = $value;
             
         }
@@ -181,11 +213,24 @@ class OverrideController extends Controller
                 ', 
                 [request('overrideID')]);
         
+
         switch (request('status')):
             // endore
             case 1:
+                
+                // find number of endorsers limit to 2
+                $sqlQuery = 'select overrideID from formoverride 
+                    where endorsedby_ LIKE "%,%"
+                    and overrideID = :ID';
+                     
+                $checkendorser = DB::select($sqlQuery, [request('overrideID')]);
+                if($checkendorser) {
+                    return request()->all();
+                }
+
                 $sqlQuery = '
-                update formoverride set status = :status, 
+                update formoverride set status = :status,
+                    remarks = "'.request('remarks').'",
                     endorsedby_ = 
                     IF(endorsedby_ IS NULL , "'.$user.'", 
                         CONCAT(
@@ -193,6 +238,7 @@ class OverrideController extends Controller
                         )
                     ),
                     endorseddate = "'.$now.'"
+                    
                 where 
                     (endorsedby_ NOT LIKE "%'.$user.'%" or endorsedby_ IS NULL)
                 and overrideID = :ID
@@ -201,7 +247,8 @@ class OverrideController extends Controller
             // approve
             case 2:
                 $sqlQuery = 'update formoverride set status = :status,
-                    approvedby = '.$user.', approveddate = "'.$now.'"
+                    approvedby = "'.$user.'", approveddate = "'.$now.'",
+                    remarks = "'.request('remarks').'"
                     WHERE overrideID = :ID
                 ';
                 
@@ -209,7 +256,8 @@ class OverrideController extends Controller
             //  rejected
             case 3:
                 $sqlQuery = 'update formoverride set status = :status,
-                    approvedby = '.$user.', approveddate = "'.$now.'"
+                    approvedby = "'.$user.'", approveddate = "'.$now.'",
+                    remarks = "'.request('remarks').'"
                     WHERE overrideID = :ID
                 ';
                 
@@ -235,6 +283,7 @@ class OverrideController extends Controller
                 break;
         endswitch;
         // return $sqlQuery;
+       
         DB::select($sqlQuery, [request('status'), request('overrideID')]);
         
         // // MAIL NOTIFICATION

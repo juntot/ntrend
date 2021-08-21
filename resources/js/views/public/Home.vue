@@ -705,7 +705,7 @@ export default {
 			if(regex.test((this.searchEmp))){
 				// let search = (this.searchEmp).replace(/[^a-zA-Z0-9-. ]/g, '');
 				let search = this.searchEmp;
-				axios.get('api/search-emp/'+search).then(res=>{
+				axios.post('api/search-emp', {keyword: search}).then(res=>{
 					if(res.data.length > 0 && res.status == 200){
 						this.empList = res.data;
 					}
@@ -720,7 +720,7 @@ export default {
 			if(regex.test((this.searchDept))){
 				// let search = (this.searchDept).replace(/[^a-zA-Z0-9-. ]/g, '');
 				let search = this.searchDept;
-				axios.get('api/search-dept/'+search).then(res=>{
+				axios.post('api/search-dept',{keyword: search}).then(res=>{
 					if(res.data.length > 0 && res.status == 200){
 						this.deptList = res.data;
 					}
@@ -736,7 +736,7 @@ export default {
 
 				// let search = (this.searchComp).replace(/[^a-zA-Z0-9-. ]/g, '');
 				let search = this.searchComp;
-				axios.get('api/search-comp/'+search).then(res=>{
+				axios.post('api/search-comp',{keyword: search}).then(res=>{
 					if(res.data.length > 0 && res.status == 200){
 						this.compList = res.data;
 					}

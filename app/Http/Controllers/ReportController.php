@@ -904,6 +904,44 @@ class ReportController extends Controller
                             ]);
                 return $data;
                 break;
+
+            // override form
+            case 'overrideform':
+                $data = DB::select('select overtime.*,
+                            CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname, dept.deptname, comp.compname,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = overtime.approvedby
+                            ) as approvedby
+                            from formoverride overtime right join employee emp
+                                on emp.empID = overtime.empID_
+                            inner join positiontbl pos
+                                on pos.posID = emp.posID_
+                            inner join department dept
+                                on dept.deptID = emp.deptID_
+                            inner join branchtbl branch
+                                on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
+                            WHERE
+                                (overtime.dateoverride BETWEEN :dateFrom AND :dateTo)
+                            AND
+                                emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
+                            AND
+                                overtime.status IN('.$status.')
+                            AND
+                                overtime.recstat != 1',
+                            [
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
+                                // $branch,
+                                // $status
+                                // UserSession::getSessionID()
+
+                            ]);
+                return $data;
+                break;
         endswitch;
         // return explode(",",$branch);
         return [];

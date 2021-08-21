@@ -283,7 +283,7 @@
 										<div class="panel-heading">
 											<h4 class="panel-title">
 											<!-- <a data-toggle="collapse" data-parent="#accordion" href="#collapseemp">MANAGE EMPLOYEE</a> -->
-												<router-link to="/supplemenentary-witness" @click.native="hideMobileNav" class="accordion-menu collapseall">
+												<router-link to="/supplementary-witness" @click.native="hideMobileNav" class="accordion-menu collapseall">
 													Witness Approval
 													<span v-show="witnessNotifs" class="pending-stat-notif">@{{witnessNotifs}}</span>
 

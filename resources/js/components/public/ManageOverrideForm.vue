@@ -8,31 +8,76 @@
                 </div>
                 <div class="col-md-8">
                     <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
+                        <!-- <div class="form-field__control">
                             <select :disabled="$parent.disabledinput" v-model="company" name="company" v-validate="'required'" class="form-field__input" 
                             >
-                                <option v-for="comp in compRows" :value="comp.name" :key="comp.id">{{comp.name}}</option>
+                                <option v-for="comp in compRows" 
+                                    :value="comp.name" 
+                                    :key="comp.id"
+                                    @click="selectCompany(comp)"
+                                >{{comp.name}}</option>
                             </select>
                             <label class="form-field__label">Company</label>
                             <div class="form-field__bar"></div>
                         </div>
-                        <span class="errors">{{ errors.first('company') }}</span>
+                        <span class="errors">{{ errors.first('company') }}</span> -->
+                        <div class="relative-pos">
+                            <div class="form-field__control">
+                                <input :disabled="$parent.disabledinput" type="text" :value="company"  v-validate="'required'" name="company"  class="form-field__input"
+                                @focus="compFocus = true"
+                                @blur="handleBlur"
+                                >
+                                <label class="form-field__label">Company</label>
+                                <div class="form-field__bar"></div>
+                            </div>
+                            <span class="errors">{{ errors.first('company') }}</span>
+                            <!-- loader and err msg -->
+                            <div v-if="loader2">
+                                <i class="fas fa-spinner fa-spin"></i> 
+                                <span class="errors" style="padding-left: 8px">{{errMsg}}</span>
+                            </div>
+                            <div class="absolute-pos bg-white suggestion_filter" 
+                                v-if="compFocus">
+                                <ul>
+                                    <li v-for="comp in compRows" 
+                                    @click.prevent="selectCompany(comp)"
+                                    :key="comp.id">
+                                        {{comp.name}}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <input :disabled="true" type="text" :value="status | txtStatus" name="status"  class="form-field__input">
+                            <input :disabled="true" type="text" :value="computedStatus" name="status"  class="form-field__input">
                             <label class="form-field__label">Status</label>
                             <div class="form-field__bar"></div>
                         </div>
                         <span class="errors">{{ errors.first('status') }}</span>
                     </div>
                 </div>
-                <div class="col-md-8">
+                <div class="clearfix"></div>
+                <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <select :disabled="$parent.disabledinput" v-model="division" name="division" v-validate="'required'" class="form-field__input" 
+                            <!-- <select :disabled="$parent.disabledinput" v-model="branch" name="branch" v-validate="'required'" readonly="true" class="form-field__input" 
+                            >
+                                <option v-for="branch in branchRows" :value="branch.name" :key="branch.id">{{branch.name}}</option>
+                            </select> -->
+                            <input :disabled="true" type="text" :value="branch" name="branch"  v-validate="'required'" class="form-field__input">
+                            <label class="form-field__label">Branch</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors" v-if="errBranch">{{ 'Unable to get branch name' }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <select :disabled="$parent.disabledinput || isDisable" v-model="division" name="division" v-validate="'required'" class="form-field__input" 
                             >
                                 <option v-for="div in divRows" :value="div.name" :key="div.id">{{div.name}}</option>
                             </select>
@@ -45,29 +90,50 @@
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" class="form-field__input" :value="dateoverride" name="dateoverride" readonly="true" >
-                            <label class="form-field__label">Date Override</label>
+                            <input :disabled="$parent.disabledinput || isDisable" type="text" class="form-field__input" :value="dateoverride" name="dateoverride" readonly="true" >
+                            <label class="form-field__label">Date & Time Override</label>
                             <div class="form-field__bar"></div>
                         </div>
                     </div>
                 </div>
+                <div class="clearfix"></div>
                 <div class="col-md-8">
                     <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <select :disabled="$parent.disabledinput" v-model="branch" name="branch" v-validate="'required'" class="form-field__input" 
-                            >
-                                <option v-for="branch in branchRows" :value="branch.name" :key="branch.id">{{branch.name}}</option>
-                            </select>
-                            <label class="form-field__label">Branch</label>
-                            <div class="form-field__bar"></div>
+                        <div class="relative-pos">
+                            <div class="form-field__control">
+                                <input :disabled="$parent.disabledinput || isDisable" type="text" v-model="search_customer" 
+                                    @keyup.prevent="getCustomer"
+                                    v-validate="'required'" name="customer name"  class="form-field__input">
+                                <label class="form-field__label">Customer Name</label>
+                                <div class="form-field__bar"></div>
+                            </div>
+                            <span v-if="!search_customer" class="errors">
+                                {{ search_customer && !customerList.length ? 
+                                    'customer not found':''||  errors.first('customer name') }}
+                            </span>
+                            <div class="absolute-pos bg-white suggestion_filter" 
+                                v-if="search_customer && !customer_name && customerList.length > 0 || loader  && !customer_name
+                            ">
+                                <!-- loader and err msg -->
+                                <div v-if="loader" style="padding-left: 8px">
+                                    <i class="fas fa-spinner fa-spin"></i> 
+                                    <span class="errors" style="padding-left: 8px">{{errMsg}}</span>
+                                </div>
+                                <ul>
+                                    <li v-for="customer in customerList" 
+                                    @click.prevent="selectedCustomer(customer)"
+                                    :key="customer.CardCode">
+                                        {{customer.CardName}}
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <span class="errors">{{ errors.first('branch') }}</span>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <select :disabled="$parent.disabledinput" v-model="mode" name="mode" v-validate="'required'" class="form-field__input" 
+                            <select :disabled="$parent.disabledinput || isDisable" v-model="mode" name="mode" v-validate="'required'" class="form-field__input" 
                             >
                                 <option value="PICK-UP">PICK-UP</option>
                                 <option value="DELIVERY IN-BASE">DELIVERY IN-BASE</option>
@@ -81,17 +147,39 @@
                 </div>
                 <div class="col-md-8">
                     <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="customer_name"  v-validate="'required'" name="customer name"  class="form-field__input">
-                            <label class="form-field__label">Customer Name</label>
-                            <div class="form-field__bar"></div>
+                        <div class="relative-pos">
+                            <div class="form-field__control">
+                                <input :disabled="$parent.disabledinput || isDisable" type="text" v-model="search_employee"  v-validate="'required'" name="sales employee"  class="form-field__input"
+                                @keyup.prevent="searchEmployee"
+                                >
+                                <label class="form-field__label">Sales Employee</label>
+                                <div class="form-field__bar"></div>
+                            </div>
+                            <span class="errors" v-if="!search_employee">{{ errors.first('sales employee') }}</span>
+                            <div class="absolute-pos bg-white suggestion_filter" 
+                                v-if="search_employee && !sales_employee && employeeList.length > 0
+                            ">
+                                <!-- loader and err msg -->
+                                <div v-if="loader">
+                                    <i class="fas fa-spinner fa-spin"></i> 
+                                    <span class="errors" style="padding-left: 8px">{{errMsg}}</span>
+                                </div>
+                                <ul>
+                                    <li v-for="emp in employeeList" 
+                                    @click.prevent="selectedEmployee(emp.fullname)"
+                                    :key="emp.empID">
+                                        {{emp.fullname}}
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <span class="errors">{{ errors.first('customer name') }}</span>
                     </div>
-                </div>
+                </div>  
                 <div class="col-md-4">
                             <div class="form-group-limitx">
-                                    <Datepicker :disabled="$parent.disabledinput" :value="commited_date"  wrapper-class="mdb-form-field" input-class="form-field__input datePicker" :typeable="false" :format="'MM/dd/yyyy'">
+                                    <Datepicker :disabled="$parent.disabledinput || isDisable" :value="commited_date"  wrapper-class="mdb-form-field" 
+                                    @selected="selectDateCommitment"
+                                    input-class="form-field__input datePicker" :typeable="false" :format="'MM/dd/yyyy'">
                                     <label slot="afterDateInput" class="form-field__label">Commitment date</label>
                                     <div slot="afterDateInput" class="form-field__bar"></div>
                                     <span slot="afterDateInput" class="errors">{{ errors.first('mname') }}</span>
@@ -100,18 +188,38 @@
                 </div>
                 <div class="col-md-8">
                     <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="sales_employee"  v-validate="'required'" name="sales employee"  class="form-field__input">
-                            <label class="form-field__label">Sales Employee</label>
-                            <div class="form-field__bar"></div>
+                        <div class="relative-pos">
+                            <div class="form-field__control">
+                                <input :disabled="$parent.disabledinput || isDisable" type="text" v-model="search_manager"  v-validate="'required'" name="sales manager"  class="form-field__input"
+                                @keyup.prevent="searchManager"
+                                >
+                                <label class="form-field__label">Sales Manager</label>
+                                <div class="form-field__bar"></div>
+                            </div>
+                            <span class="errors" v-if="!search_manager">{{ errors.first('sales manager') }}</span>
+                            <div class="absolute-pos bg-white suggestion_filter" 
+                                v-if="search_manager && !sales_manager && employeeList.length > 0
+                            ">
+                                <!-- loader and err msg -->
+                                <div v-if="loader">
+                                    <i class="fas fa-spinner fa-spin"></i> 
+                                    <span class="errors" style="padding-left: 8px">{{errMsg}}</span>
+                                </div>
+                                <ul>
+                                    <li v-for="emp in employeeList" 
+                                    @click.prevent="selectedEmployee(emp.fullname, 'manager')"
+                                    :key="emp.empID">
+                                        {{emp.fullname}}
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
-                        <span class="errors">{{ errors.first('sales employee') }}</span>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <select :disabled="$parent.disabledinput" v-model="commited_time" name="commmitment time" v-validate="'required'" class="form-field__input" 
+                            <select :disabled="$parent.disabledinput || isDisable" v-model="commited_time" name="commmitment time" v-validate="'required'" class="form-field__input" 
                             >
                                 <option value="MORNING">MORNING</option>
                                 <option value="AFTERNOON">AFTERNOON</option>
@@ -125,17 +233,17 @@
                 <div class="col-md-8">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="sales_manager"  v-validate="'required'" name="sales manager"  class="form-field__input">
-                            <label class="form-field__label">Sales Manager</label>
+                            <input :disabled="$parent.disabledinput || isDisable" v-validate="'required'" type="text" v-model="amount_order" class="form-field__input" name="amount of order" >
+                            <label class="form-field__label">Amount of Order</label>
                             <div class="form-field__bar"></div>
                         </div>
-                        <span class="errors">{{ errors.first('sales manager') }}</span>
+                        <span class="errors">{{ errors.first('amount of order') }}</span>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" v-validate="'required'" type="text" v-model="po_so" class="form-field__input" name="PO/SO" >
+                            <input :disabled="$parent.disabledinput || isDisable" v-validate="'required'" type="text" v-model="po_so" class="form-field__input" name="PO/SO" >
                             <label class="form-field__label">PO/SO</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -179,7 +287,7 @@
                                         </div>
                                     </div>
                                     <div class="clearfix"></div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-8">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
                                                 <input :disabled="$parent.disabledinput" type="text" v-model="current_stat"  v-validate="" name="current status"  class="form-field__input">
@@ -212,15 +320,23 @@
                                                 <table width="100%" class="table table-hover mdb-table" style="margin-bottom: 0">
                                                         <thead>
                                                             <tr>
-                                                                <th class="text-center" width="200px">Invoice#</th>
+                                                                <th class="text-center" style="
+                                                                    min-width: 89px; max-width: 89px !important;
+                                                                    width: 89px;
+                                                                ">
+                                                                    Invoice#
+                                                                </th>
                                                                 <th class="text-center">Invoice Date</th>
                                                                 <th class="text-center">Amount</th>
-                                                                <th class="text-center">Age</th>
+                                                                <th class="text-center" style="
+                                                                    min-width: 89px; max-width: 89px !important;
+                                                                    width: 89px;
+                                                                ">Age</th>
                                                                 <th class="text-center" colspan="2">Division</th>
                                                             </tr>
                                                             <tr v-show="!$parent.disabledinput">
                                                                 <td>
-                                                                    <div class="mdb-form-field form-group-limit">
+                                                                    <div class="mdb-form-field form-group-limitx">
                                                                         <div class="form-field__control form-field--is-filled">
                                                                             <input :disabled="$parent.disabledinput" type="text" name="invoice num" v-model="overdue_fields.invoice_num" class="form-field__input inline-input" >
                                                                             <div class="form-field__bar"></div>
@@ -229,7 +345,8 @@
                                                                     </div>
                                                                 </td>
                                                                 <td>
-                                                                    <Datepicker :disabled="$parent.disabledinput" :value="overdue_fields.invoice_date" wrapper-class="mdb-form-field" input-class="form-field__input datePicker inline-input" @selected="''" :typeable="false" :format="'MM/dd/yyyy'">
+                                                                    <Datepicker :disabled="$parent.disabledinput" :value="overdue_fields.invoice_date" wrapper-class="mdb-form-field" input-class="form-field__input datePicker inline-input" 
+                                                                    @selected="selectDateInvoice" :typeable="false" :format="'MM/dd/yyyy'">
                                                                         <div slot="afterDateInput" class="form-field__bar"></div>
                                                                     </Datepicker>
                                                                 </td>
@@ -252,15 +369,29 @@
                                                                     </div>
                                                                 </td>
                                                                 <td>
-                                                                    <div class="mdb-form-field form-group-limit">
+                                                                    <!-- <div class="mdb-form-field form-group-limit">
                                                                         <div class="form-field__control form-field--is-filled">
                                                                             <input :disabled="$parent.disabledinput" type="text" name="division" v-model="overdue_fields.division" class="form-field__input inline-input" >
                                                                             <div class="form-field__bar"></div>
                                                                         </div>
                                                                         <span class="errors">{{ errors.first('division') }}</span>
+                                                                    </div> -->
+                                                                    <div class="mdb-form-field form-group-limitx">
+                                                                        <div class="form-field__control form-field--is-filled">
+                                                                            <select :disabled="$parent.disabledinput" v-model="overdue_fields.division" name="division overdue" class="form-field__input inline-input" >
+                                                                                <option v-for="div in divRows" :value="div.name" :key="div.id">{{div.name}}</option>
+                                                                            </select>
+                                                                            <div class="form-field__bar"></div>
+                                                                        </div>
+                                                                        <span class="errors">{{ errors.first('division overdue') }}</span>
                                                                     </div>
                                                                 </td>
-                                                                <td class="text-right">
+                                                                <td class="text-right"
+                                                                style="
+                                                                    min-width: 50px; max-width: 65px !important;
+                                                                    width: 50px;
+                                                                "
+                                                                >
                                                                     <button class="btn btn-primary" @click.prevent="appendTable">add</button>
                                                                 </td>
                                                             </tr>
@@ -319,7 +450,7 @@
                             </div>
                             <div :id="3" :class="'panel-collapse collapse'">
                                 <div class="panel-body">
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
                                                 <input :disabled="$parent.disabledinput" type="text" v-model="cl"  v-validate="" name="CL"  class="form-field__input">
@@ -330,7 +461,7 @@
                                         </div>
                                     </div>
                                     <div class="clearfix"></div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
                                                 <input :disabled="$parent.disabledinput" type="text" v-model="ar"  v-validate="" name="A/R"  class="form-field__input">
@@ -341,7 +472,7 @@
                                         </div>
                                     </div>
                                     <div class="clearfix"></div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
                                                 <input :disabled="$parent.disabledinput" type="text" v-model="pdc"  v-validate="" name="PDC"  class="form-field__input">
@@ -352,7 +483,7 @@
                                         </div>
                                     </div>
                                     <div class="clearfix"></div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
                                                 <input :disabled="$parent.disabledinput" type="text" v-model="order"  v-validate="" name="Order"  class="form-field__input">
@@ -363,7 +494,7 @@
                                         </div>
                                     </div>
                                     <div class="clearfix"></div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
                                                 <input :disabled="$parent.disabledinput" type="text" v-model="total"  v-validate="" name="Total"  class="form-field__input">
@@ -384,17 +515,17 @@
                                             <span class="errors">{{ errors.first('excess') }}</span>
                                         </div>
                                     </div>
-                                    <div class="col-xs-5 col-sm-5 col-md-1">
+                                    <div class="col-xs-5 col-sm-5 col-md-2">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
-                                                <input :disabled="$parent.disabledinput" type="text" :value="100" name="lname"  class="form-field__input">
-                                                <label class="form-field__label">%</label>
+                                                <input :disabled="$parent.disabledinput" type="text" v-model="percent" name="percent"  class="form-field__input">
+                                                <label class="form-field__label">% (ex: 100)</label>
                                                 <div class="form-field__bar"></div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
                                                 <input :disabled="$parent.disabledinput" type="text" v-model="last_cl"  v-validate="" name="last CL"  class="form-field__input">
@@ -405,7 +536,7 @@
                                         </div>
                                     </div>
                                     <div class="clearfix"></div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-5">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
                                                 <input :disabled="$parent.disabledinput" type="text" v-model="commit_cl"  v-validate="" name="commitment CL"  class="form-field__input">
@@ -501,7 +632,8 @@
                                                                     </div>
                                                                 </td>
                                                                 <td>
-                                                                    <Datepicker :value="check_fields.check_date" wrapper-class="mdb-form-field" input-class="form-field__input datePicker inline-input" @selected="''" :typeable="false" :format="'MM/dd/yyyy'">
+                                                                    <Datepicker :value="check_fields.check_date" wrapper-class="mdb-form-field" input-class="form-field__input datePicker inline-input" 
+                                                                    @selected="selectDateCheck" :typeable="false" :format="'MM/dd/yyyy'">
                                                                         <div slot="afterDateInput" class="form-field__bar"></div>
                                                                     </Datepicker>
                                                                 </td>
@@ -538,9 +670,9 @@
                                         </div>
                                     </div>
                                     <div class="clearfix"></div>
-                                    <div class="col-md-12">
+                                    <div class="col-md-5">
                                         <br>
-                                        <div class="mdb-form-field form-group-limit">
+                                        <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
                                                 <input type="text" :disabled="$parent.disabledinput" v-model="paying_habit"  v-validate="" name="paying habit"  class="form-field__input">
                                                 <label class="form-field__label">Paying Habit (Past 3 Months)</label>
@@ -549,6 +681,7 @@
                                             <span class="errors">{{ errors.first('paying habit') }}</span>
                                         </div>
                                     </div>
+                                    <div class="clearfix"></div>
                                 </div>
                             </div>
                         </div>
@@ -590,7 +723,7 @@
                     <div class="col-md-3">
                         <div class="mdb-form-field form-group-limit">
                             <div class="form-field__control">
-                                <input :disabled="!$parent.$data.forapprover == 'approval'" type="text" class="form-field__input" :value="computedfullname" name="branch" readonly="true">
+                                <input :disabled="!$parent.$data.forapprover == 'approval'" type="text" class="form-field__input" :value="computedfullname" name="preparedby" readonly="true">
                                 <label class="form-field__label">Prepared By</label>
                                 <div class="form-field__bar"></div>
                             </div>
@@ -599,18 +732,18 @@
                     <div class="col-md-3" v-for="(val, index) in endorser" :key="index">
                         <div class="mdb-form-field form-group-limit">
                             <div class="form-field__control">
-                                <input :disabled="!$parent.$data.forapprover == 'approval'" type="text" class="form-field__input" :value="val || ''" name="branch" readonly="true">
+                                <input :disabled="!$parent.$data.forapprover == 'approval'" type="text" class="form-field__input" :value="val || ''" name="endorsement" readonly="true">
                                 <label class="form-field__label">
-                                    Endorsed By
+                                    {{index | endorsTerm}} Endorsement
                                 </label>
                                 <div class="form-field__bar"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4" v-show="selected.status > 1">
+                    <div class="col-md-3" v-show="selected.status > 1">
                         <div class="mdb-form-field form-group-limit">
                             <div class="form-field__control">
-                                <input :disabled="!$parent.$data.forapprover == 'approval'" type="text" class="form-field__input" :value="selected.approvedby || ''" name="branch" readonly="true">
+                                <input :disabled="!$parent.$data.forapprover == 'approval'" type="text" class="form-field__input" :value="selected.approvedby || ''" name="approve" readonly="true">
                                 <label class="form-field__label">Approved/Rejected By</label>
                                 <div class="form-field__bar"></div>
                             </div>
@@ -628,14 +761,14 @@
                 </div>
                 <div class="clearfix"></div>
                 <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addOverride" :disabled="isDisable || !isFormValid" v-if="!overrideID && $parent.$data.forapprover != 'approval'">
-                    <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateOverride" :disabled="isDisable || !isFormValid" v-if="overrideID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addOverride" :disabled="isDisable || !isFormValid || !customer_name" v-if="!overrideID && $parent.$data.forapprover != 'approval'">
+                    <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateOverride" :disabled="isDisable || !isFormValid || !customer_name" v-if="overrideID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteOverride" :disabled="isDisable" v-if="overrideID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
                     
-                    <input type="submit" class="btn btn-primary" value="Endorse" @click.prevent="requestActionOverride(1)" v-if="overrideID && $parent.$data.forapprover == 'approval' && selected.status < 1">
+                    <input type="submit" class="btn btn-primary" value="Endorse" @click.prevent="requestActionOverride(1)" v-if="overrideID && $parent.$data.forapprover == 'approval' && (!(selected.endorsedby_ || '').includes(userinfo.fullname) && selected.status < 2) && endorser.length < 2">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionOverride(2)" v-if="overrideID && $parent.$data.forapprover == 'approval' && selected.status != 2">
                     <input type="submit" class="btn btn-primary" value="Reject" @click.prevent="requestActionOverride(3)" v-if="overrideID && $parent.$data.forapprover == 'approval' && selected.status != 3">
-                    <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionOverride(0)" v-if="overrideID && $parent.$data.forapprover == 'approval' && selected.status >= 1">
+                    <!-- <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionOverride(0)" v-if="overrideID && $parent.$data.forapprover == 'approval' && selected.status >= 1"> -->
                 </div>
             </form>
 
@@ -645,6 +778,8 @@
 <script>
 // let leavetype = ['Sick Leave', 'Birthday Leave', 'Leave w/o Pay', 'Bereavement Leave', 'Vacation Leave', 'Others'];
 // let status = ['Pending', 'Approved', 'Rejected'];
+const countTerms = ['st', 'nd', 'rd', 'th'];
+
 let excludeBody = [
             'compRows',
             'divRows',
@@ -652,26 +787,58 @@ let excludeBody = [
             'check_fields',
             'overdue_fields',
             'reciever_emails',
-            'isDisable'
+            'isDisable',
+            'search_customer',
+            'customerList',
+            'employeeList',
+            'search_manager',
+            'search_employee',
+            'compFocus',
+            'selectedComp',
+            'loader',
+            'loader2',
+            'errBranch',
+            'errMsg'
         ];
 
 export default {
     props: ['userinfo', 'selected'],
     data() {
 		return {
+        search_customer: '',
+        search_manager: '',
+        search_employee: '',
+
+        customerList: [],
+        employeeList: [],
+
+        // customerData: {},
+        loader: false,
+        loader2: false,
+        errBranch: false,
+        isDisable: true,
+        compFocus: false,
+        
+
+        errMsg: '',
 
         empID_: '',
-        dateoverride: moment(new Date()).format('MM/DD/YYYY'),
+        dateoverride: moment(new Date()).format('MM/DD/YYYY hh:mm A'),
         mode: '',
         commited_time: '',
         commited_date: moment(new Date()).format('MM/DD/YYYY'),
         po_so: '',
+        // company
+        selectedComp: '',
         company: '',
+        // end
         division: '',
         branch: '',
         customer_name: '',
         sales_employee: '',
         sales_manager: '',
+        amount_order: '',
+        
         // reasons section
         reason: '',
         current_stat: '',
@@ -689,8 +856,9 @@ export default {
         check_type: [],
         additional_info: '',
         remarks: '',
-        isDisable: false,
+        
         overrideID:'',
+        percent: '',
         
         approvedby: '',
 
@@ -711,7 +879,6 @@ export default {
             amount: '',
         },
         status: 0,
-        isDisable: false,
         compRows: [],
         divRows: [],
         branchRows: [],
@@ -720,13 +887,16 @@ export default {
     watch:{
         userinfo(val, old){
             this.MDBINPUT();
-        }
+        },
+        
     },
     filters: {
-        txtStatus(val) {
-            return val == 0? 'Pending':
-                   val == 1 ? 'Endorsed':
-                   val == 2 ? 'Approved': 'Rejected'
+        endorsTerm(val) {
+            // return this.selected.endorsedby_
+            return val > 2? (val+1) + countTerms[3]: (val+1) + countTerms[val]
+            // return val == 0? 'Pending':
+            //        val == 1 ? 'Endorsed':
+            //        val == 2 ? 'Approved': 'Rejected'
         }
     },
     methods:{
@@ -748,8 +918,6 @@ export default {
                         
                     }
                 }
-                
-                
                 params['reciever_emails'] = this.$parent.reciever_emails;
                 
                 axios.post('api/addoverride', params).then(({data})=>{
@@ -783,7 +951,7 @@ export default {
             }
         },
         async deleteOverride(){
-            const reciever_emails = this.$parent.reciever_emails;
+            const reciever_emails = await this.$parent.reciever_emails;
             axios.post('api/deleteoverride/'+this.overrideID, {reciever_emails})
             .then(({data})=>{
                 this.$parent.deleteRow(this.overrideID);
@@ -791,45 +959,28 @@ export default {
             }).catch((err)=>{console.log(err);});
         },
          // ACTIONS FOR LEAVE I.E APPROVE / REJECT / CANCEL
-        requestActionOverride(status = null){
+        async requestActionOverride(status = null){
             let params =  {};
             for (const key in this.$data) {
                 if (!excludeBody.includes(key)) {
                     if(key == 'overdue_tbl' || key == 'check_tbl'){
                         params[key] = JSON.stringify(this.$data[key]);
                     } else if(key=='check_type') {
-                        params[key] = this.$data[key].toString();
+                        params[key] = await this.$data[key].toString();
                     }else {
-                        params[key] = this.$data[key];
+                        params[key] = await this.$data[key];
                     }
                     
                 }
             }
-            
-            
-            // Endorse
+            //  ENDORSE 
             if(status == 1) {
-                // params.endorsedby_ = this.userinfo.empID;
-                // params['empID_'] = this.$parent.$data.empID_;
-                // params['old_status'] = this.selected.status;
-                
-                // params['email'] = this.$parent.$data.selected.email;
-                // delete params.isDisable;
+                params.endorsedby_ = await params.endorsedby_? params.endorsedby_ + ','+(this.userinfo.fullname || '') 
+                                    : this.userinfo.fullname || '';
             }
-            // Approve
-            if(status == 2) {
-                // params.approvedby = this.userinfo.empID;
-            }
-            // Rejected
-            if(status == 3) {
-                // params.approvedby = this.userinfo.empID;
-            }
-
-            // canceled FROM approved / rejected status
-            if(status == 0 && this.status >= 2 ) {
-                // this will be use to verify in admin part to put back in endorsed status
-                // being cancelled from approved
-                params['stat'] = 1;
+            //  APPROVE
+            if(status >= 2) {
+                params.approvedby = (this.userinfo.fullname || '');
             }
 
             params['status'] = status;
@@ -837,6 +988,66 @@ export default {
                 this.$parent.updateRow(response.data);
                 $("#myModal").modal("hide");
             }).catch((err)=>{ console.log(err); });
+        },
+        handleBlur(e){
+            e.preventDefault();
+        },
+        selectCompany(val){
+            
+            this.selectedComp =  val.name;
+            this.company = val.name;
+            this.compFocus = false;
+            this.MDBINPUT();
+            
+            this.loader2 = true;
+            this.errMsg = '';
+            axios.get(SAP+'/login', {
+                company: val.name,
+                user: val.user,
+                pwd: val.pwd
+            })
+            .then(({data})=>{
+                this.isDisable = false;
+                this.loader2 = false;
+            }).catch(()=>this.errMsg = 'Network problem please contact your IT-Department');
+        },
+        selectedEmployee(val, tag = 'employee') {
+            if(tag == 'manager') {
+                this.search_manager = val;
+                this.sales_manager = val;
+            } else {
+                this.search_employee = val;
+                this.sales_employee = val;
+            }
+            
+        },
+        selectedCustomer(val) {
+            
+            this.search_customer = val.CardName;
+            this.customer_name = val.CardName;
+            this.isDisable = true;
+            this.errBranch = false;
+            axios.post(SAP+'/api', {
+                url: `BusinessPartnerGroups(${val.GroupCode})`,
+                method: 'GET',
+            }).then(async ({data})=>{
+                // this.customerData = val
+                this.branch = await data.Name; 
+                this.isDisable = false;
+                this.MDBINPUT();
+                // console.log(data);
+            }).catch(er=>{
+                this.errBranch = true;
+            });
+        },
+        selectDateCommitment(val){
+            this.commited_date = moment(val).format('MM/DD/YYYY');
+        },
+        selectDateInvoice(val){
+            this.overdue_fields['invoice_date'] = moment(val).format('MM/DD/YYYY');
+        },
+        selectDateCheck(val){
+            this.check_fields['check_date'] = moment(val).format('MM/DD/YYYY');
         },
         appendTable(){
             const tbl = Object.values(this.overdue_fields);
@@ -881,8 +1092,12 @@ export default {
                 ) {
                     this.$data[key] =  '';
                 }
-                if(key=='isDisable'){
+                if(key == 'loader' || key == 'errBranch' ||
+                   key == 'compFocus' || key == 'loader2'){
                     this.$data[key] = false;
+                }
+                if(key == 'isDisable') {
+                    this.$data[key] = true;
                 }
                 if(key == 'dateoverride' || key == 'commited_date'){
                     this.dateoverride = moment(new Date()).format('MM/DD/YYYY');
@@ -907,17 +1122,35 @@ export default {
             };
             $("#myModal").modal("hide");
         },
-        setDataForEdit(data = null){
+        async setDataForEdit(data = null){
             for(let i in data)
             {
-                this.$data[i] = data[i];
+                this.$data[i] = await data[i];
+                if(i == 'customer_name') {
+                    this.$data['search_customer'] = await data[i];
+                    // parse json data here for customerList
+                }
+                if(i == 'sales_employee') {
+                    this.$data['search_employee'] = await data[i];
+                    // parse json data here for customerList
+                }
+                if(i == 'sales_manager') {
+                    this.$data['search_manager'] = await data[i];
+                    // parse json data here for customerList
+                }
+                // if(i == 'customerData') {
+                //     let jsonCustomer = await JSON.parse(data[i]);
+                //     this.$data[i] = jsonCustomer;
+                //     this.$data['customerList'] = [jsonCustomer];
+                // }
                 if(i == 'check_tbl' || i == 'overdue_tbl')
-                    this.$data[i] = JSON.parse(data[i]);
+                    this.$data[i] = await JSON.parse(data[i]);
                 if(i == 'check_type' && data[i]) 
-                    this.$data[i] = (data[i]).split(",");
+                    this.$data[i] = await (data[i]).split(",");
                 if(i == 'check_type' && !data[i])
                     this.$data[i] = [];
             }
+            
             
             // console.log(data, this.$data);
             // return;
@@ -946,14 +1179,85 @@ export default {
                         }
                     );
              });
+        },
+        searchEmployee(){
+            this.loader = false;
+			let validSearch = /^[a-zA-Z0-9, Ññ)\._-]+$/g
+			let regex = RegExp(validSearch);
+            this.sales_employee = '';
+            this.errMsg = '';
+			if(regex.test((this.search_employee))){
+				
+                // FOR UPDATE GET ONLY THE LAST NAME
+                let search = '';
+                if(this.selected.overrideID) {
+                    search = (this.search_employee).split(", ");
+                    search = search[0];
+                    // return;
+                }else{
+                    search = this.search_employee;
+                }
+                
+                
+				axios.post('api/search-override-emp',{keyword: search}).then(res=>{
+					if(res.data.length > 0 && res.status == 200){
+						this.employeeList = res.data;
+					}
+                    this.loader = false;
+				})
+				.catch(err => this.errMsg = 'Network problem please contact your IT-Department');
+			}
+
+		},
+        searchManager(){
+            this.loader = false;
+			let validSearch = /^[a-zA-Z0-9, Ññ)\._-]+$/g
+			let regex = RegExp(validSearch);
+            this.sales_manager = '';
+            this.errMsg = '';
+			if(regex.test((this.search_manager))){
+				
+                let search = '';
+                if(this.selected.overrideID) {
+                    search = (this.search_manager).split(", ");
+                    search = search[0];
+                    // return;
+                }else{
+                    search = this.search_manager;
+                }
+                
+				axios.post('api/search-override-emp',{keyword: search}).then(res=>{
+					if(res.data.length > 0 && res.status == 200){
+						this.employeeList = res.data;
+					}
+                    this.loader = false;
+				})
+				.catch(err => this.errMsg = 'Network problem please contact your IT-Department');
+			}
+
+		},
+        getCustomer(){
+            this.customer_name = '';
+            this.errMsg = '';
+            this.loader = true;
+            axios.post(SAP+'/api', {
+                url: `BusinessPartners?$select=CardCode,EmailAddress, GroupCode,CardName,CardType&$filter=startswith(CardName, '${(this.search_customer.trim()).toUpperCase()}') &$orderby=CardCode&$top=1000`,
+                method: 'GET',
+            }).then(({data})=>{
+                this.loader = false;
+                this.customerList = data.value; 
+            }).catch(()=>{
+                this.errMsg = 'Network problem please contact your IT-Department';
+            });
         }
     },
     computed:{
         isFormValid(){
-            return !Object.keys(this.fields).some(key => this.fields[key].invalid);
+            return !Object.keys(this.fields).some(key => this.fields[key].invalid) 
+                    && !this.errBranch && this.sales_employee && this.sales_manager;
         },
         endorser(){
-            return this.selected.endorsedby_? this.selected.endorsedby_.split(',') : [];
+            return (this.selected.endorsedby_? this.selected.endorsedby_.split(',') : []);
         },
        
         computedfullname(){
@@ -964,6 +1268,26 @@ export default {
         },
         computedbranchname(){
             return this.selected.hasOwnProperty('fullname') ? this.selected.branchname  : this.userinfo.branchname;
+        },
+        computedStatus() {
+            const val = this.status;
+            let endorseCount = (this.selected.endorsedby_? this.selected.endorsedby_.split(',') : []).length;
+            
+            const lastdigit = endorseCount.toString().split('').pop();
+            if(lastdigit == '1'){
+                endorseCount = endorseCount+countTerms[endorseCount-1];
+            } else if(lastdigit == '2') {
+                endorseCount = endorseCount+countTerms[endorseCount-1];
+            } else if(lastdigit == '3') {
+                endorseCount = endorseCount+countTerms[endorseCount-1];
+            } else if(lastdigit == '11') {
+                endorseCount = endorseCount+countTerms[3];
+            }else {
+                endorseCount = endorseCount+countTerms[endorseCount-1];
+            }
+            return val == 0? 'Pending':
+                   val == 1 ? endorseCount + ' Endorsement':
+                   val == 2 ? 'Approved': 'Rejected'
         }
     },
 
@@ -994,6 +1318,7 @@ export default {
                 }
             });
         });
+       
     },
     beforeDestroy(){
         bus.$off('setupdate', this.test)

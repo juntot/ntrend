@@ -5,7 +5,7 @@
         </div>
         <div class="clearfix"></div>
         <!-- dates -->
-        <div class="col-md-6 nopadding-left">
+        <div class="col-md-12 nopadding">
             <br>
             <div class="col-md-12 bgc-white">
                 <p class="orange-text">Company</p>
@@ -17,26 +17,37 @@
                     <thead>
                         <tr>
                             <th>Company Name</th>
+                            <th>User</th>
+                            <th>Password</th>
                             <th>Operation</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(val, index) in compRows" :key="index">
-                            <td :id="val.id" data-type="company">{{val.name}}</td>
-                            <td><button type="button" class="btn btn-danger remove-override">Delete</button></td>
+                        <tr v-for="(val, index) in compRows" :key="index" @click="selected = val">
+                            <td>{{val.name}}</td>
+                            <td>user</td>
+                            <td  :id="val.id" :data-type="'company'">{{'12345' | filterPass}}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary retest-connection">Test Connection</button>
+                                <button type="button" class="btn btn-danger remove-override">Delete</button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
                 <br>
             </div>
         </div>
-        <div class="col-md-6 nopadding-right">
+        <div class="col-md-12 nopadding">
             <br>
             <div class="col-md-12 bgc-white">
                 <p class="orange-text">Division</p>
                 <div class="col-md-6 nopadding with-margin-bottom">
                     <button class="btn btn-primary" data-toggle="modal" data-target="#myModal"
-                    @click.prevent="type = 'division'">Add New</button>
+                    @click.prevent="
+                        type = 'division', 
+                        overrideFields.user = 'test', 
+                        overrideFields.pwd = 'test'
+                    ">Add New</button>
                 </div>
                 <table id="override-division-tbl" class="mdl-data-table" style="width: 100%">
                     <thead>
@@ -46,8 +57,8 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(val, index) in divRows" :key="index">
-                            <td :id="val.id" data-type="division">{{val.name}}</td>
+                        <tr v-for="(val, index) in divRows" :key="index" @click="selected = val">
+                            <td :id="val.id" :data-type="'division'">{{val.name}}</td>
                             <td><button type="button" class="btn btn-danger remove-override">Delete</button></td>
                         </tr>
                     </tbody>
@@ -58,30 +69,6 @@
 
         <div class="clearfix"></div>
         <br>
-        <div class="col-md-12 bgc-white">
-            <div class="bgc-white">
-                <p class="orange-text">Branch</p>
-                <div class="col-lg-6 col-md-6  with-margin-bottom nopadding" >
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#myModal"
-                    @click.prevent="type = 'branch'">Add New</button>
-                </div>
-                <table id="override-branch-tbl" class="mdl-data-table" style="width: 100%">
-                    <thead>
-                        <tr>
-                            <th>Branch Name</th>
-                            <th>Operation</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="(val, index) in branchRows" :key="index">
-                            <td :id="val.id" data-type="branch">{{val.name}}</td>
-                            <td><button type="button" class="btn btn-danger remove-override">Delete</button></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <br>
-            </div>
-        </div>
          <!-- Modal -->
             <div id="myModal" class="modal fade" role="dialog">
                 <div class="modal-dialog">
@@ -103,6 +90,27 @@
                                     <span class="errors">{{ errors.first('branch name') }}</span>
                                 </div>
                             </div>
+                            <div class="col-md-12" v-show="type == 'company'">
+                                <div class="mdb-form-field">
+                                    <div class="form-field__control">
+                                        <input type="text" v-validate="'required'" v-model="overrideFields.user" class="form-field__input" name="user">
+                                        <label class="form-field__label">User Name</label>
+                                        <div class="form-field__bar"></div>
+                                    </div>
+                                    <span class="errors">{{ errors.first('user') }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-12" v-show="type == 'company'">
+                                <div class="mdb-form-field">
+                                    <div class="form-field__control">
+                                        <input type="text" v-validate="'required'" v-model="overrideFields.pwd" class="form-field__input" name="password">
+                                        <label class="form-field__label">Password</label>
+                                        <div class="form-field__bar"></div>
+                                    </div>
+                                    <span class="errors">{{ errors.first('password') }}</span>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
                             <div class="col-lg-12 modal-footer">
                                 <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="add" v-if="!isUpdate" :disabled="!isFormValid">
                                 <input type="submit" class="btn btn-primary" value="Update" @click.prevent="update" v-if="isUpdate" :disabled="!isFormValid" >
@@ -116,13 +124,53 @@
 
                 </div>
             </div>
+
+        <!-- Modal2 -->
+            <div id="myModal2" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <!-- <h4 class="modal-title">Modal Header</h4> -->
+                        </div>
+                        <div class="modal-body text-center">
+                            <p class="text-center" v-if="loader" style="color: orange; padding-bottom: 25px;">
+                                <i class="fas fa-spinner fa-spin" style="font-size: 4em;"></i> 
+                            </p>
+                            <p class="text-center" v-if="!loader" style="color: orange; padding-bottom: 25px;">
+                                <i class="fas fa-plane-departure" style="font-size: 4em;"></i> 
+                            </p>
+                            <h5>
+                                {{errMsg}}
+                            </h5>
+                            
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="modal-footer" style="padding-bottom: 15px;">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
     </div>
 </template>
 <script>
-
+const exclude = [
+    'selected'
+];
 export default {
     data(){
         return{
+            loader: false,
+            errMsg: `Please wait while checking your credentials`,
+            selected: {
+                name: '',
+                user: 'test',
+                pwd: 'test',
+            },
             compRows: [
                 {id: 1, name: 'aw'},
                 {id: 123, name: 'aw2'}
@@ -132,6 +180,8 @@ export default {
             branchRows: [],
             overrideFields: {
                 name: '',
+                user: '',
+                pwd: '',
             },
             type: 'company',
             isUpdate: false,
@@ -139,22 +189,14 @@ export default {
     },
     watch:{
         rows(val, old){
-            // let row = val;
-
-            // row.forEach((item, index)=>{
-            //     // if(!isNaN(item.leavetype) && !isNaN(item.status)){
-            //         row[index]['formtype'] = this.selected_type.formtitle;
-            //     // }
-            // });
-
-            // this.dtHandle.clear();
-            // this.dtHandle.rows.add(row);
-            // this.dtHandle.draw();
         },
     },
     filters:{
         capitalize(value){
             return value.charAt(0).toUpperCase() + value.slice(1)
+        },
+        filterPass(val){
+            return (val).split("").reduce((acc, val) => acc+='*', '');
         }
     },
     computed:{
@@ -176,18 +218,21 @@ export default {
     methods:{
         add(){
             if(!this.overrideFields.name) return true;
+
             const data = {...this.overrideFields, type: this.type};
+            if(this.type == 'division') {
+                delete data.user;
+                delete data.pwd;
+            }
+            
             axios.post('api/add-override-company', data)
             .then( async ({data})=>{
-                const newRec = await {...this.overrideFields, id: data.id};
+                const newRec = await {...data, id: data.id};
                 if(this.type == 'company') {
                     await this.compRows.push(newRec);
                 }
                 if(this.type == 'division') {
                     await this.divRows.push(newRec);
-                }
-                if(this.type == 'branch') {
-                    await this.branchRows.push(newRec);
                 }
                 $('.modal').modal('hide');
             });
@@ -195,13 +240,20 @@ export default {
         update(){
             if(!this.overrideFields.name) return true;
             const data = {...this.overrideFields, type: this.type};
-
+            
+            // const data = {...this.overrideFields, type: this.type};
+            if(this.type == 'division') {
+                delete data.user;
+                delete data.pwd;
+            }
             // mange update
             const inputData = this.overrideFields;
             const updateRow = (row) =>{
                 for (const iterator of this[row]) {
                     if(iterator.id == inputData.id) {
                         iterator.name = inputData.name;
+                        iterator.user = inputData.user;
+                        iterator.pwd = inputData.pwd;
                     }
                 }
             }
@@ -217,9 +269,6 @@ export default {
 
                 if(this.type == 'division') {
                     updateRow('divRows');
-                }
-                if(this.type == 'branch') {
-                    updateRow('branchRows');
                 }
                 $('.modal').modal('hide');
             });
@@ -243,18 +292,35 @@ export default {
                         const rows = this.divRows.filter(data=>data.id != obj.id);
                         this.divRows = rows;
                     }
-                    if(obj.type == 'branch') {
-                        const rows = this.branchRows.filter(data=>data.id != obj.id);
-                        this.branchRows = rows;
-                    }
                 });
             }
         },
-        setUpdate(data, type){
-            this.overrideFields = data;
+        async setUpdate(data, type){
+            
+            this.overrideFields['name'] = this.selected.name;            
             this.type = type;
+            
+            this.overrideFields['id'] = this.selected.id;
+            this.overrideFields['user'] = type=='company'? this.selected.user : 'test';
+            this.overrideFields['pwd'] =  type=='company'? this.selected.pwd  : 'test';
+            
             $('#myModal').modal('show');
             this.MDBINPUT();
+            
+        },
+        testConnection(){
+            this.loader = true;
+            $('#myModal2').modal('show');
+            axios.get(SAP+'/login', {
+                company: this.selected.name || '',
+                user: this.selected.user || '',
+                pwd: this.selected.pwd || ''
+            }).then(()=>{
+                this.loader = false;
+            }).catch(er=>{
+                this.errMsg = `Network connection error. Please check SAP API Server if you are connected`;
+            });
+            
         },
         MDBINPUT(){
             this.$nextTick(() => {
@@ -282,8 +348,11 @@ export default {
         closeModal(){
             this.overrideFields = {
                 name: '',
-                id: '',
-            }
+                user: '',
+                pwd: ''
+            };
+            this.loader = false;
+            this.errMsg = '';
             this.isUpdate = false;
         },
     },
@@ -300,11 +369,8 @@ export default {
                 if(val.type == 'company') {
                     this.compRows = JSON.parse(val.json);
                 }
-                else if(val.type == 'division') {
+                else if(val.type == 'division'){
                     this.divRows = JSON.parse(val.json)
-                }
-                else {
-                    this.branchRows = JSON.parse(val.json);
                 }
             });
         });
@@ -321,16 +387,26 @@ export default {
             isremove = true;
         });
 
+        $("tbody").on('click', 'button.retest-connection', function() {
+            const data = $(this).closest("tr")   // Finds the closest row <tr> 
+                    .find("td") 
+                    .siblings(":last");
+            self.testConnection();
+            isremove = true;
+        });
+
         $("tbody").on('click', 'tr', function() {
             if(!isremove) {
                 self.isUpdate = true;
                 const data = $(this).closest("tr")   // Finds the closest row <tr> 
                        .find("td") 
                        .siblings(":last");
-                
+                // console.log(data.attr('id'), data.data('type'));
                 self.setUpdate({id: data.attr('id'), name: data.text()}, data.data('type'));
             }
+            isremove = false;    
         });
+        
         
     }
 }
