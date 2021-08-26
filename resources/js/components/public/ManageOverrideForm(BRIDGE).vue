@@ -64,7 +64,7 @@
                     <div class="mdb-form-field form-group-limitx">
                         <div class="relative-pos">
                             <div class="form-field__control">
-                                <input :disabled="disableCustomerField || $parent.disabledinput || isDisable || !company" type="text" v-model="search_customer" 
+                                <input :disabled="$parent.disabledinput || isDisable" type="text" v-model="search_customer" 
                                     @keyup.prevent="getCustomer"
                                     v-validate="'required'" name="customer name"  class="form-field__input">
                                 <label class="form-field__label">Customer Name</label>
@@ -272,17 +272,14 @@
                             <div :id="1" :class="'panel-collapse collapse'">
                                 <div class="panel-body">
                                     <div class="col-md-8">
-                                        <div class="mdb-form-field form-group-limitx form-field--is-filled">
+                                        <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
                                                 <select :disabled="$parent.disabledinput" v-model="reason" name="reason" v-validate="" class="form-field__input" 
                                                 >
-                                                    <option value="">SELECT OPTIONS</option>
                                                     <option value="BOUNCED CHECKS">BOUNCED CHECKS</option>
                                                     <option value="LONG TERM COLLECTION">LONG TERM COLLECTION</option>
                                                     <option value="LONG OVERDUE">LONG OVERDUE</option>
                                                     <option value="DORMANT">DORMANT</option>
-                                                    <option value="HOLD/MOVED CHECKS">HOLD/MOVED CHECKS</option>
-
                                                 </select>
                                                 <label class="form-field__label">Reason</label>
                                                 <div class="form-field__bar"></div>
@@ -454,6 +451,61 @@
                             </div>
                             <div :id="3" :class="'panel-collapse collapse'">
                                 <div class="panel-body">
+                                    <div class="col-md-5">
+                                        <div class="mdb-form-field form-group-limitx">
+                                            <div class="form-field__control">
+                                                <input :disabled="$parent.disabledinput" type="text" v-model="cl"  v-validate="" name="CL"  class="form-field__input">
+                                                <label class="form-field__label">CL</label>
+                                                <div class="form-field__bar"></div>
+                                            </div>
+                                            <span class="errors">{{ errors.first('CL') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-md-5">
+                                        <div class="mdb-form-field form-group-limitx">
+                                            <div class="form-field__control">
+                                                <input :disabled="$parent.disabledinput" type="text" v-model="ar"  v-validate="" name="A/R"  class="form-field__input">
+                                                <label class="form-field__label">A/R</label>
+                                                <div class="form-field__bar"></div>
+                                            </div>
+                                            <span class="errors">{{ errors.first('A/R') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-md-5">
+                                        <div class="mdb-form-field form-group-limitx">
+                                            <div class="form-field__control">
+                                                <input :disabled="$parent.disabledinput" type="text" v-model="pdc"  v-validate="" name="PDC"  class="form-field__input">
+                                                <label class="form-field__label">PDC</label>
+                                                <div class="form-field__bar"></div>
+                                            </div>
+                                            <span class="errors">{{ errors.first('PDC') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-md-5">
+                                        <div class="mdb-form-field form-group-limitx">
+                                            <div class="form-field__control">
+                                                <input :disabled="$parent.disabledinput" type="text" v-model="order"  v-validate="" name="Order"  class="form-field__input">
+                                                <label class="form-field__label">ORDER</label>
+                                                <div class="form-field__bar"></div>
+                                            </div>
+                                            <span class="errors">{{ errors.first('Order') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-md-5">
+                                        <div class="mdb-form-field form-group-limitx">
+                                            <div class="form-field__control">
+                                                <input :disabled="$parent.disabledinput" type="text" v-model="total"  v-validate="" name="Total"  class="form-field__input">
+                                                <label class="form-field__label">TOTAL</label>
+                                                <div class="form-field__bar"></div>
+                                            </div>
+                                            <span class="errors">{{ errors.first('Total') }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
                                     <div class="col-xs-7 col-sm-7 col-md-3">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
@@ -533,16 +585,16 @@
                                     </div>
                                     <div class="col-md-4">
                                         <div class="group">
-                                            <label class="checkbox-lbl mdblbl inline-blocklbl mdblblradio">Pulled Out-long Term
-                                            <input :disabled="$parent.disabledinput" type="checkbox" value="Pulled Out-long Term" v-model="check_type">
+                                            <label class="checkbox-lbl mdblbl inline-blocklbl mdblblradio">Puled Out-long Term
+                                            <input :disabled="$parent.disabledinput" type="checkbox" value="Puled Out-long Term" v-model="check_type">
                                             <span class="mdbcheckmark"></span>
                                             </label>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="group">
-                                            <label class="checkbox-lbl mdblbl inline-blocklbl mdblblradio">Pulled Out-Error Details
-                                            <input :disabled="$parent.disabledinput" type="checkbox" value="Pulled Out-Error Details" v-model="check_type">
+                                            <label class="checkbox-lbl mdblbl inline-blocklbl mdblblradio">Puled Out-Error Details
+                                            <input :disabled="$parent.disabledinput" type="checkbox" value="Puled Out-Error Details" v-model="check_type">
                                             <span class="mdbcheckmark"></span>
                                             </label>
                                         </div>
@@ -644,80 +696,6 @@
                     <h5 class="form-subtitle"><em>&nbsp;</em></h5>
                 </div> -->
                 <hr style="border-top: 8px solid #1F7193">
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="cl"  v-validate="'required'" name="CL"  class="form-field__input">
-                            <label class="form-field__label">CL</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('CL') }}</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="pdc"  v-validate="'required'" name="PDC"  class="form-field__input">
-                            <label class="form-field__label">PDC</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('PDC') }}</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="total"  v-validate="'required'" name="Total"  class="form-field__input">
-                            <label class="form-field__label">TOTAL</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('Total') }}</span>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="ar"  v-validate="'required'" name="A/R"  class="form-field__input">
-                            <label class="form-field__label">A/R</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('A/R') }}</span>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="order"  v-validate="'required'" name="Order"  class="form-field__input">
-                            <label class="form-field__label">ORDER</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('Order') }}</span>
-                    </div>
-                </div>
-                <div class="col-xs-7 col-sm-7 col-md-2">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="excess2"  v-validate="'required'" name="excess2"  class="form-field__input">
-                            <label class="form-field__label">EXCESS</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('excess2') }}</span>
-                    </div>
-                </div>
-                <div class="col-xs-5 col-sm-5 col-md-2">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="percent2" v-validate="'required'" name="percent2"  class="form-field__input">
-                            <label class="form-field__label">% (ex: 100)</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('percent2') }}</span>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-
                 <div class="col-lg-12">
                 <h5 class="form-subtitle"></h5>
                     <div class="mdb-form-field">
@@ -821,16 +799,13 @@ let excludeBody = [
             'loader',
             'loader2',
             'errBranch',
-            'errMsg',
-            'headers',
-            'disableCustomerField'
+            'errMsg'
         ];
 
 export default {
     props: ['userinfo', 'selected'],
     data() {
 		return {
-        // headers: '',
         search_customer: '',
         search_manager: '',
         search_employee: '',
@@ -844,7 +819,6 @@ export default {
         errBranch: false,
         isDisable: false,
         compFocus: false,
-        disableCustomerField: true,
         
 
         errMsg: '',
@@ -877,7 +851,6 @@ export default {
         order: '',
         total: '',
         excess: '',
-        excess2: '',
         last_cl: '',
         commit_cl: '',
         paying_habit: '',
@@ -887,7 +860,6 @@ export default {
         
         overrideID:'',
         percent: '',
-        percent2: '',
         
         approvedby: '',
 
@@ -1030,29 +1002,19 @@ export default {
             this.selectedComp =  val.name;
             this.company = val.name;
             this.compFocus = false;
-            this.disableCustomerField = true;
-            this.customerList = [];
             this.MDBINPUT();
-            
             
             this.loader2 = true;
             this.errMsg = '';
-            
-            axios.post('api/override-login', {
-                id: val.id,
-                type: 'company',
+            axios.post(SAP+'/login', {
+                company: val.name,
+                user: val.user,
+                pwd: val.pwd
             })
-            .then(({status})=>{
-                if(status == 200) {
-                    this.isDisable = false;
-                    this.loader2 = false;
-                    this.disableCustomerField = false;
-                }else{
-                    this.errMsg = 'An error occured when connecting please contact your IT-Department';    
-                }
-                
-            }).catch((e)=>{
-                console.log(e);
+            .then(({data})=>{
+                this.isDisable = false;
+                this.loader2 = false;
+            }).catch(()=>{
                 this.errMsg = 'Unable to connect to SAP-DB please contact your IT-Department';
                 this.isDisable = true;
             });
@@ -1073,20 +1035,14 @@ export default {
             this.customer_name = val.CardName;
             this.isDisable = true;
             this.errBranch = false;
-            axios.post(`api/consume-api`,{
-                path: `BusinessPartnerGroups(${val.GroupCode})`,
-                method: 'GET'
-            })
-            .then(async ({data})=>{
+            axios.post(SAP+'/api', {
+                url: `BusinessPartnerGroups(${val.GroupCode})`,
+                method: 'GET',
+            }).then(async ({data})=>{
                 // this.customerData = val
-                if(data.status == 200) {
-                    this.branch = await data.data.Name; 
-                    this.isDisable = false;
-                    this.MDBINPUT();
-                }else{
-                    this.errBranch = true;    
-                }
-                
+                this.branch = await data.Name; 
+                this.isDisable = false;
+                this.MDBINPUT();
                 // console.log(data);
             }).catch(er=>{
                 this.errBranch = true;
@@ -1186,7 +1142,7 @@ export default {
                 check_date: moment(new Date()).format('MM/DD/YYYY'),
                 amount: '',
             };
-            this.$data['disableCustomerField'] = true;
+            
             // $("#myModal").modal("hide");
         },
         async setDataForEdit(data = null){
@@ -1218,6 +1174,7 @@ export default {
                 if(i == 'check_type' && !data[i])
                     this.$data[i] = [];
             }
+            
             
             // console.log(data, this.$data);
             // return;
@@ -1253,7 +1210,6 @@ export default {
 			let regex = RegExp(validSearch);
             this.sales_employee = '';
             this.errMsg = '';
-            
 			if(regex.test((this.search_employee))){
 				
                 // FOR UPDATE GET ONLY THE LAST NAME
@@ -1308,35 +1264,12 @@ export default {
             this.customer_name = '';
             this.errMsg = '';
             this.loader = true;
-            
-            // const axiosConfig = {
-            //     headers: {
-            //         'content-Type': 'application/json',
-            //         "Accept": "/",
-            //         "Cache-Control": "no-cache",
-            //         "Cookie": document.cookie
-            //     },
-            //     credentials: "same-origin"
-            // };
-            
-            // axios.defaults.withCredentials = true;
-
-            // axios.get(`${SAP}/BusinessPartners?$select=CardCode,EmailAddress, 
-            //     GroupCode,CardName,CardType&$filter=startswith(CardName, 
-            // '${(this.search_customer.trim()).toUpperCase()}') &$orderby=CardCode&$top=1000`)
-            
-            axios.post(`api/consume-api`,{
-                path: `BusinessPartners?$select=CardCode,EmailAddress,GroupCode,CardName,CardType&$filter=startswith(CardName,\'${(this.search_customer.trim()).toUpperCase()}\')&$orderby=CardCode&$top=1000`,
-                method: 'GET'
-            })
-            .then(({data})=>{
-                if(data.status == 200) {
-                    this.loader = false;
-                    this.customerList = data.data.value;     
-                }else{
-                    this.errMsg = 'Invalid data please try again';
-                }
-                
+            axios.post(SAP+'/api', {
+                url: `BusinessPartners?$select=CardCode,EmailAddress, GroupCode,CardName,CardType&$filter=startswith(CardName, '${(this.search_customer.trim()).toUpperCase()}') &$orderby=CardCode&$top=1000`,
+                method: 'GET',
+            }).then(({data})=>{
+                this.loader = false;
+                this.customerList = data.value; 
             }).catch(()=>{
                 this.errMsg = 'Network problem please contact your IT-Department';
             });
@@ -1401,7 +1334,7 @@ export default {
         .then(({data})=>{
             data.forEach( val => {
                 if(val.type == 'company') {
-                    this.compRows = (val.json);
+                    this.compRows = JSON.parse(val.json);
                 }
                 else if(val.type == 'division') {
                     this.divRows = JSON.parse(val.json)

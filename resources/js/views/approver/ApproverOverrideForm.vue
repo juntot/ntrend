@@ -7,6 +7,54 @@
 			{{formtitle}}
 		</div>
         <div class="col-lg-12 margin-15">
+            <div class="col-md-6">
+                    <div :class="openFilter?'dropdown open':'dropdown'">
+                    <button class="btn btn-primary dropdown-toggle" type="button" @click.prevent="openFilter = !openFilter">
+                        Filter Status
+                    <span class="caret"></span></button>
+                    
+                    <ul class="dropdown-menu" style="padding: 10px">
+                        <button type="button" class="close" 
+                        
+                        @click="openFilter = !openFilter">x</button>
+                        <li style="padding: 4px 15px">
+                            <label>
+                                <input type="checkbox" value="0" v-model="status" name="status" >
+                                <span class="mdbcheckmark"></span>
+                                Pending
+                            </label>
+                        </li>
+                        <li style="padding: 4px 15px">
+                            <label>
+                                <input type="checkbox" value="1.0" v-model="status" name="status" >
+                                <span class="mdbcheckmark"></span>
+                                1st Endorsement
+                            </label>
+                        </li>
+                        <li style="padding: 4px 15px">
+                            <label>
+                                <input type="checkbox" value="1.1" v-model="status" name="status" >
+                                <span class="mdbcheckmark"></span>
+                                2nd Endorsement
+                            </label>
+                        </li>
+                        <li style="padding: 4px 15px">
+                            <label>
+                                <input type="checkbox" value="2" v-model="status" name="status" >
+                                <span class="mdbcheckmark"></span>
+                                Approved
+                            </label>
+                        </li>
+                        <li style="padding: 4px 15px">
+                            <label>
+                                <input type="checkbox" value="3" v-model="status" name="status" >
+                                <span class="mdbcheckmark"></span>
+                                Rejected
+                            </label>
+                        </li>
+                    </ul>
+                    </div>
+            </div>
             <!--  -->
             <table id="overrideform" class="mdl-data-table" style="width:100%"></table>
 
@@ -32,14 +80,15 @@
 </template>
 <script>
 import ManageOverrideForm from '../../components/public/ManageOverrideForm';
-let status = ['Pending', 'Approved', 'Rejected'];
-
+// let status = ['Pending', 'Approved', 'Rejected'];
+let defaultRows = [];
 export default {
     components:{
         ManageOverrideForm
     },
     data(){
         return{
+            openFilter: false,
             forapprover: '',
             formtitle: '',
             rows: [],
@@ -49,9 +98,43 @@ export default {
             approvers: [],
             reciever_emails: [],
             selected: {},
+            status: ['0', '1.0', '1.1', '2', '3'],
         }
     },
     watch:{
+        status(val, old){
+            let rows = [];
+            // if(val.includes('1.1')){
+                // rows = 
+            // }
+            rows = defaultRows.filter(data=>{
+                return val.includes(data.status+'') || data.status == 1;
+            }).reduce((acc, cur)=>{
+                if(!val.includes('1.0')){
+                    
+                    if(!cur.endorseddate){
+                        console.log('tae', cur.endorseddate, cur.endorseddate != '');
+                        acc.push(cur);
+                    }
+                }
+                if(!val.includes('1.1')){
+                    if(!cur.endorseddate2){
+                        acc.push(cur);
+                    }
+                }
+                if(val.includes('1.0') && val.includes('1.1')){
+                    acc.push(cur);
+                }
+                
+                return acc;
+            }, []);
+
+            
+
+            this.dtHandle.clear();
+            this.dtHandle.rows.add(rows);
+            this.dtHandle.draw();
+        },
         rows(val, old){
             let row = val;
             this.dtHandle.clear();
@@ -117,8 +200,8 @@ export default {
         
         axios.get('api/approvalOverrideForm').then((response)=>{
             this.loader = false;
-            this.rows=response.data;
-
+            this.rows = response.data;
+            defaultRows = response.data;
 
             $.extend(jQuery.fn.dataTableExt.oSort, {
                 "date-uk-pre": function (a) {

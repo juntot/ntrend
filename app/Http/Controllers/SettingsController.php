@@ -124,6 +124,7 @@ class SettingsController extends Controller
 
     public function getFormRecords(){
 
+        
         // $data = DB::table(request(''))->select('name', 'email as user_email')->get();
         $sql = "select form.status, form.datefiled, CONCAT(emp.fname, emp.lname) as fullname,
                 dept.deptname, comp.compname, pos.posname, brch.branchname

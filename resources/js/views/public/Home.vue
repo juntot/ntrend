@@ -55,6 +55,7 @@
 											photos/videos
 										</label>
 										<input id="file-attachment" type="file" style="display: none;" @change.prevent="newFile">
+									
 										<!-- employee tags -->
 										<!-- <button class="btn btn-info round"
 											id="btn-popupover-employee"
@@ -232,13 +233,16 @@
 													<!-- commentator name -->
 													<span class="avatar-name">{{comment.fullname || ''}}</span><br/>
 													{{comment.text_comment || ''}}
+
+													<div class="comment-actionx" v-if="comment.commentBy_ == $root.userinfo.empID">
+														<span @click="deleteComment(comment)">
+															<i class="fas fa-trash color-redorange" title="tag by users"></i>
+														</span>
+													</div>
 												</div>
 											</div>
 										</div>
-										<div class="comment-action" v-if="comment.commentBy_ == $root.userinfo.empID">
-											<!-- <span data-toggle="modal" data-target="#myModal" @click="editMsg(index)">edit</span> &nbsp;|&nbsp; -->
-											<span @click="deleteComment(comment)">delete</span>
-										</div>
+										
 									</div>
 									
 								</div>
@@ -335,13 +339,19 @@
 											<div class="comment-list">
 												<span class="avatar-name">{{comment.fullname || ''}}</span><br/>
 												{{comment.text_comment || ''}}
+												
+												
+												<div class="comment-actionx" v-if="comment.commentBy_ == $root.userinfo.empID">
+													<span @click="deleteComment(comment)">
+														<i class="fas fa-trash color-redorange" title="tag by users"></i>
+													</span>
+												</div>
 											</div>
 										</div>
 									</div>
-									<div class="comment-action" v-if="comment.commentBy_ == $root.userinfo.empID">
-										<!-- <span data-toggle="modal" data-target="#myModal">edit</span> &nbsp;|&nbsp; -->
+									<!-- <div class="comment-action" v-if="comment.commentBy_ == $root.userinfo.empID">
 										<span @click.prevent="deleteComment(comment)">delete</span>
-									</div>
+									</div> -->
 								</div>
 									<!-- comment textarea -->
 								<div style="padding-bottom: 15px; text-align: right;">
@@ -401,7 +411,7 @@
 </template>
 
 <script>
-
+let defaultCompList = [];
 export default {
 
     data(){
@@ -491,9 +501,18 @@ export default {
 			formData.append('taggedepts', arrDept);
 
 			let arrComp = [];
-			this.checkedComps.forEach(obj => {
-				arrComp.push('comp'+obj);
-			});
+			if(this.checkedComps.length){
+				this.checkedComps.forEach(obj => {
+					arrComp.push('comp'+obj);
+				});
+			}else{
+				// this will be use to tag all post to all company by default
+				// check the tag with comp below similar code
+				defaultCompList.forEach(obj => {
+					arrComp.push('comp'+obj.compID);
+				});
+			}
+			
 			// formData.append('taggedepts', this.checkedDepts);
 			formData.append('taggedcomps', arrComp);
 
@@ -516,9 +535,15 @@ export default {
 
 			// TAG WITH COMP
 			let arrTagComp = [];
-			this.tagwithComp.forEach(obj => {
-				arrTagComp.push(obj.compname);
-			});
+			if(this.checkedComps.length) {
+				this.tagwithComp.forEach(obj => {
+					arrTagComp.push(obj.compname);
+				});
+			}else{
+				defaultCompList.forEach(obj => {
+					arrTagComp.push('comp'+obj.compname);
+				});
+			}
 			formData.append('tagwith_comp', arrTagComp);
 
 			axios.post('api/addAnnouncement', formData).then((response)=>{
@@ -744,6 +769,21 @@ export default {
 				.catch(err => console.log(err));
 			}
 		},
+		loadCompany(val){
+			let validSearch = /^[a-zA-Z0-9 Ññ&)\._-]+$/g
+			let regex = RegExp(validSearch);
+			if(regex.test((val))){
+
+				// let search = (val).replace(/[^a-zA-Z0-9-. ]/g, '');
+				let search = val;
+				axios.post('api/search-comp',{keyword: search}).then(res=>{
+					if(res.data.length > 0 && res.status == 200){
+						defaultCompList = res.data;
+					}
+				})
+				.catch(err => console.log(err));
+			}
+		},
 
 		showTags(string = ''){
 			if(string != null){
@@ -938,6 +978,7 @@ export default {
 	},
 	created () {
  		// window.addEventListener('scroll', this.handleScroll);
+		 this.loadCompany(' ');
 	},
 	beforeDestroy(){
 		document.getElementById('content').className += " content";

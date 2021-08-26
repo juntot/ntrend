@@ -6,11 +6,103 @@ use Illuminate\Http\Request;
 use DB;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\CurlService;
 use Carbon\Carbon;
 
 class OverrideController extends Controller
 {
+    
+    public $cookie;
 
+    // LOGIN
+    public function overrideLogin(){
+        
+        $postfields = [];
+        
+        $getData = DB::table('override_setting')
+            ->select('json')
+            ->where('type', request('type'))
+            ->get();
+        
+            if($getData) {
+                // return $getData[0]->json;
+                $arr = json_decode($getData[0]->json, true);
+                $temp = [];
+                foreach($arr as $item) { //foreach element in $arr
+
+                    if($item['id'] == request('id')) {
+                        $postfields = [
+                            "CompanyDB" => $item['name'],
+                            "UserName"  => $item['user'],
+                            "Password"  => $item['pwd']
+                        ];
+                    }
+                }
+                // $arr = json_encode($temp);
+            }
+
+
+
+        // $postfields = [
+        //     "CompanyDB" => "APBW_LIVE2",
+        //     "UserName" => "manager",
+        //     "Password" => "ntmc1234",
+        // ];
+        $result = CurlService::httpCurl(
+            'https://119.93.149.92:50000/b1s/v1/Login',
+            'POST',
+            $postfields
+        );
+        // $this->cookie = ;
+        session(['sap' => $result['data']]);
+        return response('Response', $result['statusCode']);
+            
+    }
+
+    public function consumeSAPEndpoint(){
+        
+        // $path = 'BusinessPartners?$select=CardCode,EmailAddress,GroupCode,CardName,CardType&$filter=startswith(CardName,\'A\')&$orderby=CardCode&$top=1000';
+        $path = request('path');
+        // dd($path);
+        $result = CurlService::httpCurlGet(
+            'https://119.93.149.92:50000/b1s/v1/'.$path,
+            'GET',
+            [],
+            array(
+                'Cookie: '.session()->get('sap'),
+                "Content-Type: application/json",
+                "Accept: application/json",
+            )
+        );
+        
+        return $result;
+    }
+
+    function getOverrideSetting() {
+        $getData = DB::select('select type, json from override_setting');
+        
+        $data = [];
+        if($getData) {
+            // return $getData[0]->json;
+            $arr = json_decode($getData[0]->json, true);
+                
+            foreach ($getData as $value) {
+                
+                foreach($arr as $item) { 
+                    if($value->type == 'company'){
+                        $data[] = [
+                            'id'   => $item['id'],
+                            'name' => $item['name'],
+                        ];
+                    }
+                }
+                if($value->type == 'company') {
+                    $value->json = $data;
+                }
+            }
+        }
+        return $getData;
+    }
     // get employee lsiting
     public function searchEmp(){
         $data = DB::select('select empID,  CONCAT(fname,", ",lname) as fullname 
@@ -71,6 +163,7 @@ class OverrideController extends Controller
     function addOverride(){
         date_default_timezone_set("Asia/Hong_Kong");
         $now = Carbon::now();
+        
         request()->merge([
             'dateoverride' => $now,
             'empID_' => UserSession::getSessionID(),
@@ -81,7 +174,7 @@ class OverrideController extends Controller
         
         $id = DB::table('formoverride')->insertGetId(request()->except(['reciever_emails']));
         
-        request()->merge(['overrideID' => $id, 'status' => 0, 'dateoverride' => UserSession::formatDate($now, 'm/d/Y h:m A')]);
+        request()->merge(['overrideID' => $id, 'status' => 0, 'dateoverride' => UserSession::formatDate($now, 'm/d/Y h:i A')]);
         
         // mail notification
         MailServices::sendNotify(request('reciever_emails'), UserSession::getSessionID(), 'OVERRIDE REQUEST');
@@ -114,7 +207,7 @@ class OverrideController extends Controller
                 'status', 'recstat'
             ]));
         request()->merge([
-            'dateoverride' => UserSession::formatDate($now, 'm/d/Y h:m A')
+            'dateoverride' => UserSession::formatDate($now, 'm/d/Y h:i A')
         ]);
         return request()->all();
     }
@@ -217,7 +310,7 @@ class OverrideController extends Controller
         switch (request('status')):
             // endore
             case 1:
-                
+                $endorserQuery = '';
                 // find number of endorsers limit to 2
                 $sqlQuery = 'select overrideID from formoverride 
                     where endorsedby_ LIKE "%,%"
@@ -226,6 +319,13 @@ class OverrideController extends Controller
                 $checkendorser = DB::select($sqlQuery, [request('overrideID')]);
                 if($checkendorser) {
                     return request()->all();
+                }
+
+                
+                if(request()->has('next_endorser')){
+                    $endorserQuery = 'endorseddate2 = "'.$now;
+                } else {
+                    $endorserQuery = 'endorseddate = "'.$now;
                 }
 
                 $sqlQuery = '
@@ -237,12 +337,13 @@ class OverrideController extends Controller
                             endorsedby_, ",", "'.$user.'"
                         )
                     ),
-                    endorseddate = "'.$now.'"
+                    '.$endorserQuery.'"
                     
                 where 
                     (endorsedby_ NOT LIKE "%'.$user.'%" or endorsedby_ IS NULL)
                 and overrideID = :ID
                 ';
+                // dd(request('status'),request('overrideID'), $sqlQuery);
                 break;
             // approve
             case 2:

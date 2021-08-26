@@ -16,7 +16,55 @@ Route::get('/api/mail', function(){
     return 'awsss';
 });
 
+Route::get('/api/override-login', function(){
+    
+    $postfields = [
+        "CompanyDB" => "APBW_LIVE2",
+        "Password" => "ntmc1234",
+        "UserName" => "manager"
+    ];
+    $headers = array(
+        "Content-Type: application/json",
+        "Accept: application/json",
+    );
 
+    $url = "https://119.93.149.92:50000/b1s/v1/Login";
+    $ch = curl_init();
+    // curl_setopt($ch, CURLOPT_HEADER, true);
+    // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    // curl_setopt($ch, CURLOPT_HTTPGET, 1);
+    curl_setopt($ch, CURLOPT_URL, $url);
+    // curl_setopt($ch, CURLOPT_DNS_USE_GLOBAL_CACHE, false );
+    // curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 2 );
+    // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    // curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($postfields));
+
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+
+    curl_setopt($ch, CURLOPT_DNS_USE_GLOBAL_CACHE, false );
+    curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 2 );
+
+
+    $result = curl_exec($ch);
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err = curl_error($ch);
+
+
+    curl_close($ch);
+
+    if ($err) {
+        echo "Error #:" . $err;
+    } else {
+        return ['data'=> json_decode($result), 'status'=>$httpcode];
+    }
+});
 
 Route::group(['middleware' => 'prevent-back-history'], function(){
 
@@ -250,9 +298,7 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/api/getSupplierAccreditationApprover', 'SupplierAccreditationController@getSupplierAccreditationApprover'); // get approvers
 
             // OVERRIDE FORM
-            Route::get('/api/get-override-company', 'OverrideController@getOverrideSetting');
-            Route::post('/api/override-login', 'OverrideController@overrideLogin');
-            Route::any('/api/consume-api', 'OverrideController@consumeSAPEndpoint');
+            
 
             Route::post('/api/search-override-emp', 'OverrideController@searchEmp');
             Route::post('/api/addoverride', 'OverrideController@addOverride');
@@ -518,7 +564,7 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
 
 
             // OVrride Settings
-            Route::get('/api/get-override-setting-company', 'SettingsController@getOverrideSetting');
+            Route::get('/api/get-override-company', 'SettingsController@getOverrideSetting');
             Route::post('/api/add-override-company', 'SettingsController@addOverrideSetting');
             Route::post('/api/update-override-company', 'SettingsController@updateOverrideSetting');
             Route::post('/api/del-override-company', 'SettingsController@delOverrideSetting');

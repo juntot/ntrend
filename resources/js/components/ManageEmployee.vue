@@ -494,6 +494,10 @@ export default {
                     // console.log(data);
                 }
 
+                if(i == 'SL' || i == 'VL' || i == 'BL' || i == 'DL'){
+                    this.$data[i] = data[i] || 0;
+                }
+
 
                 this.selected.branchname = data.branchname;
                 this.selected.deptname = data.deptname;

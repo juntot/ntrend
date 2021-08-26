@@ -28,7 +28,7 @@ import AdminCalendar from './calendar_view/Admin_Calendar'
 export default{
 
     mode: 'history',
-    base: '/ntrends/',
+    // base: '/ntrends/',
     routes:[
         // graph
         {

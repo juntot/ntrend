@@ -19,8 +19,6 @@ window.bus = new Vue;
 Vue.use(VueRouter);
 // moment().tz("Asia/Manila").format();
 moment.tz.setDefault("Asia/Manila");
-window.SAP ='http://project.northtrend.com:999';
-// window.SAP ='http://localhost:999';
 
 const app = new Vue({
     store: store,

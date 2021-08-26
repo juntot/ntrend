@@ -84,43 +84,64 @@ export default {
 
             let rows = [];
             let header = [
-                'OVERRIDE ID', 'CREATOR NAME', 'COMPANY', 'BRANCH', 'DIVISION', 'DATE OVERRIDE', 
+                'OVERRIDE ID', 'CREATOR NAME', 'DATABASE', 'BRANCH', 'DIVISION', 'DATE OVERRIDE & TIME', 
                 'CUSTOMER NAME', 'MODE', 'SALES EMPLOYEE', 'SALES MANAGER', 'COMMITMENT DATE', 
-                'COMMITMENT TIME', 'AMOUNT ORDER', 'PO/SO', 'ADDITIONAL INFO', 'ENDORSED BY', 
-                'ENDORSED DATE', 'APPROVED BY', 'APPROVED DATE', 'APPROVER REMARKS', 
-                'REQUEST TO ENDORSED DURATION', 'REQUEST TO APPROVED DURATION', 
-                'ENDORSED TO APPROVED DURATION', 'STATUS'
+                'COMMITMENT TIME', 'AMOUNT ORDER', 'PO/SO', 
+                'CL', 'PDC', 'A/R', 'ORDER', 'TOTAL', 'EXCESS', '%',
+                
+                'ADDITIONAL INFO', 'REASONS',
+                '1ST ENDORSER', '1ST ENDORSER DATE & TIME', '2ND ENDORSER', '2ND ENDORSER DATE & TIME', 
+                'APPROVED BY', 'APPROVED DATE & TIME', 'APPROVER REMARKS', 'STATUS',
+                'REQUEST TO 1ST ENDORSEMENT DURATION', 
+                'REQUEST TO 2ND ENDORSEMENT DURATION', 
+                '1ST ENDORSEMENT TO APPROVED DURATION', 
+                '2ND ENDORSEMENT TO APPROVED DURATION',
+                'REQUEST TO APPROVED DURATION', 
             ];
+
             rows.push(header);
             this.rows.forEach(obj => {                                
                 let records = [
-                            obj.overrideID, obj.fullname, obj.company, obj.branch, obj.division,
-                            obj.dateoverride, obj.customer_name, obj.mode, obj.sales_employee, obj.sales_manager,
-                            obj.commited_date, obj.commited_time, obj.amount_order, obj.po_so, obj.additional_info,
-                            obj.endorsedby_, obj.endorseddate, obj.approvedby, obj.approveddate, 
-                            obj.remarks, 
+                            obj.overrideID, obj.fullname, obj.company, obj.branch, obj.division, obj.dateoverride, 
+                            obj.customer_name, obj.mode, obj.sales_employee, obj.sales_manager, obj.commited_date, 
+                            obj.commited_time, obj.amount_order, obj.po_so, 
+                            obj.cl, obj.pdc, obj.ar, obj.order, obj.total, obj.excess2, obj.percent2,
 
+                            obj.additional_info, obj.reasons, 
+                            obj.endorsedby_, obj.endorseddate, obj.endorsedby2_, obj.endorseddate2, 
+                            obj.approvedby, obj.approveddate, obj.remarks, obj.status == 1? 'Endorsed': obj.status == 2 ? 'Approved': obj.status == 3?
+                            'Rejected' : 'Pending',
+                            
+                            
                             obj.endorseddate && obj.dateoverride ?
                             moment.utc(moment(obj.endorseddate, "HH:mm:ss").diff(moment(obj.dateoverride, "HH:mm:ss"))).format("HH:mm:ss") : '',
 
-                            obj.approveddate && obj.dateoverride ?
-                            moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.dateoverride, "HH:mm:ss"))).format("HH:mm:ss") : '',
+                            obj.endorseddate2 && obj.dateoverride ?
+                            moment.utc(moment(obj.endorseddate2, "HH:mm:ss").diff(moment(obj.dateoverride, "HH:mm:ss"))).format("HH:mm:ss") : '',
 
+                            
+                            
                             obj.endorseddate && obj.approveddate ?
                             moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.endorseddate, "HH:mm:ss"))).format("HH:mm:ss") : '',
 
-                            // obj.status == 1? 'Endorsed': obj.status == 2 ? 'Approved': obj.status == 3?
-                            // 'Rejected' : 'Pending'
-                            obj.status
+                            obj.endorseddate2 && obj.approveddate ?
+                            moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.endorseddate, "HH:mm:ss"))).format("HH:mm:ss") : '',
+                            
+                            
+                            
+                            obj.approveddate && obj.dateoverride ?
+                            moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.dateoverride, "HH:mm:ss"))).format("HH:mm:ss") : '',
+
+                            
                         ];
                 // records.push();
                 rows.push(records);
             });
-            console.log(rows);
-            return;
             
+            // console.log(rows);
             // /* SHEET 1 */
             // let ws = XLSX.utils.aoa_to_sheet([["a","b", "c"],[3,2,1],[1,2,3]]);
+            
             let ws = XLSX.utils.aoa_to_sheet(rows);
             XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 

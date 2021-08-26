@@ -912,7 +912,48 @@ class ReportController extends Controller
                             (
                                 select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
                                 where subemp.empID = overtime.approvedby
-                            ) as approvedby
+                            ) as approvedby,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = 
+                                IF(LOCATE(",",
+                                    overtime.endorsedby_),
+                                    SUBSTRING_INDEX(overtime.endorsedby_, ",", 1),
+                                    overtime.endorsedby_
+                                )
+                            ) as endorsedby_,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = 
+                                IF(LOCATE(",",
+                                    overtime.endorsedby_),
+                                    SUBSTR(overtime.endorsedby_, ((POSITION("," in overtime.endorsedby_)-1) * -1)),
+                                    ""
+                                )
+                            ) as endorsedby2_,
+                            (
+                                CONCAT(
+                                    IF(overtime.reason IS NOT NULL OR overtime.reason <> "" OR overtime.current_stat IS NOT NULL, "ON HOLD," ,""),
+                                    IF(overtime.comment IS NOT NULL OR overtime.comment <> "" OR overtime.overdue_tbl <> "[]", "OVERDUE," ,""),
+                                    IF( overtime.excess IS NOT NULL or overtime.excess <> ""
+                                        OR
+                                        overtime.percent IS NOT NULL or overtime.percent <> ""
+                                        OR
+                                        overtime.last_cl IS NOT NULL or overtime.last_cl <> ""
+                                        OR 
+                                        overtime.commit_cl IS NOT NULL or overtime.commit_cl <> ""
+                                        , "OVER/NO CREDIT LIMIT,", ""
+                                    ),
+                                    IF(
+                                        overtime.check_type IS NOT NULL
+                                        OR
+                                        overtime.check_tbl <> "[]"
+                                        OR 
+                                        overtime.paying_habit IS NOT NULL OR overtime.paying_habit <> "",
+                                        "UNSETTLED CHECK MOVEMENT", ""
+                                    )
+                                )
+                            ) as reasons
                             from formoverride overtime right join employee emp
                                 on emp.empID = overtime.empID_
                             inner join positiontbl pos

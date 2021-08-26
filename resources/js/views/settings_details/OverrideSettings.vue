@@ -22,7 +22,7 @@
                             <th>Operation</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="tbl_bodyoverride">
                         <tr v-for="(val, index) in compRows" :key="index" @click="selected = val">
                             <td>{{val.name}}</td>
                             <td>user</td>
@@ -56,7 +56,7 @@
                             <th>Operation</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="tbl_bodyoverride">
                         <tr v-for="(val, index) in divRows" :key="index" @click="selected = val">
                             <td :id="val.id" :data-type="'division'">{{val.name}}</td>
                             <td><button type="button" class="btn btn-danger remove-override">Delete</button></td>
@@ -140,7 +140,7 @@
                                 <i class="fas fa-spinner fa-spin" style="font-size: 4em;"></i> 
                             </p>
                             <p class="text-center" v-if="!loader" style="color: orange; padding-bottom: 25px;">
-                                <i class="fas fa-plane-departure" style="font-size: 4em;"></i> 
+                                <i class="fas fa-check" style="font-size: 4em;"></i>
                             </p>
                             <h5>
                                 {{errMsg}}
@@ -171,10 +171,7 @@ export default {
                 user: 'test',
                 pwd: 'test',
             },
-            compRows: [
-                {id: 1, name: 'aw'},
-                {id: 123, name: 'aw2'}
-            ],
+            compRows: [],
             divRows: [],
 
             branchRows: [],
@@ -193,6 +190,7 @@ export default {
     },
     filters:{
         capitalize(value){
+            if(value)
             return value.charAt(0).toUpperCase() + value.slice(1)
         },
         filterPass(val){
@@ -311,14 +309,26 @@ export default {
         testConnection(){
             this.loader = true;
             $('#myModal2').modal('show');
-            axios.get(SAP+'/login', {
-                company: this.selected.name || '',
-                user: this.selected.user || '',
-                pwd: this.selected.pwd || ''
+            
+            // return;
+            axios.post('api/override-login', {
+                id: this.selected.id || 0,
+                type: this.type || '',
+                // user: this.selected.user || '',
+                // pwd: this.selected.pwd || ''
             }).then(()=>{
                 this.loader = false;
+                this.errMsg = `Successfuly connected`;
             }).catch(er=>{
-                this.errMsg = `Network connection error. Please check SAP API Server if you are connected`;
+
+                console.log('status', er.response.status);
+                if(er.response.status == 401){
+                    this.errMsg = `Invalid user credentials`
+                }
+                else{
+                    this.errMsg = `Network connection error. Please check SAP API Server if you are connected`;
+                }
+                
             });
             
         },
@@ -352,7 +362,7 @@ export default {
                 pwd: ''
             };
             this.loader = false;
-            this.errMsg = '';
+            this.errMsg = `Please wait while checking your credentials`;
             this.isUpdate = false;
         },
     },
@@ -363,7 +373,7 @@ export default {
         this.MDBINPUT();
         $('.modal').on("hidden.bs.modal", this.closeModal);
         
-        axios.get('api/get-override-company')
+        axios.get('api/get-override-setting-company')
         .then(({data})=>{
             data.forEach( val => {
                 if(val.type == 'company') {
@@ -377,7 +387,7 @@ export default {
 
         const self = this;
         let isremove = false;
-        $("tbody").on('click', 'button.remove-override', function() {
+        $("tbody.tbl_bodyoverride").on('click', 'button.remove-override', function() {
             const data = $(this).closest("tr")   // Finds the closest row <tr> 
                     .find("td") 
                     .siblings(":last");
@@ -387,7 +397,7 @@ export default {
             isremove = true;
         });
 
-        $("tbody").on('click', 'button.retest-connection', function() {
+        $("tbody.tbl_bodyoverride").on('click', 'button.retest-connection', function() {
             const data = $(this).closest("tr")   // Finds the closest row <tr> 
                     .find("td") 
                     .siblings(":last");
@@ -395,7 +405,7 @@ export default {
             isremove = true;
         });
 
-        $("tbody").on('click', 'tr', function() {
+        $("tbody.tbl_bodyoverride").on('click', 'tr', function() {
             if(!isremove) {
                 self.isUpdate = true;
                 const data = $(this).closest("tr")   // Finds the closest row <tr> 

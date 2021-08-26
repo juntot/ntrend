@@ -79,6 +79,9 @@ body, header, article, footer{
 .bg-white{
   background: white;
 }
+.color-redorange{
+ color: #dc0202; 
+}
 
 
 /* vueityfy */
@@ -1158,8 +1161,10 @@ hr#narrow-margin-post{
   /* margin: 0 0 24px; */
   margin: 0 0 10px;
 }
-.comment-wrap:hover .comment-action{
-  display: block;
+
+.comment-actionx{
+  text-align: right;
+  cursor: pointer;
 }
 
 .comment-action{
@@ -1167,12 +1172,17 @@ hr#narrow-margin-post{
   text-align: right;
   bottom: 9px;
   display: none;
-  transition: 0.5s;
+  transition: 1s;
+}
+
+.comment-wrap:hover .comment-action{
+  display: block;
 }
 
 .comment-action span:hover{
   text-decoration: underline;
   cursor: pointer;
+  
 }
 
 .more-comments:hover{

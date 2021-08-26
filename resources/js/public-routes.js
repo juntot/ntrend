@@ -70,7 +70,7 @@ import PageNotFound from './views/404';
 export default{
 
     mode: 'history',
-    base: '/ntrends/',
+    // base: '/ntrends/',
     routes:[
         {
             path: '/',
