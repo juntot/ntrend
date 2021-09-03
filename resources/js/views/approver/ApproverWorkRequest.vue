@@ -16,7 +16,7 @@
                     <ul class="dropdown-menu" style="padding: 10px">
                         <button type="button" class="close" 
                         
-                        @click="openFilter = !openFilter">x</button>
+                        @click="openFilter = !openFilter">×</button>
                         <li style="padding: 4px 15px">
                             <label>
                                 <input type="checkbox" value="0" v-model="status" name="status" >

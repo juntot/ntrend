@@ -71,6 +71,9 @@ export default {
     methods:{
        
         setUpdate(data){
+            if(data.endorsedby2_){
+                data.endorsedby_ += ','+data.endorsedby2_;
+            }
             bus.$emit('setupdate', data);
         },
 
@@ -78,6 +81,18 @@ export default {
             this.disabledinput = false;
             this.selected = {};
         },
+
+        getDuration(from, to) {
+              
+            var ms = moment(to,"YYYY-MM-DD HH:mm:ss").diff(moment(from,"YYYY-MM-DD HH:mm:ss"));
+            var d = moment.duration(ms);
+            var s = Math.floor(d.asHours()) + moment.utc(ms).format(":mm:ss");
+            
+            s = s.slice(0, (s.indexOf(':'))).length <= 1 ? '0'+s: s;
+            
+            return s;
+        },
+
         downloadXLS(){
 
             let wb = XLSX.utils.book_new();
@@ -94,6 +109,7 @@ export default {
                 'APPROVED BY', 'APPROVED DATE & TIME', 'APPROVER REMARKS', 'STATUS',
                 'REQUEST TO 1ST ENDORSEMENT DURATION', 
                 'REQUEST TO 2ND ENDORSEMENT DURATION', 
+                '1ST ENDORSEMENT TO 2ND ENDORSEMENT DURATION', 
                 '1ST ENDORSEMENT TO APPROVED DURATION', 
                 '2ND ENDORSEMENT TO APPROVED DURATION',
                 'REQUEST TO APPROVED DURATION', 
@@ -114,23 +130,30 @@ export default {
                             
                             
                             obj.endorseddate && obj.dateoverride ?
-                            moment.utc(moment(obj.endorseddate, "HH:mm:ss").diff(moment(obj.dateoverride, "HH:mm:ss"))).format("HH:mm:ss") : '',
+                            this.getDuration(obj.dateoverride, obj.endorseddate):'',
+                            // moment.utc(moment(obj.endorseddate, "HH:mm:ss").diff(moment(obj.dateoverride, "HH:mm:ss"))).format("HH:mm:ss") : '',
 
                             obj.endorseddate2 && obj.dateoverride ?
-                            moment.utc(moment(obj.endorseddate2, "HH:mm:ss").diff(moment(obj.dateoverride, "HH:mm:ss"))).format("HH:mm:ss") : '',
-
+                            this.getDuration(obj.dateoverride, obj.endorseddate2):'',
+                            // moment.utc(moment(obj.endorseddate2, "HH:mm:ss").diff(moment(obj.dateoverride, "HH:mm:ss"))).format("HH:mm:ss") : '',
                             
+                            // 1rst endorsement to 2nd endorsement
+                            obj.endorseddate && obj.endorseddate2 ?
+                            this.getDuration(obj.endorseddate, obj.endorseddate2):'',
                             
                             obj.endorseddate && obj.approveddate ?
-                            moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.endorseddate, "HH:mm:ss"))).format("HH:mm:ss") : '',
+                            this.getDuration(obj.endorseddate, obj.approveddate):'',
+                            // moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.endorseddate, "HH:mm:ss"))).format("HH:mm:ss") : '',
 
                             obj.endorseddate2 && obj.approveddate ?
-                            moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.endorseddate, "HH:mm:ss"))).format("HH:mm:ss") : '',
+                            this.getDuration(obj.endorseddate2, obj.approveddate):'',
+                            // moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.endorseddate, "HH:mm:ss"))).format("HH:mm:ss") : '',
                             
                             
                             
                             obj.approveddate && obj.dateoverride ?
-                            moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.dateoverride, "HH:mm:ss"))).format("HH:mm:ss") : '',
+                            this.getDuration(obj.dateoverride, obj.approveddate):'',
+                            // moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.dateoverride, "HH:mm:ss"))).format("HH:mm:ss") : '',
 
                             
                         ];
@@ -181,7 +204,7 @@ export default {
                 title: "Creator", data: 'fullname'
             },
             {
-                title: 'Amount of order', data: 'mode'
+                title: 'Amount of order', data: 'amount_order'
             },
             {
                 title: "Status", data: 'status',

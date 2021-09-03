@@ -48,7 +48,7 @@ body, header, article, footer{
 
 
 .hidden-overflow{
-  overflow: hidden;
+  /* overflow: hidden; */
 }
 
 .redwine{

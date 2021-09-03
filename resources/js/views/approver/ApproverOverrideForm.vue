@@ -16,7 +16,7 @@
                     <ul class="dropdown-menu" style="padding: 10px">
                         <button type="button" class="close" 
                         
-                        @click="openFilter = !openFilter">x</button>
+                        @click="openFilter = !openFilter">×</button>
                         <li style="padding: 4px 15px">
                             <label>
                                 <input type="checkbox" value="0" v-model="status" name="status" >
@@ -110,26 +110,24 @@ export default {
             rows = defaultRows.filter(data=>{
                 return val.includes(data.status+'') || data.status == 1;
             }).reduce((acc, cur)=>{
-                if(!val.includes('1.0')){
-                    
-                    if(!cur.endorseddate){
-                        console.log('tae', cur.endorseddate, cur.endorseddate != '');
+                if(val.includes('1.1') && !val.includes('1.0')){
+                    if((cur.endorsedby_.includes(',') && cur.status == 1) || cur.status != 1){
                         acc.push(cur);
                     }
-                }
-                if(!val.includes('1.1')){
-                    if(!cur.endorseddate2){
+                }else if(val.includes('1.0') && !val.includes('1.1')){
+                    if((!cur.endorsedby_.includes(',') && cur.status == 1) || cur.status != 1){
                         acc.push(cur);
                     }
-                }
-                if(val.includes('1.0') && val.includes('1.1')){
+                }else if(!val.includes('1.1') && !val.includes('1.0')){
+                    if(cur.status != 1){
+                        acc.push(cur);
+                    }
+                }else{
                     acc.push(cur);
                 }
                 
                 return acc;
             }, []);
-
-            
 
             this.dtHandle.clear();
             this.dtHandle.rows.add(rows);

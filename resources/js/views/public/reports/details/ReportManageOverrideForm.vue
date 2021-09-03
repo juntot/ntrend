@@ -370,61 +370,6 @@
                             </div>
                             <div :id="3" :class="'panel-collapse collapse'">
                                 <div class="panel-body">
-                                    <div class="col-md-5">
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input :disabled="true" type="text" v-model="cl"  v-validate="" name="CL"  class="form-field__input">
-                                                <label class="form-field__label">CL</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('CL') }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="col-md-5">
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input :disabled="true" type="text" v-model="ar"  v-validate="" name="A/R"  class="form-field__input">
-                                                <label class="form-field__label">A/R</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('A/R') }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="col-md-5">
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input :disabled="true" type="text" v-model="pdc"  v-validate="" name="PDC"  class="form-field__input">
-                                                <label class="form-field__label">PDC</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('PDC') }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="col-md-5">
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input :disabled="true" type="text" v-model="order"  v-validate="" name="Order"  class="form-field__input">
-                                                <label class="form-field__label">ORDER</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('Order') }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="col-md-5">
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input :disabled="true" type="text" v-model="total"  v-validate="" name="Total"  class="form-field__input">
-                                                <label class="form-field__label">TOTAL</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('Total') }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
                                     <div class="col-xs-7 col-sm-7 col-md-3">
                                         <div class="mdb-form-field form-group-limitx">
                                             <div class="form-field__control">
@@ -567,7 +512,81 @@
                 <!-- <div class="col-md-12 col-lg-12">
                     <h5 class="form-subtitle"><em>&nbsp;</em></h5>
                 </div> -->
+                
                 <hr style="border-top: 8px solid #1F7193">
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <input :disabled="true" type="text" v-model="cl"  v-validate="'required'" name="CL"  class="form-field__input">
+                            <label class="form-field__label">CL</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('CL') }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <input :disabled="true" type="text" v-model="pdc"  v-validate="'required'" name="PDC"  class="form-field__input">
+                            <label class="form-field__label">PDC</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('PDC') }}</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <input :disabled="true" type="text" :value="total" readonly="true" v-validate="'required'" name="Total"  class="form-field__input">
+                            <label class="form-field__label">TOTAL</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('Total') }}</span>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <input :disabled="true" type="text" v-model="ar"  v-validate="'required'" name="A/R"  class="form-field__input">
+                            <label class="form-field__label">A/R</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('A/R') }}</span>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <input :disabled="true" type="text" v-model="order"  v-validate="'required'" name="Order"  class="form-field__input">
+                            <label class="form-field__label">ORDER</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('Order') }}</span>
+                    </div>
+                </div>
+                <div class="col-xs-7 col-sm-7 col-md-2">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <input :disabled="true" type="text" :value="excess2" readonly="true"  v-validate="'required'" name="excess2"  class="form-field__input">
+                            <label class="form-field__label">EXCESS</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('excess2') }}</span>
+                    </div>
+                </div>
+                <div class="col-xs-5 col-sm-5 col-md-2">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <input :disabled="true" type="text" :value="percent2" readonly="true" v-validate="'required'" name="percent2"  class="form-field__input">
+                            <label class="form-field__label">% (ex: 100)</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('percent2') }}</span>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
                 <div class="col-lg-12">
                 <h5 class="form-subtitle"></h5>
                     <div class="mdb-form-field">
@@ -706,6 +725,7 @@ export default {
         order: '',
         total: '',
         excess: '',
+        excess2: '',
         last_cl: '',
         commit_cl: '',
         paying_habit: '',
@@ -715,6 +735,7 @@ export default {
         
         overrideID:'',
         percent: '',
+        percent2: '',
         
         approvedby: '',
 
@@ -1029,7 +1050,7 @@ export default {
     mounted(){
 
         this.MDBINPUT();
-        if(this.$parent.disabledinput){
+        if(this.true){
             $('.vdp-datepicker div.vdp-datepicker__calendar:nth-child(2)').addClass('disable-dates-approver');
         }
         // MODAL

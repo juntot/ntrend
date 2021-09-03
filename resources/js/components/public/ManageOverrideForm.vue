@@ -667,7 +667,7 @@
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="total"  v-validate="'required'" name="Total"  class="form-field__input">
+                            <input :disabled="$parent.disabledinput" type="text" :value="computedTotal" readonly="true" v-validate="'required'" name="Total"  class="form-field__input">
                             <label class="form-field__label">TOTAL</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -699,7 +699,7 @@
                 <div class="col-xs-7 col-sm-7 col-md-2">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="excess2"  v-validate="'required'" name="excess2"  class="form-field__input">
+                            <input :disabled="$parent.disabledinput" type="text" :value="computedExcess2" readonly="true"  v-validate="'required'" name="excess2"  class="form-field__input">
                             <label class="form-field__label">EXCESS</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -709,7 +709,7 @@
                 <div class="col-xs-5 col-sm-5 col-md-2">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="percent2" v-validate="'required'" name="percent2"  class="form-field__input">
+                            <input :disabled="$parent.disabledinput" type="text" :value="computedPercent2" readonly="true" v-validate="'required'" name="percent2"  class="form-field__input">
                             <label class="form-field__label">% (ex: 100)</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -1007,7 +1007,7 @@ export default {
                 params.endorsedby_ = await params.endorsedby_? 
                                     params.endorsedby_ + ','+(this.userinfo.fullname || '') 
                                     : this.userinfo.fullname || '';
-                if(params.endorsedby_){
+                if(params.endorsedby_.includes(',')){
                     params['next_endorser'] = 'next_endorser';
                 }
             }
@@ -1308,25 +1308,11 @@ export default {
             this.customer_name = '';
             this.errMsg = '';
             this.loader = true;
-            
-            // const axiosConfig = {
-            //     headers: {
-            //         'content-Type': 'application/json',
-            //         "Accept": "/",
-            //         "Cache-Control": "no-cache",
-            //         "Cookie": document.cookie
-            //     },
-            //     credentials: "same-origin"
-            // };
-            
-            // axios.defaults.withCredentials = true;
-
-            // axios.get(`${SAP}/BusinessPartners?$select=CardCode,EmailAddress, 
-            //     GroupCode,CardName,CardType&$filter=startswith(CardName, 
-            // '${(this.search_customer.trim()).toUpperCase()}') &$orderby=CardCode&$top=1000`)
-            
-            axios.post(`api/consume-api`,{
-                path: `BusinessPartners?$select=CardCode,EmailAddress,GroupCode,CardName,CardType&$filter=startswith(CardName,\'${(this.search_customer.trim()).toUpperCase()}\')&$orderby=CardCode&$top=1000`,
+            const searchStr = ((this.search_customer).trim()).toUpperCase();
+            axios.post(`api/consume-api`, {
+                query:'BusinessPartners?$select=CardCode,EmailAddress,GroupCode,CardName,CardType',
+                params: `&$filter=(startswith(CardName,\'${searchStr}\')) or startswith(CardCode, \'${searchStr}\')`,
+                order: '&$orderby=CardName&$top=1000',
                 method: 'GET'
             })
             .then(({data})=>{
@@ -1343,6 +1329,29 @@ export default {
         }
     },
     computed:{
+        computedTotal(){
+            const ar = Number(this.ar.replace(/,/g,'')) || 0;
+            const pdc = Number(this.pdc.replace(/,/g, '')) || 0;
+            const order = Number(this.order.replace(/,/g,'')) || 0;
+            return this.total = (new Intl.NumberFormat().format((ar + pdc + order)));
+        },
+        computedExcess2(){
+            const ar = Number(this.ar.replace(/,/g,'')) || 0;
+            const pdc = Number(this.pdc.replace(/,/g, '')) || 0;
+            const order = Number(this.order.replace(/,/g,'')) || 0;
+            const cl = Number(this.cl.replace(/,/g,'')) || 0;
+            const excess = (ar + pdc + order) - cl;
+            return this.excess2 = (new Intl.NumberFormat().format(excess));
+        },
+        computedPercent2(){
+            const ar = Number(this.ar.replace(/,/g,'')) || 0;
+            const pdc = Number(this.pdc.replace(/,/g, '')) || 0;
+            const order = Number(this.order.replace(/,/g,'')) || 0;
+            const cl = Number(this.cl.replace(/,/g,'')) || 0;
+            const excess = (ar + pdc + order) - cl;
+            const percent2 = (( excess/cl )*100) || 0;
+            return this.percent2 = (new Intl.NumberFormat().format((percent2).toFixed(2)));
+        },
         isFormValid(){
             return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },

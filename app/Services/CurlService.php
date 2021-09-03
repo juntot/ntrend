@@ -85,6 +85,7 @@ class CurlService{
 
             
             $ch = curl_init();
+            // $url = curl_escape($ch, $url);
             curl_setopt($ch, CURLOPT_URL, $url);
     
             if(!$headers){
@@ -122,7 +123,6 @@ class CurlService{
             if ($err) {
                 echo "Error #:" . $err;
             } else {
-
                 return ['data'=> json_decode($result), 'status'=>$httpcode];
             }
     }

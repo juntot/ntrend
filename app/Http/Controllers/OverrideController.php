@@ -62,10 +62,23 @@ class OverrideController extends Controller
     public function consumeSAPEndpoint(){
         
         // $path = 'BusinessPartners?$select=CardCode,EmailAddress,GroupCode,CardName,CardType&$filter=startswith(CardName,\'A\')&$orderby=CardCode&$top=1000';
-        $path = request('path');
-        // dd($path);
+        $path = '';
+        if(request()->has('path'))
+            $path = request('path');
+        
+        if(request()->has('query'))
+            $path .= request('query');
+        
+        if(request()->has('params'))
+            $path .= request('params');
+
+        if(request()->has('order'))
+            $path .= request('order');
+        
+        
+        
         $result = CurlService::httpCurlGet(
-            'https://119.93.149.92:50000/b1s/v1/'.$path,
+            'https://119.93.149.92:50000/b1s/v1/'.str_replace ( ' ', '%20', $path),
             'GET',
             [],
             array(
