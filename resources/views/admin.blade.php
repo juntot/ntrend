@@ -128,7 +128,7 @@
 											<div class="panel-heading">
 												<h4 class="panel-title">
                                                     <div class="dflex d-align-center">
-                                                        <a  data-toggle="collapse" data-parent="#accordion" href="#users" class="accordion-menu">Users</a>
+                                                        <a  data-toggle="collapse" data-parent="#accordion" href="#users" class="accordion-menu">Manage Users</a>
                                                         <span></span>
                                                     </div>
 												</h4>
