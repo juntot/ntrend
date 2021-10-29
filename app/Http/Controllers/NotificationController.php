@@ -181,7 +181,15 @@ class NotificationController extends Controller
                                 eleave.recstat != 1 
                                 and eform.'.$formcol.' = 1
                                 and eleave.status = 1', [UserSession::getSessionID()]);
-                    }else{
+                    }else if($formcode == 'formtransmittal'){
+                        $data = DB::select('select count(eleave.empID_) as count
+                                from '.$formcode.' eleave 
+                                where eleave.approvedby = :approverID and
+                                eleave.recstat != 1 
+                                and eleave.status = 0', [UserSession::getSessionID()]);
+                    }
+                    
+                    else{
                         $data = DB::select('select count(eleave.empID_) as count
                                 from '.$formcode.' eleave left join eformapproverbyemp eform
                                     on eleave.empID_ = eform.empID_

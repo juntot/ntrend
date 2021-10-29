@@ -14,13 +14,11 @@ class SupplementaryController extends Controller
      public function addSupplementary(){
 
         // Session ID
-        
         request()->merge(['empID_' => UserSession::getSessionID() ]);
         $response = request()->except(['ísDisable', 'supdate']);
         request()->merge([
             'datefiled' => UserSession::formatDate(request()->datefiled)
         ]);
-
 
         $data = DB::table('formsupplementary')->insertGetId(request()->except(['isDisable', 'supID', 'entries', 'supdate', 'timein', 'timeout', 'timein2', 'timeout2','reason' , 'remarks', 'approvedby', 'reciever_emails']));
         // GET LAST INDEX
@@ -158,8 +156,9 @@ class SupplementaryController extends Controller
         AND
             form.recstat != 1
         AND
-            form.status <= 1'
-        );
+            form.status <= 1
+        ORDER BY form.supID desc
+        limit 1000');
         // check if data has vale
         if(count($data) > 0)
         {
@@ -273,6 +272,8 @@ class SupplementaryController extends Controller
             esup.status > 0
         and
             esup.recstat != 1
+        ORDER BY esup.supID desc
+        limit 1000
         ', [UserSession::getSessionID()]);
 
         // check if data has vale

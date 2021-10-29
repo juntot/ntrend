@@ -959,6 +959,12 @@ span.errors{
 
 
 /* DATATBLE */
+.td-ellipsis {
+  max-width: 500px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .mdl-data-table td, .mdl-data-table th {
   text-align: left !important;
 }

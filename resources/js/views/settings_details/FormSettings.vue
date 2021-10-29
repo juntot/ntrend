@@ -151,6 +151,14 @@ export default {
             // }
             else if(this.selected_type.td == "formsupplementary"){
                 this.selected_status_name = '';
+                return [
+                    {status: 0, name: 'Pending'},
+                    {status: 2, name: 'Approved'},
+                    {status: 3, name: 'Rejected'},
+                    {status: 99, name: 'Disabled'},
+                ];
+            }
+            else if(this.selected_type.td == "formtransmittal"){
                 this.selected_status_name = '';
                 return [
                     {status: 0, name: 'Pending'},

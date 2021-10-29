@@ -129,6 +129,7 @@ import ReportOffset                     from './reports/ReportOffset';
 import ReportWorkRequest                from './reports/ReportWorkRequest';
 import ReportOvertimeRequest            from './reports/ReportOvertimeRequest';
 import ReportOverrideForm               from './reports/ReportOverrideForm';
+import ReportTransmittal                from './reports/ReportTransmittal';
 
 // let brand = ['NTMC', 'APBW', 'PHILCREST', 'TYREPLUS'];
 // let status = ['Pending', 'Approved', 'Rejected'];
@@ -145,7 +146,9 @@ let typeofReportBus = {
                 prs:                    'initPRS',          prf:                    'initPRF',              canvas:             'initCanvas',
                 salarydiscrepancy:      'initSalDis',       supplieraccreditation:  'initSupAccre',         travelform:         'initTravel',
                 undertimerequest:       'initUndertime',    urgentcheck:            'initUrgentCheck',      offset:             'initOffset',
-                workrequest:            'initWorkRequest',  overtimerequest:        'initOvertime',         overrideform:       'initOverride'
+                workrequest:            'initWorkRequest',  overtimerequest:        'initOvertime',         overrideform:       'initOverride',
+                transmittal:            'initTransmittal',
+
             };
 
 export default {
@@ -169,7 +172,8 @@ export default {
         ReportOffset,
         ReportWorkRequest,
         ReportOvertimeRequest,
-        ReportOverrideForm
+        ReportOverrideForm,
+        ReportTransmittal,
     },
     data(){
         return{
@@ -224,7 +228,8 @@ export default {
                 ReportPRS:                  'prs',                    ReportPRF:                    'prf',                        ReportCanvas:             'canvas',
                 ReportSalaryDiscrepancy:    'salarydiscrepancy',      ReportSupplierAccreditation:  'supplieraccreditation',      ReportTravelForm:         'travelform',
                 ReportUndertimeRequest:     'undertimerequest',       ReportUrgentCheck:            'urgentcheck',                ReportOffset:             'offset',
-                ReportWorkRequest:          'workrequest',            ReportOvertimeRequest:        'overtimerequest',            ReportOverrideForm:       'overrideform'
+                ReportWorkRequest:          'workrequest',            ReportOvertimeRequest:        'overtimerequest',            ReportOverrideForm:       'overrideform',
+                ReportTransmittal:          'transmittal',
             },
         }
     },
@@ -303,6 +308,16 @@ export default {
 
                 ];
 
+            }else if(el.target.value == "transmittal"){
+
+                options =  [
+                    {label: 'Partially Received', title: 'Partially Received', value: 1},
+                    {label: 'Received', title: 'Received', value: 2},
+                    {label: 'Rejected', title: 'Rejected', value:3},
+                    {label: 'Pending', title: 'Pending', value: 0},
+
+                ];
+
             }else{
                 options =  [
                     {label: 'Approved', title: 'Approved', value: 1},
@@ -368,7 +383,7 @@ export default {
             .catch(err => console.log(err));
         },
         closeModal(){
-            // this.disabledinput = false;
+            $('.multiple').removeClass('form-field__control');
         },
 
 
@@ -510,7 +525,7 @@ export default {
         .catch(err=>console.log(err))
 
         // MODAL
-        $('#myModal').on("hidden.bs.modal", this.closeModal);
+        $('.modal').on("hidden.bs.modal", this.closeModal);
 
 
         // multi select status

@@ -683,6 +683,8 @@
 	<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script> -->
   	<!-- <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script> -->
 
+		<!-- chart.js -->
+		<script src="{{URL::asset('resources/assets/js/chart/chart.js')}}"></script>
 
 	<!-- <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script> -->
 	<script src="{{URL::asset('resources/assets/js/datatable/jquery.dataTables.js')}}"></script>
@@ -721,10 +723,13 @@
 	<!-- <script src="{{URL::asset('resources/assets/js/zoom/image-zoom.js')}}"></script> -->
 	<script src="{{URL::asset('resources/assets/js/zoom/image-zoom.min.js')}}"></script>
 
+	<!-- confetti & fireworks -->
+	<script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script>
+	<script src="https://unpkg.com/fireworks-js@latest/dist/fireworks.js"></script>
 
 	<script src="{{URL::to('/public/js/public-app.js')}}"></script>
 	<!-- <script src="./public/js/public-app.js"></script> -->
-
+	
 
 
 <script>

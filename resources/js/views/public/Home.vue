@@ -1,6 +1,79 @@
 <template>
-
+		
     <div>
+				<!-- fireworks & confetti -->
+			<div style="position: relative" v-show="showGreeting">
+					<canvas id="my-canvas" 
+					@click="hideGreetings"
+					style="top:0; position: fixed; left:0; width: 100%; z-index: 10
+					"></canvas>
+					<div class="fireworks-container" style="
+					left: 0;
+					top: 0;
+					width: 100%;
+					height: 100%;
+					position: fixed;
+					z-index: 9;
+					background: rgba(0,0,0,.4);
+					"
+					></div>
+					<div class="birthday-list" style="
+					position: fixed; 
+					z-index: 9;
+					left: 50%;
+					top: 50%;
+    			transform: translate(-50%, -50%);
+					box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 8px;
+					border-radius: 2px;
+					padding: 15px;
+					min-width: 350px;
+					background: white;
+					border: 10px solid;
+					border-image-slice: 1;
+					border-width: 5px;
+					border-image-source: linear-gradient(to right, red, orange);
+					">
+							<h4
+							style="
+							font-size: 3rem;
+							background: -webkit-linear-gradient(#e73827, #f85032);
+							font-weight: bold;
+							-webkit-background-clip: text;
+							-webkit-text-fill-color: transparent;
+							text-align: center;
+							line-height: 150%;
+							"
+							>HAPPY BIRTHDAY</h4>
+							<ul style="list-style: none">
+								<li v-for="(birthday, idx) in birthdays" :key="idx">
+									<div class="dflex d-align-center">
+										<div class="post-avatar avatar align-self-start">
+											<img id="avatar-sm" :src="birthday.avatar? 'storage/app/'+birthday.avatar :'public/images/priemer_jacket.jpg'" alt="Avatar" style="width:50px; height: 50px; object-fit: cover;">
+										</div>
+										<div class="flex-grow-1" style="width: 100%;">
+											<h5 class="avatar-name">{{birthday.fullName}} <br>
+												<small>{{birthday.birthdate | filterBirthDate}}</small><br>
+												<small>{{birthday.posname}}</small><br>
+												<small>{{birthday.deptname}}</small><br>
+												<small>{{birthday.branchname}}</small><br>
+											</h5>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<div class="text-center">
+									<i
+							style="
+							font-size: 12px;
+							background: -webkit-linear-gradient(#e73827, #f85032);
+							-webkit-background-clip: text;
+							-webkit-text-fill-color: transparent;
+							"
+							>Greetings from: Exceltrend Family</i>
+							</div>
+					</div>
+			</div>
+			<!-- end -->
 		<div id="loader-announcement">
 			<div class="loader-fixed">
 				<div class="dot"></div>
@@ -27,7 +100,7 @@
 								    <img id="post-avatar" class="avatar-status" :src="$root.userinfo.avatar? 'storage/app/'+$root.userinfo.avatar : 'public/images/priemer_jacket.jpg'" alt="Avatar" style="width:50px; height: 50px; object-fit: cover;">
 							    </div>
 							    <div class="post-textarea flex-grow-8">
-								    <textarea ref="search" id="textarea-post" class="autoExpand" v-model="posts.message" name="post-message" data-autoresize rows="1" cols="500" data-min-rows='1' :placeholder="placeholder" v-validate="'max:65520'" ></textarea>
+								    <textarea ref="search" id="textarea-post" class="autoExpand" v-model="posts.message" name="post-message" data-autoresize rows="1" cols="500" data-min-rows='1' :placeholder="placeholder" v-validate="'max:777215'" ></textarea>
 
 									<div id="attachment-container">
 										<!-- videos preview-->
@@ -254,7 +327,7 @@
 											style="width:35px; height: 35px; object-fit: cover; border-radius: 50%">
 										</div>
 										<div style="margin-left: 8px; flex: 1">
-											<textarea name="comment" @keyup="showBtnComment" :data-postid="val.postID" placeholder="Write a comment.." id="textarea-comment" data-autoresizecomment class="noborder txtarea-comment width-100" rows="1" v-validate="'max:65520'">
+											<textarea name="comment" @keyup="showBtnComment" :data-postid="val.postID" placeholder="Write a comment.." id="textarea-comment" data-autoresizecomment class="noborder txtarea-comment width-100" rows="1" v-validate="'max:777215'">
 											</textarea>
 										</div>
 									</div>
@@ -309,7 +382,7 @@
                         <div class="modal-body">
 							<!-- error -->
 							<span class="errors" v-show="errors.has('message-update')">{{ errors.first('message-update') }} Total characters: {{countPostUpdateString}}/65520</span>
-                            <textarea name="message-update" id="textarea-postxxxx" data-autoresizetextarea class="noborder width-100" rows="1" v-model="formUpdate.message" v-validate="'max:65520'"
+                            <textarea name="message-update" id="textarea-postxxxx" data-autoresizetextarea class="noborder width-100" rows="1" v-model="formUpdate.message" v-validate="'max:777215'"
 								:disabled="formUpdate.postedby_ != $root.userinfo.empID || daysDif > 1"></textarea>
 
 							<!-- videos -->
@@ -361,7 +434,7 @@
 											style="width:35px; height: 35px; object-fit: cover; border-radius: 50%">
 										</div>
 										<div style="margin-left: 8px; flex: 1">
-											<textarea name="comment" @keyup="showBtnCommentModal" :data-postid="formUpdate.postID" placeholder="Write a comment.." id="textarea-comment" data-autoresizecomment class="noborder txtarea-comment width-100" rows="1" v-validate="'max:65520'">
+											<textarea name="comment" @keyup="showBtnCommentModal" :data-postid="formUpdate.postID" placeholder="Write a comment.." id="textarea-comment" data-autoresizecomment class="noborder txtarea-comment width-100" rows="1" v-validate="'max:777215'">
 											</textarea>
 										</div>
 									</div>
@@ -412,63 +485,68 @@
 
 <script>
 let defaultCompList = [];
+let fireworks;
 export default {
 
     data(){
         return{
             posts:{
-				message: '',
-				dateposted: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-			},
-			formUpdate:{
-				attachment:'',
-				avatar:'',
-				dateposted:'',
-				fullname:'',
-				message:'',
-				postID:'',
-				postedby_:'',
-				status:'',
-				taggedepts:'',
-				taggednames:'',
-				type:'',
+						message: '',
+						dateposted: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+					},
+					formUpdate:{
+						attachment:'',
+						avatar:'',
+						dateposted:'',
+						fullname:'',
+						message:'',
+						postID:'',
+						postedby_:'',
+						status:'',
+						taggedepts:'',
+						taggednames:'',
+						type:'',
 
-			},
-			showCommentBtn: {
-				display: false,
-				id:''
-			},
-			showCommentBtnModal: {
-				display: false,
-				id:''
-			},
-			comment: [],
-			announcement: [],
-			// postmsg: '',
-			page: 1,
-			attachmentNames: '',
-			type: '',
-				// search for tags
-			searchEmp: '',
-			searchDept: '',
-			searchComp: '',
-				// array result for search
-			empList: [],
-			deptList: [],
-			compList: [],
-				// tags
-			checkedNames: [],
-			checkedDepts: [],
-			checkedComps: [],
+					},
+					showCommentBtn: {
+						display: false,
+						id:''
+					},
+					showCommentBtnModal: {
+						display: false,
+						id:''
+					},
+					comment: [],
+					announcement: [],
+					// postmsg: '',
+					page: 1,
+					attachmentNames: '',
+					type: '',
+						// search for tags
+					searchEmp: '',
+					searchDept: '',
+					searchComp: '',
+						// array result for search
+					empList: [],
+					deptList: [],
+					compList: [],
+						// tags
+					checkedNames: [],
+					checkedDepts: [],
+					checkedComps: [],
 
-			tagwithEmp: [],
-			tagwithDept: [],
-			tagwithComp: [],
+					tagwithEmp: [],
+					tagwithDept: [],
+					tagwithComp: [],
 
-			disableBtn:  false,
-			// for modal show small
-			tagLists: [],
-			isNoPost: false,
+					disableBtn:  false,
+					// for modal show small
+					tagLists: [],
+					isNoPost: false,
+
+					// greetings
+					showGreeting: false,
+					birthdays: [],
         };
 	},
 	methods:{
@@ -531,7 +609,6 @@ export default {
 				arrTagDept.push(obj.deptname);
 			});
 			formData.append('tagwith_dept', arrTagDept);
-
 
 			// TAG WITH COMP
 			let arrTagComp = [];
@@ -942,14 +1019,81 @@ export default {
 
 			}
 			
-		}
+		},
 
+		// birthday greetings
+		getBirthdays(){
+				axios.get('api/birthdays').then((response)=>{
+					if(response.status == 200 && response.data.length > 0){
+						this.birthdays = response.data;
+						if(!localStorage.getItem('greetings')){
+							this.showGreeting = true;
+							this.greetingConfetti();
+						}else{
+							const cacheDate = localStorage.getItem('greetings');
+							const currentDate = moment().format('YYYY-MM-DD');
+							if(cacheDate != currentDate){
+								this.showGreeting = true;
+								localStorage.setItem('greetings', currentDate);
+								this.greetingConfetti();
+							}
+						}
+					}
+				})
+				.catch((err)=>{ console.log(err); });
+		},
+		hideGreetings(){
+			this.showGreeting = false;
+			localStorage.setItem('greetings', moment().format('YYYY-MM-DD'));
+			fireworks.stop();
+			
+		},
+		// greetings confeeit
+		greetingConfetti(){
+			// if(!localStorage.getItem('greetings') || this.showGreeting) {
+
+					// // fireworks
+					setTimeout(()=>{
+						const container = document.querySelector('.fireworks-container')
+						fireworks = new Fireworks(container,{ 
+							acceleration: 1.005,
+							rocketsPoint: 3,
+							// friction: .9,
+							particles: 300,
+							// gravity: 3.1,
+							// sound: {
+							// 	enable: true,
+							// 	files: [
+							// 			"https://fireworks.js.org/sounds/explosion0.mp3",
+							// 			"https://fireworks.js.org/sounds/explosion1.mp3",
+							// 			"https://fireworks.js.org/sounds/explosion2.mp3"
+							// 	],
+							// 	volume: {
+							// 			"min": 4,
+							// 			"max": 90
+							// 	}
+							// },
+					});
+					fireworks.start();
+					}, 500);
+					
+					
+					var confettiElement = document.getElementById('my-canvas');
+					var confettiSettings = { target: confettiElement, rotate: true, size: 2 };
+					var confetti = new ConfettiGenerator(confettiSettings);
+					confetti.render();
+
+			// }
+		}
 
 	},
 	filters:{
 		moment: function (date) {
     		return moment(date).fromNow();
-  		}
+		},
+		filterBirthDate: function(date) {
+			return moment(date).format('MMMM D');
+		}
 	},
 	computed:{
 		daysDif(){
@@ -976,10 +1120,7 @@ export default {
                 return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },
 	},
-	created () {
- 		// window.addEventListener('scroll', this.handleScroll);
-		 this.loadCompany(' ');
-	},
+	
 	beforeDestroy(){
 		document.getElementById('content').className += " content";
 	},
@@ -988,20 +1129,26 @@ export default {
 	},
 
 	updated(){
-		jQuery.each(jQuery('textarea[data-autoresizecomment]'), function() {
+			jQuery.each(jQuery('textarea[data-autoresizecomment]'), function() {
 
-			let offset = this.offsetHeight - this.clientHeight;
+				let offset = this.offsetHeight - this.clientHeight;
 
-			let resizeTextarea3 = function(el) {
-				jQuery(el).css('height', 'auto').css({'height': el.scrollHeight + offset, "max-height": '200px'});
-			};
-			jQuery(this).on('keyup input', function() {
-				resizeTextarea3(this);
-			}).removeAttr('data-autoresizecomment');
+				let resizeTextarea3 = function(el) {
+					jQuery(el).css('height', 'auto').css({'height': el.scrollHeight + offset, "max-height": '200px'});
+				};
+				jQuery(this).on('keyup input', function() {
+					resizeTextarea3(this);
+				}).removeAttr('data-autoresizecomment');
 
-		});
-	},
-    mounted(){
+			});
+		},
+		created () {
+ 		// window.addEventListener('scroll', this.handleScroll);
+		 this.getBirthdays();
+		 this.loadCompany(' ');
+		},
+    mounted(){	
+		// scroll
 		window.addEventListener('scroll', this.handleScroll);
 		// remove white background for content
 		document.getElementById('content').classList.remove("content");

@@ -124,7 +124,13 @@ class SettingsController extends Controller
 
     public function getFormRecords(){
 
-        
+        if(request('td') == 'formtransmittal') {
+            request()->merge([
+                'datefrom' => UserSession::formatDate(request()->datefrom, 'Y-m-d 00:00:00'),
+                'dateto' => UserSession::formatDate(request()->dateto, 'Y-m-d 23:59:59'),
+            ]);
+        }
+        // return request()->all();
         // $data = DB::table(request(''))->select('name', 'email as user_email')->get();
         $sql = "select form.status, form.datefiled, CONCAT(emp.fname, emp.lname) as fullname,
                 dept.deptname, comp.compname, pos.posname, brch.branchname

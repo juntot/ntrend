@@ -174,9 +174,9 @@ export default {
         },
         {
             title: "Total Days", data: 'totaldays',
-            render:(data, type, row )=>{
-                return row['halfday'] > 0 ? data + 0.5 : 1;
-            },
+            // render:(data, type, row )=>{
+            //     return row['halfday'] > 0 ? data + 0.5 : 1;
+            // },
         },
         {
             title: "Half day", data: 'halfday',

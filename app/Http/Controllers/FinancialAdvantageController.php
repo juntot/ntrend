@@ -5,18 +5,26 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use Carbon\Carbon;
 use DB;
+
 
 class FinancialAdvantageController extends Controller
 {
     // ADD
     public function addFinancialAdvantage(){
+        date_default_timezone_set("Asia/Hong_Kong");
+        $now = Carbon::now();
+        
         // Session ID
         request()->merge(['empID_' => UserSession::getSessionID()]);
         $response = request()->except(['ísDisable']);
 
         request()->merge([
-            'datefiled' => UserSession::formatDate(request()->datefiled)
+            'datefiled' => $now,
+            'inclusiveDateFrom' => UserSession::formatDate(request()->inclusiveDateFrom),
+            'inclusiveDateTo' => UserSession::formatDate(request()->inclusiveDateTo),
+            'liqDate' => UserSession::formatDate(request()->liqDate),
         ]);
 
         $data = DB::table('formfinancialadvantage')->insertGetId(request()->except(['isDisable', 'faID', 'remarks', 'approvedby', 'reciever_emails']));
@@ -26,17 +34,23 @@ class FinancialAdvantageController extends Controller
             $response = array_merge($response, ['status' => 0, 'faID' => $data]);
 
         // mail notification
-        MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'FINANCIAL ADVANTAGE REQUEST');
-        MailServices::formNotify(request('reciever_emails'), request('empID_'), 'financial advantage request', $data, 'fadvantage');
+        MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'FINANCIAL ADVANCE REQUEST');
+        MailServices::formNotify(request('reciever_emails'), request('empID_'), 'financial advance request', $data, 'fadvantage');
         return $response;
     }
     // UPDATE
     public function updateFinancialAdvantage(){
+        date_default_timezone_set("Asia/Hong_Kong");
+        $now = Carbon::now();
+
         // SESSION ID
         request()->merge(['empID_' => UserSession::getSessionID(), 'status' => 0]);
         $response = request()->except(['ísDisable']);
         request()->merge([
-            'datefiled' => UserSession::formatDate(request()->datefiled)
+            'datefiled' => $now,
+            'inclusiveDateFrom' => UserSession::formatDate(request()->inclusiveDateFrom),
+            'inclusiveDateTo' => UserSession::formatDate(request()->inclusiveDateTo),
+            'liqDate' => UserSession::formatDate(request()->liqDate),
         ]);
 
         DB::table('formfinancialadvantage')
@@ -56,9 +70,11 @@ class FinancialAdvantageController extends Controller
     public function getFinancialAdvantageByEmployee(){
         // SESSION ID
         $data = DB::select('select form.*,
-        DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
+        DATE_FORMAT(form.datefiled, "%m/%d/%Y %h:%i %p") as datefiled,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formfinancialadvantage form left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid
+        order by form.faID desc
+        ', [UserSession::getSessionID()]);
         return $data;
     }
 
@@ -76,7 +92,7 @@ class FinancialAdvantageController extends Controller
         // [UserSession::getSessionID(), UserSession::getSessionID()]);
         // $data = DB::select('select efadvantage.* from formfinancialadvantage efadvantage left join eformapproverbyemp eform on efadvantage.empID_ = eform.empID_ where eform.approverID_ = :approverID', [UserSession::getSessionID()]);
         $data = DB::select('select efadvantage.*,
-                            DATE_FORMAT(efadvantage.datefiled, "%m/%d/%Y") as datefiled,
+                            DATE_FORMAT(efadvantage.datefiled, "%m/%d/%Y %h:%i %p") as datefiled,
                             CONCAT(emp.fname," ",emp.lname) as fullname, emp.email,
                             branch.branchname, pos.posname , dept.deptname
                             from formfinancialadvantage efadvantage left join eformapproverbyemp eform
@@ -90,32 +106,37 @@ class FinancialAdvantageController extends Controller
                             inner join department dept
                                 on dept.deptID = emp.deptID_
                             where efadvantage.recstat != 1 and
-                            eform.approverID_ = :approverID', [UserSession::getSessionID()]);
+                            eform.approverID_ = :approverID
+                            order by efadvantage.faID desc
+                            ', [UserSession::getSessionID()]);
         return $data;
     }
 
     // IE APPROVE / REJECTED
     public function actionFormFinancialAdvantage(){
+        date_default_timezone_set("Asia/Hong_Kong");
+        $now = Carbon::now();
+
         DB::table('formfinancialadvantage')
         ->where('faID', request('faID'))
         ->update([
             'status' => request('status'), 'approvedby'=> request('approvedby'),
-            'approveddate'=> date("Y-m-d"), 'remarks' => request('remarks')
+            'approveddate'=> $now, 'remarks' => request('remarks')
             ]);
 
         // MAIL NOTIFICATION
         if(request('status') == 1)
         {
-            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'FINANCIAL ADVANTAGE REQUEST', 'APPROVED');
-            MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'financial advantage request', 'approved', request('faID'), 'fadvantage');
+            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'FINANCIAL ADVANCE REQUEST', 'APPROVED');
+            MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'financial advance request', 'approved', request('faID'), 'fadvantage');
         }
         elseif(request('status') == 2){
-            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'FINANCIAL ADVANTAGE REQUEST', 'REJECTED');
-            MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'financial advantage request', 'rejected', request('faID'), 'fadvantage');
+            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'FINANCIAL ADVANCE REQUEST', 'REJECTED');
+            MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'financial advance request', 'rejected', request('faID'), 'fadvantage');
         }
         else{
-            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'FINANCIAL ADVANTAGE REQUEST', 'CANCELLED');
-            MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'financial advantage request', 'cancelled', request('faID'), 'fadvantage');
+            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'FINANCIAL ADVANCE REQUEST', 'CANCELLED');
+            MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'financial advance request', 'cancelled', request('faID'), 'fadvantage');
         }
         return request()->all();
     }

@@ -151,7 +151,7 @@ export default {
                 }
             });
             this.dtHandle=$('#overtimeform').DataTable({
-            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [3] }],
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [4] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,

@@ -52,6 +52,27 @@
             <div class="col-lg-12">
                 <h5 class="form-subtitle"><em>Financial Advance Details</em></h5>
             </div>
+            <div class="col-md-4">
+                <div class="form-group-limit">
+                        <Datepicker  :value="inclusiveDateFrom" :disabled="$parent.disabledinput" @selected="selectDateFrom" wrapper-class="mdb-form-field" input-class="form-field__input datePicker"
+                        :typeable="false" :format="'MM/dd/yyyy'">
+                        <label slot="afterDateInput" class="form-field__label">Includsive Date From</label>
+                        <div slot="afterDateInput" class="form-field__bar"></div>
+                        <span slot="afterDateInput" class="errors">{{ errors.first('date from') }}</span>
+                        </Datepicker>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group-limit">
+                        <Datepicker  :value="inclusiveDateTo" :disabled="$parent.disabledinput" @selected="selectDateTo" wrapper-class="mdb-form-field" input-class="form-field__input datePicker"
+                        :typeable="false" :format="'MM/dd/yyyy'">
+                        <label slot="afterDateInput" class="form-field__label">Inclusive Date To</label>
+                        <div slot="afterDateInput" class="form-field__bar"></div>
+                        <span slot="afterDateInput" class="errors">{{ errors.first('date to') }}</span>
+                        </Datepicker>
+                </div>
+            </div>
+            <div class="clearfix"></div>
             <div class="col-md-2">
                     <div class="mdb-form-field form-group-limit">
                         <div class="form-field__control">
@@ -70,6 +91,17 @@
                             <div class="form-field__bar"></div>
                         </div>
                     </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="col-md-12">
+                <div class="mdb-form-field">
+                    <div class="form-field__control mdb-bgcolor">
+                        <textarea :disabled="$parent.disabledinput" class="form-field__textarea"  cols="4" rows="4" v-validate="'required'" v-model="reason" name="additional-info"></textarea>
+                        <label class="form-field__label">Reason</label>
+                        <div class="form-field__bar"></div>
+                    </div>
+                    <h6><span class="errors">{{ errors.first('additional-info') }}</span></h6>
+                </div>
             </div>
             <div class="clearfix"></div>
             <div class="col-lg-12">
@@ -114,17 +146,31 @@
                     </div>
                     <div class="col-md-4"></div>
             </div>
-
+            <div class="cearflix"></div>
+            <br><br><br>
             <div class="col-md-12">
-                <div class="mdb-form-field">
-                    <div class="form-field__control mdb-bgcolor">
-                        <textarea :disabled="$parent.disabledinput" class="form-field__textarea"  cols="4" rows="4" v-validate="'required'" v-model="reason" name="additional-info"></textarea>
-                        <label class="form-field__label">Additional Details</label>
-                        <div class="form-field__bar"></div>
-                    </div>
-                    <h6><span class="errors">{{ errors.first('additional-info') }}</span></h6>
+                <div class="form-group-limit" style="margin: 0 auto;">
+                        <Datepicker :value="liqDate" :disabled="$parent.disabledinput" @selected="selectDateLiq" wrapper-class="mdb-form-field" input-class="form-field__input datePicker"
+                        :typeable="false" :format="'MM/dd/yyyy'">
+                        <label slot="afterDateInput" class="form-field__label">Date of liquidation (after 3 working days)</label>
+                        <div slot="afterDateInput" class="form-field__bar"></div>
+                        <span slot="afterDateInput" class="errors">{{ errors.first('date to') }}</span>
+                        </Datepicker>
                 </div>
             </div>
+            <br><br>
+            <div class="clearfix"></div>
+            <div class="col-lg-12 text-center">
+                <p style="line-height: 2.1">
+                <span class="font-weight-bold">Authority to Deduct</span><br>
+                <span class="font-weight-bold">This is to autorize the payroll in-charge of</span>
+                Trend Group of Companies <br>
+                <span class="font-weight-bold">to deduct from my salary to total amount as specified above</span> 
+                if not liquidated <br> 
+                within three (3) working days after the activity is completed.
+                </p>
+            </div>
+            
             <div class="clearfix"></div>
             <div class="col-lg-12">
                     <h5 class="form-subtitle"><em>FOR APPROVER</em></h5>
@@ -181,7 +227,7 @@ export default {
 		return {
 
         // empID_: '',
-        datefiled: moment(new Date()).format('MM/DD/YYYY'),
+        datefiled: moment(new Date()).format('MM/DD/YYYY hh:mm A'),
 		modtype: 1,
         reason: '',
         amount: '',
@@ -189,8 +235,10 @@ export default {
         isDisable: false,
         faID: '',
         approvedby: '',
-        remarks: ''
-
+        remarks: '',
+        inclusiveDateFrom: moment(new Date()).format('MM/DD/YYYY'),
+        inclusiveDateTo: moment(new Date()).format('MM/DD/YYYY'),
+        liqDate: moment(new Date()).format('MM/DD/YYYY'),
 		}
     },
     watch:{
@@ -199,6 +247,15 @@ export default {
         }
     },
     methods:{
+        selectDateFrom(val){
+            this.inclusiveDateFrom = moment(val).format('MM/DD/YYYY');
+        },
+        selectDateTo(val){
+            this.inclusiveDateTo = moment(val).format('MM/DD/YYYY');
+        },
+        selectDateLiq(val){
+            this.liqDate = moment(val).format('MM/DD/YYYY');
+        },
         addFinancialAdvantage(){
             if(this.isFormValid){
                 this.isDisable = true;
@@ -255,8 +312,11 @@ export default {
                 if(key != 'datefiled' && key != 'dateneed' && key != 'worktype' && key != 'modtype'){
                     this.$data[key] =  '';
                 }
-                if(key == 'datefiled'){
+                if(key == 'liqDate' || key == 'inclusiveDateFrom' || key == 'inclusiveDateTo'){
                     this.$data[key] =  moment(new Date()).format('MM/DD/YYYY');
+                }
+                if(key == 'datefiled'){
+                    this.$data[key] =  moment(new Date()).format('MM/DD/YYYY hh:mm A')
                 }
                 if(key=='isDisable'){
                     this.$data[key] = false;

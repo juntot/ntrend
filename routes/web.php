@@ -51,6 +51,9 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
 
 
 
+        // ============================ GREETINGS ===============================
+        Route::get('/api/birthdays', 'GreetingController@birthdayGreeting');
+
 
         // ============================ GLOBAL ===============================
             Route::get('/api/global-getinfo', 'GlobalController@getGlobalEmployeeInfo');
@@ -261,6 +264,14 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/api/getoverride', 'OverrideController@getOverride');
             Route::get('/api/getOverrideApprover', 'OverrideController@getOverrideApprover');
 
+            // TRANSMITTAL FORM
+            Route::post('/api/search-transmittal-emp', 'TransmittalController@searchEmp');
+            Route::get('/api/get-transmittal', 'TransmittalController@getTransmittal');
+            Route::post('/api/addtransmittal', 'TransmittalController@addTransmittal');
+            Route::post('/api/updatetransmittal', 'TransmittalController@updateTransmittal');
+            Route::post('/api/deletetransmittal/{transID?}', 'TransmittalController@deleteTransmittal');
+
+
             // FORM APPROVERS ===========================================================================
             // LEAVE
             Route::get('/api/approvalleaverequest', 'LeaveController@approvalLeaveRequest');
@@ -345,6 +356,10 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/api/approvalOverrideForm', 'OverrideController@approvalOverrideForm');
             Route::post('/api/actionformOverride', 'OverrideController@actionFormOverride');
 
+            // TRANSMITTAL
+            Route::get('/api/approvaltransmittal', 'TransmittalController@approvalTransmittal');
+            Route::post('/api/actiontransmittal', 'TransmittalController@actionTransmittal');
+            
 
             // =============================  API  ==============================
 
@@ -511,6 +526,23 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             // form group details
             Route::get('/api/get-form-group-details', 'SettingsController@getFormGroupDetails');
             Route::post('/api/set-form-group-details', 'SettingsController@setFormGroupDetails');
+
+
+            // TRANSMITTAL ADDRESS
+            Route::get('/api/get-transmittal-address', 'TransmittalController@getAddress');
+            Route::post('/api/add-transmittal-address', 'TransmittalController@addAddress');
+            Route::post('/api/update-transmittal-address', 'TransmittalController@updateAddress');
+            Route::post('/api/delete-transmittal-address', 'TransmittalController@deleteAddress');
+
+            // TRANSMITTAL FROM GROUP
+            Route::get('/api/get-transmittal-group', 'TransmittalController@getFormGroup');
+            Route::post('/api/add-transmittal-group', 'TransmittalController@addFormGroup');
+            Route::post('/api/update-transmittal-group', 'TransmittalController@updateFormGroup');
+            Route::post('/api/delete-transmittal-group', 'TransmittalController@deleteFormGroup');
+
+            // transmittal form group details
+            Route::get('/api/get-transmittal-group-details', 'TransmittalController@getFormGroupDetails');
+            Route::post('/api/set-transmittal-group-details', 'TransmittalController@setFormGroupDetails');
 
 
             Route::get('/api/get-form-nav', 'SettingsController@getFormNav');

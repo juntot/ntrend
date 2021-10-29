@@ -1,13 +1,13 @@
 <template>
     <div>
-
+        <h4 class="text-right" style="color: #3f51b5">{{workID ? 'Ticket# '+workID: ''}}</h4>
         <form method="post">
             <h3 class="text-center form-title"><span class="dblUnderlined">WORK REQUEST FORM</span></h3>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limit">
                         <div class="form-field__control">
-                            <input type="text" class="form-field__input" :value="datefiled" name="Date requested" readonly="true">
-                            <label class="form-field__label">Date requested</label>
+                            <input type="text" class="form-field__input" :value="datefiled_datetime" name="Date requested" readonly="true">
+                            <label class="form-field__label">Date & Time requested</label>
                             <div class="form-field__bar"></div>
                         </div>
                     </div>
@@ -508,7 +508,8 @@ export default {
         status: 0,
         empID_: '',
         work_attachment: '',
-        datefiled: moment(new Date()).format('MM/DD/YYYY'),
+        datefiled_datetime: moment(new Date()).format('MM/DD/YYYY HH:mm:ss'),
+        datefiled: moment(new Date()).format('MM/DD/YYYY HH:mm:ss'),
 		dateneed: moment(moment(new Date()).add(1, 'days')).format('MM/DD/YYYY'),
         date_from: moment(new Date()).format('MM/DD/YYYY'),
         date_to: moment(new Date()).format('MM/DD/YYYY'),
@@ -690,7 +691,9 @@ export default {
                 if(i == 'request_type' && typeof data[i] == 'string')
                 this.$data[i] = (data[i]).split(",");
 
-
+                if(i == 'datefiled_datetime')
+                this.$data[i] = moment(data[i]).format('DD/MM/YYYY HH:mm:ss');
+                
                 // if(i == 'worktype')
                 // this.$data[i] = (worktype.indexOf(data[i]) + 1);
 

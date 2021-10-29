@@ -307,7 +307,11 @@ class ReportController extends Controller
             // FA
             case 'financialadvance':
                 $data = DB::select('select efadvantage.*,
-                            DATE_FORMAT(efadvantage.datefiled, "%m/%d/%Y") as datefiled,
+                            DATE_FORMAT(efadvantage.datefiled, "%m/%d/%Y %h:%i %p") as datefiled,
+                            DATE_FORMAT(efadvantage.inclusiveDateFrom, "%m/%d/%Y) as inclusiveDateFrom,
+                            DATE_FORMAT(efadvantage.inclusiveDateTo, "%m/%d/%Y) as inclusiveDateTo,
+                            DATE_FORMAT(efadvantage.liqDate, "%m/%d/%Y) as liqDate,
+                            DATE_FORMAT(efadvantage.approveddate, "%m/%d/%Y %h:%i %p") as approveddate,
                             CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname , dept.deptname,
                             (
                                 select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
@@ -328,7 +332,8 @@ class ReportController extends Controller
                             AND
                                 efadvantage.status IN('.$status.')
                             AND
-                                efadvantage.recstat != 1',
+                                efadvantage.recstat != 1
+                            ORDER BY efadvantage.faID',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -981,6 +986,92 @@ class ReportController extends Controller
                                 // UserSession::getSessionID()
 
                             ]);
+                return $data;
+                break;
+
+            case 'transmittal':
+                $data = DB::select('select trans.*,
+                            DATE_FORMAT(trans.datefiled, "%m/%d/%Y %h:%i %p") as datefiled,
+                            CONCAT(emp.fname," ",emp.lname) as fullname, 
+                            emp.mobile, emp.lname, emp.fname, emp.email,
+                            branch.branchname, pos.posname, dept.deptname,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = trans.approvedby
+                            ) as search_employee,
+                            (
+                                select sub.posname from positiontbl sub 
+                                inner join employee subemp
+                                    on sub.posID = subemp.posID_
+                                where subemp.empID = trans.approvedby
+                            ) as receiver_pos,
+                            (
+                                select sub.deptname from department sub 
+                                inner join employee subemp
+                                    on sub.deptID = subemp.deptID_
+                                where subemp.empID = trans.approvedby
+                            ) as receiver_dept,
+                            (
+                                select sub.branchname from branchtbl sub 
+                                inner join employee subemp
+                                    on sub.branchID = subemp.branchID_
+                                where subemp.empID = trans.approvedby
+                            ) as receiver_branch
+
+                            from formtransmittal trans right join employee emp
+                                on emp.empID = trans.empID_
+                            inner join positiontbl pos
+                                on pos.posID = emp.posID_
+                            inner join department dept
+                                on dept.deptID = emp.deptID_
+                            inner join branchtbl branch
+                                on branch.branchID = emp.branchID_
+                            WHERE
+                                (trans.datefiled BETWEEN :dateFrom AND :dateTo)
+                            AND
+                                emp.branchID_ IN('.$branch.')
+                            AND
+                                trans.status IN('.$status.')
+                            AND
+                                trans.recstat != 1',
+                            [
+                                $datefrom, $dateto,
+                                // $branch,
+                                // $status
+                                // UserSession::getSessionID()
+
+                            ]);
+                // $data = DB::select('select eccard.*,
+                // DATE_FORMAT(eccard.datefiled, "%m/%d/%Y") as datefiled,
+                // CONCAT(emp.fname," ",emp.lname) as fullname, emp.mobile, emp.lname, emp.fname, emp.email,
+                // branch.branchname, pos.posname, dept.deptname,
+                //             (
+                //     select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                //     where subemp.empID = eccard.approvedby
+                // ) as approvedby
+                // from formcallingcard eccard right join employee emp
+                //     on emp.empID = eccard.empID_
+                // inner join positiontbl pos
+                //     on pos.posID = emp.posID_
+                // inner join department dept
+                //     on dept.deptID = emp.deptID_
+                // inner join branchtbl branch
+                //     on branch.branchID = emp.branchID_
+                // WHERE
+                //     (eccard.datefiled BETWEEN :dateFrom AND :dateTo)
+                // AND
+                //     emp.branchID_ IN('.$branch.')
+                // AND
+                //     eccard.status IN('.$status.')
+                // AND
+                //     eccard.recstat != 1',
+                // [
+                //     $datefrom, $dateto,
+                //     // $branch,
+                //     // $status
+                //     // UserSession::getSessionID()
+
+                // ]);
                 return $data;
                 break;
         endswitch;

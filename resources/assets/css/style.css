@@ -420,6 +420,7 @@ body#login{
 
 .close-mobile-nav{
   display: none;
+  right: 7px !important;
 }
 
 
@@ -1123,6 +1124,9 @@ hr#narrow-margin-post{
   border-top: 1px solid #e8e8e8;
 }
 
+th.narrow-width, td.narrow-width{
+  width: 66px;
+}
 
 .inline-blocklbl{
   top: -3px;
@@ -1680,15 +1684,26 @@ ul.nopadding.nomargin.nostyle-list.emplist li:last-child label {
   animation-name: fadeInUp;
 }
 
+#printArea{
+  position: absolute;
+  top: 0;
+  left:0;
+  right:0;
+  bottom: 0;
+  visibility: hidden;
+}
 
-
+#printArea .float-list li{
+  float: left;
+  margin-left: 30px;
+}
 
 /* PRINT SECTION */
 
 @media screen {
   #printSection {
       display: none;
-  }
+  } 
 }
 
 @media print {
@@ -1722,6 +1737,9 @@ ul.nopadding.nomargin.nostyle-list.emplist li:last-child label {
     top:0;
     right: 0;
     bottom: 0;
+  }
+  #printArea{
+    visibility:visible;
   }
 }
 

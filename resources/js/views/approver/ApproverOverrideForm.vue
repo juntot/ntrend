@@ -134,9 +134,31 @@ export default {
             this.dtHandle.draw();
         },
         rows(val, old){
-            let row = val;
+            // let row = val;
+            let rows = [];
+            rows = defaultRows.filter(data=>{
+                return this.status.includes(data.status+'') || data.status == 1;
+            }).reduce((acc, cur)=>{
+                if(this.status.includes('1.1') && !this.status.includes('1.0')){
+                    if((cur.endorsedby_.includes(',') && cur.status == 1) || cur.status != 1){
+                        acc.push(cur);
+                    }
+                }else if(this.status.includes('1.0') && !this.status.includes('1.1')){
+                    if((!cur.endorsedby_.includes(',') && cur.status == 1) || cur.status != 1){
+                        acc.push(cur);
+                    }
+                }else if(!this.status.includes('1.1') && !this.status.includes('1.0')){
+                    if(cur.status != 1){
+                        acc.push(cur);
+                    }
+                }else{
+                    acc.push(cur);
+                }
+                
+                return acc;
+            }, []);
             this.dtHandle.clear();
-            this.dtHandle.rows.add(row);
+            this.dtHandle.rows.add(rows);
             this.dtHandle.draw();
         },
         approvers(val, old){

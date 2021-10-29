@@ -136,18 +136,15 @@ export default {
             this.dtHandle.draw();
         },
         rows(val, old){
-            let row = val;
+            let rows = [];
+            // let row = val;
 
-            row.forEach((item, index)=>{
-                // if(!isNaN(item.status)){
-                //     row[index]['status'] = status[item.status];
-                // }
-                // if(!isNaN(item.worktype)){
-                //     row[index]['worktype'] = worktype[(item.worktype - 1)];
-                // }
+            rows = defaultRows.filter(data=>{
+                return this.status.includes(data.status+'');
             });
+            
             this.dtHandle.clear();
-            this.dtHandle.rows.add(row);
+            this.dtHandle.rows.add(rows);
             this.dtHandle.draw();
         }
     },
@@ -234,7 +231,7 @@ export default {
                 }
             });
             this.dtHandle=$('#workrequest').DataTable({
-            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [2] }],
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [3] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
@@ -297,7 +294,10 @@ export default {
         {
             title: "Employee Name", data: 'fullname'
         },{
-            title: "Date Filed", data: 'datefiled'
+            title: "Date & Time Filed", data: 'datefiled_datetime',
+            render: function(data) {
+                return moment(data).format('MM/DD/YYYY HH:mm:ss');
+            }
         },
         // {
         //     title: "Date Needed", data: 'dateneed'

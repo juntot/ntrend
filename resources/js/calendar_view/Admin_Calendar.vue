@@ -44,7 +44,7 @@
 
                     <v-spacer></v-spacer>
                     <div class="dropdown calendar-dropdown">
-                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Dropdown Example
+                        <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">View
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">

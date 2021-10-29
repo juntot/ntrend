@@ -11,7 +11,7 @@ use App\Services\UserSession;
 class MailServices{
 
     // header notifications
-    public static function sendNotify($email, $from, $formType = null){
+    public static function sendNotify($email, $from, $formType = null, $subject = ''){
 
         $result = DB::select('select concat(fname," ",lname) as fullname from employee where empID = :from', [$from]);
 
@@ -19,11 +19,12 @@ class MailServices{
                     <span style="color:#F97000">'.$result[0]->fullname.'</span>
                     <br><br>Regarding his/her
                     <span style="color:#F97000">'.$formType.'</span>';
-
-        Mail::to($email)->send(new FormMail($message));
+        
+        Mail::to($email)->send(new FormMail($message, $subject));
+        
     }
 
-    public static function sendNotifyReviewed($email, $from, $formType = null, $status = null){
+    public static function sendNotifyReviewed($email, $from, $formType = null, $status = null, $subject = ''){
 
         $result = DB::select('select concat(fname," ",lname) as fullname from employee where empID = :from', [$from]);
 
@@ -31,7 +32,7 @@ class MailServices{
                     <br><br>and it is <span style="color:#F97000">'.$status.'</span> by
                     <span style="color:#F97000">'.$result[0]->fullname.'</span>';
 
-        Mail::to($email)->send(new FormMail($message));
+        Mail::to($email)->send(new FormMail($message, $subject));
     }
 
     // form notifications
@@ -94,14 +95,14 @@ class MailServices{
 
 
     // CONFIRMATION
-    public static function send_email_Notify($email, $from, $formType = null, $message = ''){
+    public static function send_email_Notify($email, $from, $formType = null, $message = '', $subject = ''){
 
         $result = DB::select('select concat(fname," ",lname) as fullname from employee where empID = :from', [$from]);
 
         $message = '<span style="color:#F97000">'.$result[0]->fullname.' </span> '.$message.'
                      <span style="color:#F97000">'.$formType.'</span>';
 
-        Mail::to($email)->send(new FormMail($message));
+        Mail::to($email)->send(new FormMail($message, $subject));
     }
 
     // check supplmentary for implementation
@@ -124,6 +125,14 @@ class MailServices{
     }
 
 
+    public static function getEmailsByEmpId($empID = ''){
+        $approverEmail = DB::select('select email from employee where empID = :empID', [$empID]);
+        if(count($approverEmail)){
+            return $approverEmail[0]->email;
+        }else{
+            return null;
+        }
+    }
 
     // GET APPORVERS EMAILS
     public static function getApproverEmail($id, $idVal, $form, $colName) { 

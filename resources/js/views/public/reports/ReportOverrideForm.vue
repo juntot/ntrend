@@ -93,7 +93,7 @@ export default {
             return s;
         },
 
-        downloadXLS(){
+        async downloadXLS(){
 
             let wb = XLSX.utils.book_new();
 
@@ -116,7 +116,8 @@ export default {
             ];
 
             rows.push(header);
-            this.rows.forEach(obj => {                                
+            for (const obj of this.rows) {
+                
                 let records = [
                             obj.overrideID, obj.fullname, obj.company, obj.branch, obj.division, obj.dateoverride, 
                             obj.customer_name, obj.mode, obj.sales_employee, obj.sales_manager, obj.commited_date, 
@@ -158,14 +159,18 @@ export default {
                             
                         ];
                 // records.push();
-                rows.push(records);
-            });
+                await rows.push(records);
+            }
+
+            // this.rows.forEach(obj => {                                
+                
+            // });
             
             // console.log(rows);
             // /* SHEET 1 */
             // let ws = XLSX.utils.aoa_to_sheet([["a","b", "c"],[3,2,1],[1,2,3]]);
-            
-            let ws = XLSX.utils.aoa_to_sheet(rows);
+            // console.log(rows);
+            let ws = XLSX.utils.aoa_to_sheet(await rows);
             XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
 
             XLSX.writeFile(wb, this.title+".xls");

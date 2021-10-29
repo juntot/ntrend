@@ -10,7 +10,7 @@
             <div class="col-lg-6 col-md-6  with-margin-bottom nopadding">
                 <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">ADD NEW</button>
             </div>
-            <table id="fadvantage" class="mdl-data-table" style="width:100%"></table>
+            <table id="transmittalTbl" class="mdl-data-table" style="width:100%"></table>
 
             <!-- Modal -->
             <div id="myModal" class="modal fade" role="dialog" ref="vuemodal">
@@ -22,7 +22,7 @@
                             <!-- <h4 class="modal-title">Modal Header</h4> -->
                         </div>
                         <div class="modal-body">
-                            <ManageFinancialAdvantage :userinfo="$root.userinfo" :selected="selected"></ManageFinancialAdvantage>
+                            <ManageTransmittal :userinfo="$root.userinfo" :selected="selected"></ManageTransmittal>
                         </div>
                     </div>
                 </div>
@@ -33,13 +33,33 @@
     </div>
 </template>
 <script>
-import ManageFinancialAdvantage from '../../components/public/ManageFinancialAdvantage';
-let modtype = ['RF ONLINE', 'CHECK', 'CASH', 'PETTY CASH'];
-let status = ['Pending', 'Approved', 'Rejected'];
+import ManageTransmittal from '../../components/public/ManageTransmittal';
+// let worktype = ['System Access (SAP, HRIS etc.)',
+//                 'Borrow item',
+//                 'System Autorization',
+//                 'RDP Access',
+//                 'Password Reset',
+//                 'Internet Access',
+//                 'Email Setup',
+//                 'Install Apps(Spark, Skype, etc.)',
+//                 'Setup Workstation',
+//                 'Setup Printer'
+//                 ,'Setup Telephone',
+//                 'Cleaning / Maintenance',
+//                 'Repair',
+//                 'Format',
+//                 'System Report',
+//                 'System Layout',
+//                 'GPS Report',
+//                 'Conversation History',
+//                 'CCTV Report',
+//                 'File & Data Recovery'];
+
+// let status = ['Pending', 'Approved', 'Rejected'];
 
 export default {
     components:{
-        ManageFinancialAdvantage
+        ManageTransmittal
     },
     data(){
         return{
@@ -59,12 +79,12 @@ export default {
             let row = val;
 
             row.forEach((item, index)=>{
-                if(!isNaN(item.status)){
-                    row[index]['status'] = status[item.status];
-                }
-                if(!isNaN(item.modtype)){
-                    row[index]['modtype'] = modtype[(item.modtype - 1)];
-                }
+                // if(!isNaN(item.status)){
+                //     row[index]['status'] = status[item.status];
+                // }
+                // if(!isNaN(item.worktype)){
+                //     row[index]['worktype'] = worktype[(item.worktype - 1)];
+                // }
             });
             this.dtHandle.clear();
             this.dtHandle.rows.add(row);
@@ -85,7 +105,7 @@ export default {
         {
             let row = this.$data.rows;
             row.forEach((item, index)=>{
-                if(item.faID == val)
+                if(item.transID == val)
                 {
                     this.$data.rows.splice(index, 1);
                     $("#myModal").modal("hide");
@@ -98,7 +118,7 @@ export default {
         {
             let row = this.$data.rows;
             row.forEach((item, index)=>{
-                if(item.faID == val.faID)
+                if(item.transID == val.transID)
                 {
                     this.$data.rows.splice(index, 1);
                     this.$data.rows.unshift(val);
@@ -107,6 +127,7 @@ export default {
 
         },
         setUpdate(data){
+
             bus.$emit('setupdate', data);
         },
 
@@ -121,13 +142,13 @@ export default {
     },
 
     mounted(){
+        
+        this.formtitle = (this.$router.currentRoute.name).toUpperCase();
 
-        // this.forapprover = ((this.$route.path).slice(1)).toLowerCase().split('-')[];
-        this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
-
-        axios.get('api/getFinancialAdvantagebyemployee').then((response)=>{
+        axios.get('api/get-transmittal').then((response)=>{
             this.loader = false;
             this.rows=response.data;
+
 
             $.extend(jQuery.fn.dataTableExt.oSort, {
                 "date-uk-pre": function (a) {
@@ -138,7 +159,7 @@ export default {
                         var month = parseInt(dateA[0], 10);
                         var year = parseInt(dateA[2], 10);
                         var date = new Date(year, month - 1, day)
-                        x = moment(a).valueOf();
+                        x = date.getTime();
                     }
                     catch (err) {
                         x = new Date().getTime();
@@ -155,8 +176,8 @@ export default {
                     return b - a;
                 }
             });
-            this.dtHandle=$('#fadvantage').DataTable({
-            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [1] }],
+            this.dtHandle=$('#transmittalTbl').DataTable({
+            // aoColumnDefs: [{ "sType": "date-uk", "aTargets": [0] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
@@ -166,14 +187,17 @@ export default {
             "order": [[ 0, "desc" ]],
             "rowCallback": function(row, data, index) {
                 var cellValue = data["status"];
-                    if (cellValue=="Pending") {
-                       $(row).addClass("tr-pending");
+                    if (cellValue==1) { // partially received
+                       $(row).addClass("tr-executed");
                     }
-                    if (cellValue=="Approved") {
+                    if (cellValue==2) { // confirmed
                        $(row).addClass("tr-approved");
                     }
-                    if (cellValue=="Rejected") {
+                    if (cellValue==3) { // rejected
                        $(row).addClass("tr-rejected");
+                    }
+                    if (cellValue==4) { //confirmed
+                       $(row).addClass("tr-verified");
                     }
 
                 }
@@ -183,11 +207,14 @@ export default {
             let rows = this.rows.length;
             let self = this;
             // Add event listener for opening and closing details
-            $("#fadvantage tbody").on('click', 'tr', function() {
+            $("#transmittalTbl tbody").on('click', 'tr', function() {
                 var tr = $(this).closest('tr');
                 var row = table.row( tr );
-                if(row.data().status.toLowerCase() == 'approved' ||
-                   row.data().status.toLowerCase() == 'rejected')
+                if(row.data().status == 1 || // Approved
+                   row.data().status == 2 || //'rejected'
+                   row.data().status == 3 || // executed
+                   row.data().status == 4  //  confirmed
+                )
                 {
                     self.disabledinput = true;
                     // return;
@@ -203,31 +230,30 @@ export default {
 
         });
 
-        // APPROVERS
-        axios.get('api/getFinancialAdvantageApprover').then((response)=>{
-            this.approvers =  response.data;
-        })
-        .catch((err)=>{});
 
         let columnDefs = [
-            {
-            title: "FA#", data: 'faID', visible: true,
+        {
+            title: "Pouch #", data: 'transID'
+        },
+        {
+            title: "To", data: 'search_employee'
         },
         // {
         //     title: "Employee ID", data: 'empID_'
         // },
         {
-            title: "Date & Time Filed", data: 'datefiled'
-        },{
-            title: "Amount", data: 'amount'
-        },{
-            title: "Amount in words", data: 'amountwords'
-        },{
-            title: "Mode of Release", data: 'modtype'
-        },{
-            title: "Reason", data: 'reason', className: "row-limit"
-        },{
-            title: "Status", data: 'status'
+            title: "Date & Time Filed", data: 'datefiled_datetime',
+            render: function(data) {
+                return moment(data).format('DD/MM/YYYY HH:mm:ss A');
+            }
+        },
+        {
+            title: "Status", data: 'status',
+            render: function(data){
+                return data == 0 ? 'In Transit':
+                       data == 1 ? 'Partially Received':
+                       data == 2 ? 'Received': 'Rejected';
+            }
         }];
 
         // MODAL

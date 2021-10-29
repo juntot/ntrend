@@ -20,6 +20,8 @@ import UrgentCheck from './views/public/UrgentCheck';
 import SupplierAccreditation from './views/public/SupplierAccreditation';
 import PRS from './views/public/PRS';
 import OverrideForm from './views/public/OverrideForm';
+import Transmittal from './views/public/Transmittal';
+
 
 // FOR FORM APPROVERS
 import ApproverLeaveForm from './views/approver/ApproverLeaveForm';
@@ -45,6 +47,8 @@ import ApproverUrgentCheck from './views/approver/ApproverUrgentCheck';
 import ApproverSupplierAccreditation from './views/approver/ApproverSupplierAccreditation';
 import ApproverPRS from './views/Approver/ApproverPRS';
 import ApproverOverrideForm from './views/Approver/ApproverOverrideForm';
+import ApproverTransmittal from './views/Approver/ApproverTransmittal';
+
 
 // REPORTS
 import Reports from './views/public/Reports'
@@ -205,6 +209,13 @@ export default{
             component: OverrideForm,
             name: 'Override Request Form'
         },
+        // TRansmittal
+        {
+            path: '/transmittal',
+            component: Transmittal,
+            name: 'Transmittal Form'
+            
+        },
 
         // ==================================  FOR FORM APPROVERS  ==================================
 
@@ -341,6 +352,14 @@ export default{
             component: ApproverOverrideForm,
             name: 'Approval Override Request Form'
         },
+        // TRansmittal
+        {
+            path: '/approval-transmittal',
+            component: ApproverTransmittal,
+            name: 'Approval Transmittal Form'
+            
+        },
+
         // ============================================ REPORTS =====================================================
         {
             path: '/reports',

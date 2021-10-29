@@ -73,7 +73,7 @@
             </tr>
             <tr>
                 <td style="padding-top: 50px;">
-                    <a style="cursor: pointer;" href="http://dev.northtrend.com">
+                    <a style="cursor: pointer;" href="e-portal.northtrend.com">
                         <button style="
                         text-decoration: none;
                         cursor: pointer;

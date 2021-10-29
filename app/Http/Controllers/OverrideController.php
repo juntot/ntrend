@@ -133,7 +133,10 @@ class OverrideController extends Controller
         DATE_FORMAT(form.dateoverride, "%m/%d/%Y %h:%i %p") as dateoverride,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formoverride form 
         left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid
+        ORDER BY form.overrideID desc
+        limit 1000
+        ', [UserSession::getSessionID()]);
         // return $data;
         $response = [];
         foreach ($data as $value) {
@@ -262,7 +265,9 @@ class OverrideController extends Controller
                                 on branch.branchID = emp.branchID_
                             where eform.approverID_ = :approverID
                             and eform.Override0Form = 1
-                            and eleave.recstat != 1',
+                            and eleave.recstat != 1
+                            ORDER BY eleave.overrideID desc
+                            limit 1000',
                             [UserSession::getSessionID()]);
         $response = [];
         foreach ($data as $value) {
