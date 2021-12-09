@@ -299,7 +299,7 @@ export default {
 
 			isDisable: false,
             datefiled: moment(new Date()).format('MM/DD/YYYY'),
-            supdate: moment(new Date()).format('YYYY/MM/DD'),
+            // supdate: moment(new Date()).format('YYYY/MM/DD'),
             // supdate: moment(new Date()).format('MM/DD/YYYY'),
             // timein: moment(new Date()).format('HH:mm'),
             // timeout: moment(new Date()).add(30, 'minutes').format('HH:mm'),
@@ -472,6 +472,9 @@ export default {
                 if(key === 'entries')
                 {
                     this.$data[key] = [];
+                }
+                if(key === 'datefiled'){
+                    this.$data[key] = moment(new Date()).format('MM/DD/YYYY');
                 }
 
             });

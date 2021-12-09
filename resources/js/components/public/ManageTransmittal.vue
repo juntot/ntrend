@@ -333,7 +333,8 @@
                     <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addTransmittal" :disabled="isDisable || !isFormValid || !hasEntries || !approvedby" v-if="!transID && $parent.$data.forapprover != 'approval'">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateTransmittal" :disabled="isDisable || !isFormValid || !hasEntries" v-if="transID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteTransmittal" :disabled="isDisable" v-if="transID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
-                    <input type="submit" class="btn btn-primary" value="Confirm" @click.prevent="requestActionTransmittal(1)" v-if="transID && $parent.$data.forapprover == 'approval' && status < 2">
+                    <input type="submit" class="btn btn-primary" value="Confirm" @click.prevent="requestActionTransmittal(1)" v-if="transID && $parent.$data.forapprover == 'approval' && status < 2"
+                    :disabled="computedStatus == 'In Transit'">
                     <input type="submit" class="btn btn-primary" value="Reject" @click.prevent="requestActionTransmittal(3)" v-if="transID && $parent.$data.forapprover == 'approval' && status < 2">
                     
                     <!-- <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionTransmittal(4)" v-if="transID && $parent.$data.forapprover == 'approval' && status >= 2"> -->

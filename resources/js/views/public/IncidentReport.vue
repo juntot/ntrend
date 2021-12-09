@@ -34,12 +34,12 @@
 </template>
 <script>
 import ManageIncidentReport from '../../components/public/ManageIncidentReport';
-let incidenttype = [
-        'Inventory Discrepancy', 'Habitual Tardiness', 'Habitual Absences', 'TYREPLUSAbsence w/o official leave', 'Insubordination',
-        'Non-compliance to policies/procedures', 'Delivery Discrepancy', 'Theft', 'Falsification/Tampering of Documents', 'Loss/Damage of Company Property',
-        'Non remittance/short of collections', 'Others'
-    ];
-let status = ['Pending', 'Approved', 'Rejected'];
+// let incidenttype = [
+//         'Inventory Discrepancy', 'Habitual Tardiness', 'Habitual Absences', 'TYREPLUSAbsence w/o official leave', 'Insubordination',
+//         'Non-compliance to policies/procedures', 'Delivery Discrepancy', 'Theft', 'Falsification/Tampering of Documents', 'Loss/Damage of Company Property',
+//         'Non remittance/short of collections', 'Others'
+//     ];
+// let status = ['Pending', 'Approved', 'Rejected'];
 
 export default {
     components:{
@@ -62,12 +62,12 @@ export default {
         rows(val, old){
             let row = val;
 
-            row.forEach((item, index)=>{
-                if(!isNaN(item.incidenttype) && !isNaN(item.status)){
-                    row[index]['incidenttype'] = incidenttype[item.incidenttype - 1];
-                    row[index]['status'] = status[item.status];
-                }
-            });
+            // row.forEach((item, index)=>{
+            //     if(!isNaN(item.incidenttype) && !isNaN(item.status)){
+            //         row[index]['incidenttype'] = incidenttype[item.incidenttype - 1];
+            //         row[index]['status'] = status[item.status];
+            //     }
+            // });
             this.dtHandle.clear();
             this.dtHandle.rows.add(row);
             this.dtHandle.draw();
@@ -124,7 +124,8 @@ export default {
     mounted(){
 
         // this.forapprover = ((this.$route.path).slice(1)).toLowerCase().split('-')[];
-        this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
+        // this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
+        this.formtitle = this.$route.name;
 
         axios.get('api/getIncidentReportbyemployee').then((response)=>{
             this.loader = false;
@@ -139,7 +140,8 @@ export default {
                         var month = parseInt(dateA[0], 10);
                         var year = parseInt(dateA[2], 10);
                         var date = new Date(year, month - 1, day)
-                        x = date.getTime();
+                        // x = date.getTime();
+                        x = moment(a).valueOf();
                     }
                     catch (err) {
                         x = new Date().getTime();
@@ -157,7 +159,7 @@ export default {
                 }
             });
             this.dtHandle=$('#incidentReport').DataTable({
-            // aoColumnDefs: [{ "sType": "date-uk", "aTargets": [0] }],
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [1] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
@@ -187,8 +189,7 @@ export default {
             $("#incidentReport tbody").on('click', 'tr', function() {
                 var tr = $(this).closest('tr');
                 var row = table.row( tr );
-                if(row.data().status.toLowerCase() == 'approved' ||
-                   row.data().status.toLowerCase() == 'rejected')
+                if(row.data().status >= 1 )
                 {
                     self.disabledinput = true;
                     // return;
@@ -215,19 +216,33 @@ export default {
 
         let columnDefs = [
         {
-            title: "INCIDENT ID", data: 'incidentID', visible: false,
+            title: "Incident #", data: 'incidentID', visible: true,
         },
-        // {
-        //     title: "Employee ID", data: 'empID_'
-        // },
         {
             title: "Date Filed", data: 'datefiled'
-        },{
+        },
+        {
+            title: "Reported By", data: 'reportedby'
+        },
+        {
             title: "Nature of incident", data: 'incidenttype'
         },{
             title: "Details of incident", data: 'details', className: "row-limit"
         },{
-            title: "Status", data: 'status'
+            title: "Status", data: 'status',
+            render: function(data){
+                /**
+                 * 0 pending
+                 * 1 endorse 1
+                 * 2 endorse 2
+                 * 3 close
+                 * 4 rejected
+                 */
+                return data == 0 ? 'Pending':
+                       data == 1 ? '1st Endorsed':
+                       data == 2 ? '2nd Endorsed': 
+                       data == 3 ? 'Closed': 'Rejected';
+            }
         }];
         // MODAL
         $('#myModal').on("hidden.bs.modal", this.closeModal);

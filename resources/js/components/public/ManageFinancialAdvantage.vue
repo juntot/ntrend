@@ -163,9 +163,9 @@
             <div class="col-lg-12 text-center">
                 <p style="line-height: 2.1">
                 <span class="font-weight-bold">Authority to Deduct</span><br>
-                <span class="font-weight-bold">This is to autorize the payroll in-charge of</span>
+                <span class="font-weight-bold">This is to authorize the payroll in-charge of</span>
                 Trend Group of Companies <br>
-                <span class="font-weight-bold">to deduct from my salary to total amount as specified above</span> 
+                <span class="font-weight-bold">to deduct from my salary the total amount as specified above</span> 
                 if not liquidated <br> 
                 within three (3) working days after the activity is completed.
                 </p>

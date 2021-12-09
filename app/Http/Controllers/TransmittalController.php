@@ -13,7 +13,7 @@ class TransmittalController extends Controller
     
     // search employee
      public function searchEmp(){
-        $data = DB::select('select emp.empID,  CONCAT(emp.fname,", ",emp.lname) as fullname,
+        $data = DB::select('select emp.empID,  emp.email, CONCAT(emp.fname,", ",emp.lname) as fullname,
         pos.posname as receiver_pos, dept.deptname as receiver_dept, 
         branch.branchname as receiver_branch
         from employee emp 

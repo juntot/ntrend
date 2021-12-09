@@ -230,7 +230,7 @@ export default {
         //     title: "Creator", data: 'empID_'
         // },
         {
-            title: 'Amount of order', data: 'mode'
+            title: 'Amount of order', data: 'amount_order'
         },
         {
             title: "Status", data: 'status',

@@ -204,8 +204,11 @@ class SupplementaryController extends Controller
 
             }
             request()->merge(['witnesses' => $user[0]->fullname ]);
-            MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'ATTENDANCE SUPPLEMENTARY REQUEST');
-            MailServices::formNotify(request('reciever_emails'), request('empID_'), 'attendance supplementary request', request('supID'), 'supplementary');
+            
+            $formApprover =  MailServices::getApproverEmail('supID', request('supID'), 'formsupplementary', 'Supplementary');
+
+            MailServices::sendNotify($formApprover, request('empID_'), 'ATTENDANCE SUPPLEMENTARY REQUEST');
+            MailServices::formNotify($formApprover, request('empID_'), 'attendance supplementary request', request('supID'), 'supplementary');
         }
         return request()->all();
 
@@ -214,7 +217,7 @@ class SupplementaryController extends Controller
     // FOR APPROVERS ====================================================================================================================================
 
 
-    // GET LEAVE FORM EMPLOYEE APPROVERS
+    // GET SUPPLEMENTARY FORM EMPLOYEE APPROVERS
     public function getSupplementaryApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Supplementary = 1');
         $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID

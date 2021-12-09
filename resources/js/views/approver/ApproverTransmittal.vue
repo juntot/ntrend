@@ -210,7 +210,7 @@ export default {
         //     title: "Employee ID", data: 'empID_'
         // },
         {
-            title: "Date & Time Filed", data: 'datefiled_datetime',
+            title: "Date & Time Filed", data: 'datefiled',
             render: function(data) {
                 return moment(data).format('MM/DD/YYYY HH:mm:ss A');
             }

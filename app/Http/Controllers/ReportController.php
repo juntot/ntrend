@@ -308,9 +308,9 @@ class ReportController extends Controller
             case 'financialadvance':
                 $data = DB::select('select efadvantage.*,
                             DATE_FORMAT(efadvantage.datefiled, "%m/%d/%Y %h:%i %p") as datefiled,
-                            DATE_FORMAT(efadvantage.inclusiveDateFrom, "%m/%d/%Y) as inclusiveDateFrom,
-                            DATE_FORMAT(efadvantage.inclusiveDateTo, "%m/%d/%Y) as inclusiveDateTo,
-                            DATE_FORMAT(efadvantage.liqDate, "%m/%d/%Y) as liqDate,
+                            DATE_FORMAT(efadvantage.inclusiveDateFrom, "%m/%d/%Y") as inclusiveDateFrom,
+                            DATE_FORMAT(efadvantage.inclusiveDateTo, "%m/%d/%Y") as inclusiveDateTo,
+                            DATE_FORMAT(efadvantage.liqDate, "%m/%d/%Y") as liqDate,
                             DATE_FORMAT(efadvantage.approveddate, "%m/%d/%Y %h:%i %p") as approveddate,
                             CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname , dept.deptname,
                             (
@@ -335,7 +335,7 @@ class ReportController extends Controller
                                 efadvantage.recstat != 1
                             ORDER BY efadvantage.faID',
                             [
-                                $datefrom, $dateto,
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
                                 // $branch,
                                 // $status
                                 // UserSession::getSessionID()
@@ -1035,7 +1035,7 @@ class ReportController extends Controller
                             AND
                                 trans.recstat != 1',
                             [
-                                $datefrom, $dateto,
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
                                 // $branch,
                                 // $status
                                 // UserSession::getSessionID()

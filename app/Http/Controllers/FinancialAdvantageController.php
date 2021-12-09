@@ -93,8 +93,13 @@ class FinancialAdvantageController extends Controller
         // $data = DB::select('select efadvantage.* from formfinancialadvantage efadvantage left join eformapproverbyemp eform on efadvantage.empID_ = eform.empID_ where eform.approverID_ = :approverID', [UserSession::getSessionID()]);
         $data = DB::select('select efadvantage.*,
                             DATE_FORMAT(efadvantage.datefiled, "%m/%d/%Y %h:%i %p") as datefiled,
-                            CONCAT(emp.fname," ",emp.lname) as fullname, emp.email,
-                            branch.branchname, pos.posname , dept.deptname
+                            CONCAT(emp.fname," ",emp.lname) as fullname, 
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = efadvantage.approvedby
+                            ) as approvedby,
+                            emp.email,
+                            branch.branchname, pos.posname, dept.deptname
                             from formfinancialadvantage efadvantage left join eformapproverbyemp eform
                                 on efadvantage.empID_ = eform.empID_
                             right join employee emp

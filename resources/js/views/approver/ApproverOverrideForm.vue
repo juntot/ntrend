@@ -325,7 +325,7 @@ export default {
             title: "Creator", data: 'fullname'
         },
         {
-            title: 'Amount of order', data: 'mode'
+            title: 'Amount of order', data: 'amount_order'
         },
         {
             title: "Status", data: 'status',

@@ -35,8 +35,8 @@
 </template>
 <script>
 import ReportManageTransmittal from './details/ReportManageTransmittal';
-let check = ['<i class="fas fa-times"></i>', '<i class="fas fa-check"></i>'];
-let status = ['Pending', 'Approved', 'Rejected'];
+// let check = ['<i class="fas fa-times"></i>', '<i class="fas fa-check"></i>'];
+// let status = ['Pending', 'Approved', 'Rejected'];
 
 export default {
     props: ['title'],
@@ -103,6 +103,7 @@ export default {
             this.selected = {};
         },
         setInit(data = null){
+            console.log('data === ', data)
             this.rows = data;
         },
         downloadXLS(){

@@ -3,11 +3,13 @@
     <div>
 				<!-- fireworks & confetti -->
 			<div style="position: relative" v-show="showGreeting">
+					
 					<canvas id="my-canvas" 
-					@click="hideGreetings"
-					style="top:0; position: fixed; left:0; width: 100%; z-index: 10
+					style="top:0; position: fixed; left:0; width: 100%; z-index: 9
 					"></canvas>
-					<div class="fireworks-container" style="
+					<div class="fireworks-container" 
+					@click="hideGreetings"
+					style="
 					left: 0;
 					top: 0;
 					width: 100%;
@@ -32,6 +34,8 @@
 					border-image-slice: 1;
 					border-width: 5px;
 					border-image-source: linear-gradient(to right, red, orange);
+					max-height: 500px;
+					overflow: auto;
 					">
 							<h4
 							style="
@@ -42,6 +46,8 @@
 							-webkit-text-fill-color: transparent;
 							text-align: center;
 							line-height: 150%;
+							position: static;
+							top: 0;
 							"
 							>HAPPY BIRTHDAY</h4>
 							<ul style="list-style: none">

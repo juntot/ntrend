@@ -216,18 +216,28 @@ export default {
             let rows = this.rows.length;
             let self = this;
             // Add event listener for opening and closing details
-            $("#supplementary tbody").on('click', 'tr', function() {
+            $("#supplementary tbody").on('click', 'tr', async function() {
                 var tr = $(this).closest('tr');
                 var row = table.row( tr );
-                // CHECK IF STATUS IS APPROVED TO BE READY FOR CANCELLATION
-                if(status.indexOf(row.data().status) >= 1){
-                    self.isCancel = true;
-                }
-                let dataforedit = row.data();
-                self.selected = row.data();
-                self.empID_ = row.data().empID_;
 
-                self.setUpdate(dataforedit);
+                 // APPROVERS
+                // axios.get('api/getSupplementaryApprover').then((response)=>{
+                    this.approvers =  response.data;
+                    // CHECK IF STATUS IS APPROVED TO BE READY FOR CANCELLATION
+                    if(status.indexOf(row.data().status) >= 1){
+                        self.isCancel = true;
+                    }
+                    let dataforedit = row.data();
+                    self.selected = row.data();
+                    self.empID_ = row.data().empID_;
+
+                    self.setUpdate(dataforedit);
+                // })
+                // .catch((err)=>{
+                //     alert('something went wrong please try again..');
+                // });
+
+                
 
             });
 
@@ -236,11 +246,7 @@ export default {
 
         });
 
-        // APPROVERS
-        axios.get('api/getSupplementaryApprover').then((response)=>{
-            this.approvers =  response.data;
-        })
-        .catch((err)=>{});
+       
 
         let columnDefs = [
         // {

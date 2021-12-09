@@ -134,7 +134,7 @@ class MailServices{
         }
     }
 
-    // GET APPORVERS EMAILS
+    // GET APPORVERS EMAILS BASE FROM FORM (SAMPLE OVERRIDE CONTROLLER)
     public static function getApproverEmail($id, $idVal, $form, $colName) { 
         $result = DB::select('select emp.email from employee emp
         right join eformapproverbyemp eform
