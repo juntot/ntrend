@@ -25,7 +25,7 @@
                                         <li><a href="#about" data-toggle="tab" @click.prevent="removeClass(), initTablePos">Leave Balance</a></li>
                                         
                                         <li><a href="#supplementaryForm" data-toggle="tab" @click.prevent="removeClass">Supplementary Form</a></li>
-                                        <li><a href="#override" data-toggle="tab" @click.prevent="removeClass">Override Form</a></li>
+                                        <li><a href="#override" data-toggle="tab" @click.prevent="removeClass">API Override Settings</a></li>
                                         <li><a href="#transmittalSett" data-toggle="tab" @click.prevent="removeClass">Transmittal Address</a></li>
                                         <!-- <li><a href="#contact" data-toggle="tab" @click.prevent="removeClass">Employees</a></li> -->
                                         

@@ -233,7 +233,7 @@
                 </div>
                 <div class="clearfix"></div>
                 <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addLeave" :disabled="isDisable || !isFormValid" v-if="submitBtn">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addLeave" :disabled="disabledIfNoApprover || isDisable || !isFormValid" v-if="submitBtn">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateLeave" :disabled="isDisable || !isFormValid" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteLeave" :disabled="isDisable" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionLeave(1)" v-if="approveRejecBtn">
@@ -299,12 +299,17 @@ export default {
                 }
             }
             // if(this.leavetype !=3 && this.leavetype != 1 && this.leavetype != 4){
-                if(this.greater30Days && this.leavetype != 3 && this.greater30Days && this.leavetype != 1 && this.greater30Days() && this.leavetype != 4){
-                    alert('3 days leave and up should be filed 30 days before the date filed');
-                    this.leavetype = await 3;
-                    return;
-                }
+                // if(this.greater30Days && this.leavetype != 3 && this.greater30Days && this.leavetype != 1 && this.greater30Days() && this.leavetype != 4 && this.greater30Days() && this.leavetype != 8){
+                //     alert('3 days leave and up should be filed 30 days before the date filed');
+                //     this.leavetype = await 3;
+                //     return;
+                // }
             // }
+            if(this.greater30Days && this.leavetype == 5){
+                alert('3 days leave and up should be filed 30 days before the date filed');
+                this.leavetype = await 3;
+                return;
+            }
 
         },
 
@@ -551,6 +556,9 @@ export default {
 
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         isValidType(){
             const validTypes = [1, 3, 4, 6, 7, 8, 9];
             return validTypes.includes(parseInt(this.leavetype));

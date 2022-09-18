@@ -277,7 +277,7 @@
                     <div class="modal-footer">
                         <em style="color: red;" v-if="!witnesses_list">No witness is set. please contact your I.T Administrator &nbsp;&nbsp;</em>
                         <input type="submit" class="btn btn-primary" value="Verify as witness" @click.prevent="confirmWitness" :disabled="isDisable || !isFormValid || !hasEntries" v-if="$parent.witness_approval">
-                        <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addSupplementary" :disabled="isDisable || !isFormValid || !hasEntries || !witnesses_list" v-if="!supID && $parent.$data.forapprover != 'approval'">
+                        <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addSupplementary" :disabled="disabledIfNoApprover || isDisable || !isFormValid || !hasEntries || !witnesses_list" v-if="!supID && $parent.$data.forapprover != 'approval'">
                         <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateSupplementary" :disabled="isDisable || !isFormValid || !hasEntries" v-if="supID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput">
                         <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteSupplementary" :disabled="isDisable" v-if="supID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
                         <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionSupplementary(2)" v-if="supID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel " :disabled="selected.status < 1">
@@ -366,16 +366,21 @@ export default {
             */
         },
         addSupplementary(){
+            
             if(this.isFormValid)
             {
-
+                this.isDisable = true;
                 let params = this.$data;
                 // params['reciever_emails'] = this.$parent.reciever_emails;
                 params['reciever_emails'] = witness_emails;
                 axios.post('api/addSupplementary', params).then((response)=>{
+                    // this.isDisable = false;
                     this.$parent.addRow(response.data);
                     this.closeModal();
-                }).catch((err)=>{console.log(err);});
+                }).catch((err)=>{
+                    // this.isDisable = false;
+                    console.log(err);
+                });
             }
         },
         updateSupplementary(){
@@ -508,6 +513,9 @@ export default {
 
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         confirm_witness(){
             // return this.witnesses.slice(2);
             return this.witnesses;

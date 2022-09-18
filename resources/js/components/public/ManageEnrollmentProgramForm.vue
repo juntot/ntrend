@@ -2,7 +2,7 @@
     <div>
 
             <form method="post">
-                <h3 class="text-center form-title"><span class="dblUnderlined">OVERRIDE APPLICATION FORM</span></h3>
+                <h3 class="text-center form-title"><span class="dblUnderlined">ENROLLMENT PROGRAM FORM</span></h3>
                 <div class="col-md-12 col-lg-12">
                     <h5 class="form-subtitle"><em>&nbsp;</em></h5>
                 </div>
@@ -257,385 +257,118 @@
                     <h4 class="text-center form-title"><span class="dblUnderlined">REASONS</span></h4>
                 </div>
                 <div class="col-md-12">
-                    <div class="panel-group" id="override-accordion">
-                        <div class="panel panel-default">
-                            <div class="panel-heading form-subtitle">
-                                <h5 class="form-subtitle panel-title">
-                                    <a data-toggle="collapse" data-parent="#override-accordion" :href="'#1'">
-                                        <em>
-                                            <span><i class="far fa-plus-square" style="direction: rtl; font-size: 19px;"></i></span>
-                                            ON HOLD
-                                        </em>
-                                    </a>
-                                </h5>
-                            </div>
-                            <div :id="1" :class="'panel-collapse collapse'">
-                                <div class="panel-body">
-                                    <div class="col-md-8">
-                                        <div class="mdb-form-field form-group-limitx form-field--is-filled">
-                                            <div class="form-field__control">
-                                                <select :disabled="$parent.disabledinput" v-model="reason" name="reason" v-validate="" class="form-field__input" 
-                                                >
-                                                    <option value="">SELECT OPTIONS</option>
-                                                    <option value="BOUNCED CHECKS">BOUNCED CHECKS</option>
-                                                    <option value="LONG TERM COLLECTION">LONG TERM COLLECTION</option>
-                                                    <option value="LONG OVERDUE">LONG OVERDUE</option>
-                                                    <option value="DORMANT">DORMANT</option>
-                                                    <option value="HOLD/MOVED CHECKS">HOLD/MOVED CHECKS</option>
+                    <div class="mdb-table-overflow">
+                            <table width="100%" class="table table-hover mdb-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center" width="200px">DATE</th>
+                                            <th class="text-center">TIME IN (AM)</th>
+                                            <th class="text-center">TIME OUT (AM)</th>
+                                            <th class="text-center">TIME IN (PM)</th>
+                                            <th class="text-center">TIME OUT (PM)</th>
+                                            <th class="text-center" colspan="2">REASON</th>
 
-                                                </select>
-                                                <label class="form-field__label">Reason</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('reason') }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="col-md-8">
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input :disabled="$parent.disabledinput" type="text" v-model="current_stat"  v-validate="" name="current status"  class="form-field__input">
-                                                <label class="form-field__label">Current Status</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('current status') }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- OVER DUE -->
-                        <div class="panel panel-default">
-                            <div class="panel-heading form-subtitle">
-                                <h5 class="form-subtitle panel-title">
-                                    <a data-toggle="collapse" data-parent="#override-accordion" :href="'#2'">
-                                        <em>
-                                            <span><i class="far fa-plus-square" style="direction: rtl; font-size: 19px;"></i></span>
-                                        OVERDUE
-                                        </em>
-                                    </a>
-                                </h5>
-                            </div>
-                            <div :id="2" :class="'panel-collapse collapse'">
-                                <div class="panel-body">
-                                    <br>
-                                    <div class="col-md-12">
-                                        <div class="mdb-table-overflow">
-                                                <table width="100%" class="table table-hover mdb-table" style="margin-bottom: 0">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="text-center" style="
-                                                                    min-width: 89px; max-width: 89px !important;
-                                                                    width: 89px;
-                                                                ">
-                                                                    Invoice#
-                                                                </th>
-                                                                <th class="text-center">Invoice Date</th>
-                                                                <th class="text-center">Amount</th>
-                                                                <th class="text-center" style="
-                                                                    min-width: 89px; max-width: 89px !important;
-                                                                    width: 89px;
-                                                                ">Age</th>
-                                                                <th class="text-center" colspan="2">Division</th>
-                                                            </tr>
-                                                            <tr v-show="!$parent.disabledinput">
-                                                                <td>
-                                                                    <div class="mdb-form-field form-group-limitx">
-                                                                        <div class="form-field__control form-field--is-filled">
-                                                                            <input :disabled="$parent.disabledinput" type="text" name="invoice num" v-model="overdue_fields.invoice_num" class="form-field__input inline-input" >
-                                                                            <div class="form-field__bar"></div>
-                                                                        </div>
-                                                                        <span class="errors">{{ errors.first('invoice num') }}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <Datepicker :disabled="$parent.disabledinput" :value="overdue_fields.invoice_date" wrapper-class="mdb-form-field" input-class="form-field__input datePicker inline-input" 
-                                                                    @selected="selectDateInvoice" :typeable="false" :format="'MM/dd/yyyy'">
-                                                                        <div slot="afterDateInput" class="form-field__bar"></div>
-                                                                    </Datepicker>
-                                                                </td>
-                                                                <td>
-                                                                    <div class="mdb-form-field form-group-limit">
-                                                                        <div class="form-field__control form-field--is-filled">
-                                                                            <input :disabled="$parent.disabledinput" type="text" name="amount" v-model="overdue_fields.amount" class="form-field__input inline-input" >
-                                                                            <div class="form-field__bar"></div>
-                                                                        </div>
-                                                                        <span class="errors">{{ errors.first('amount') }}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <div class="mdb-form-field form-group-limit">
-                                                                        <div class="form-field__control form-field--is-filled">
-                                                                            <input :disabled="$parent.disabledinput" type="text" name="age" v-model="overdue_fields.age" class="form-field__input inline-input" >
-                                                                            <div class="form-field__bar"></div>
-                                                                        </div>
-                                                                        <span class="errors">{{ errors.first('age') }}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <!-- <div class="mdb-form-field form-group-limit">
-                                                                        <div class="form-field__control form-field--is-filled">
-                                                                            <input :disabled="$parent.disabledinput" type="text" name="division" v-model="overdue_fields.division" class="form-field__input inline-input" >
-                                                                            <div class="form-field__bar"></div>
-                                                                        </div>
-                                                                        <span class="errors">{{ errors.first('division') }}</span>
-                                                                    </div> -->
-                                                                    <div class="mdb-form-field form-group-limitx">
-                                                                        <div class="form-field__control form-field--is-filled">
-                                                                            <select :disabled="$parent.disabledinput" v-model="overdue_fields.division" name="division overdue" class="form-field__input inline-input" >
-                                                                                <option v-for="div in divRows" :value="div.name" :key="div.id">{{div.name}}</option>
-                                                                            </select>
-                                                                            <div class="form-field__bar"></div>
-                                                                        </div>
-                                                                        <span class="errors">{{ errors.first('division overdue') }}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="text-right"
-                                                                style="
-                                                                    min-width: 50px; max-width: 65px !important;
-                                                                    width: 50px;
-                                                                "
-                                                                >
-                                                                    <button class="btn btn-primary" @click.prevent="appendTable">add</button>
-                                                                </td>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr v-for="(item, index) in overdue_tbl" :key="index">
-                                                                <td>
-                                                                    <span v-if="!$parent.disabledinput" style="padding: 0px 12px;">
-                                                                        <a @click="removeRow(index)"><i class="fas fa-trash text-danger"></i></a>
-                                                                    </span>
-                                                                    {{item.invoice_num}}
-                                                                </td>
-                                                                <td>
-                                                                    {{item.invoice_date}}
-                                                                </td>
-                                                                <td>
-                                                                    {{item.amount}}
-                                                                </td>
-                                                                <td>
-                                                                    {{item.age}}
-                                                                </td>
-                                                                <td colspan="2">
-                                                                    {{item.division}}
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                </table>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="col-lg-12">
-                                    <h5 class="form-subtitle"></h5>
-                                        <div class="mdb-form-field">
-                                            <div class="form-field__control mdb-bgcolor">
-                                                <textarea :disabled="$parent.disabledinput" class="form-field__textarea"  cols="4" rows="4" v-validate="" v-model="comment" name="reason & comment"></textarea>
-                                                <label class="form-field__label">Reason & Comment</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <h6><span class="errors">{{ errors.first('reason & comment') }}</span></h6>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- OVER/NO CREDIT LIMIT -->
-                        <div class="panel panel-default">
-                            <div class="panel-heading form-subtitle">
-                                <h5 class="form-subtitle panel-title">
-                                    <a data-toggle="collapse" data-parent="#override-accordion" :href="'#3'">
-                                        <em>
-                                            <span><i class="far fa-plus-square" style="direction: rtl; font-size: 19px;"></i></span>
-                                        OVER/NO CREDIT LIMIT
-                                        </em>
-                                    </a>
-                                </h5>
-                            </div>
-                            <div :id="3" :class="'panel-collapse collapse'">
-                                <div class="panel-body">
-                                    <div class="col-xs-7 col-sm-7 col-md-3">
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input :disabled="$parent.disabledinput" type="text" v-model="excess"  v-validate="" name="excess"  class="form-field__input">
-                                                <label class="form-field__label">EXCESS</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('excess') }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-5 col-sm-5 col-md-2">
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input :disabled="$parent.disabledinput" type="text" v-model="percent" name="percent"  class="form-field__input">
-                                                <label class="form-field__label">% (ex: 100)</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="col-md-5">
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input :disabled="$parent.disabledinput" type="text" v-model="last_cl"  v-validate="" name="last CL"  class="form-field__input">
-                                                <label class="form-field__label">Last Approved Increase CL</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('last CL') }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="col-md-5">
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input :disabled="$parent.disabledinput" type="text" v-model="commit_cl"  v-validate="" name="commitment CL"  class="form-field__input">
-                                                <label class="form-field__label">Commitment to Increase CL</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('commitment CL') }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                        </tr>
+                                        <tr v-if="!$parent.disabledinput">
+                                            <td>
+                                                <Datepicker :value="supdate" wrapper-class="mdb-form-field" input-class="form-field__input datePicker inline-input" @selected="selectSupDate" :typeable="false" :format="'MM/dd/yyyy'">
+                                                    <div slot="afterDateInput" class="form-field__bar"></div>
+                                                </Datepicker>
+                                            </td>
+                                            <td>
+                                                <div class="mdb-form-field form-group-limit">
+                                                    <div class="form-field__control form-field--is-filled">
+                                                        <input type="time" name="timein" v-model="timein" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <div class="form-field__bar"></div>
+                                                    </div>
+                                                    <span class="errors">{{ errors.first('timein') }}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="mdb-form-field form-group-limit">
+                                                    <div class="form-field__control form-field--is-filled">
+                                                        <input type="time" name="timeout" v-model="timeout" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <div class="form-field__bar"></div>
+                                                    </div>
+                                                    <span class="errors">{{ errors.first('timeout') }}</span>
+                                                </div>
+                                            </td>
+                                            <!-- afternoon -->
+                                            <td>
+                                                <div class="mdb-form-field form-group-limit">
+                                                    <div class="form-field__control form-field--is-filled">
+                                                        <input type="time" name="timein" v-model="timein2" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <div class="form-field__bar"></div>
+                                                    </div>
+                                                    <span class="errors">{{ errors.first('timein2') }}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="mdb-form-field form-group-limit">
+                                                    <div class="form-field__control form-field--is-filled">
+                                                        <input type="time" name="timeout" v-model="timeout2" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <div class="form-field__bar"></div>
+                                                    </div>
+                                                    <span class="errors">{{ errors.first('timeout2') }}</span>
+                                                </div>
+                                            </td>
+                                            <!-- END -->
+                                            <td>
+                                                <div class="mdb-form-field">
+                                                    <div class="form-field__control">
+                                                        <select v-model="reason" id="posname" name="position" class="form-field__input inline-input" >
+                                                            <option :value="'Failure to log-in / out'">Failure to log-in / out</option>
+                                                            <option :value="'Delivery team doing out base deliveries'">Delivery team doing out base deliveries</option>
+                                                            <option :value="'Out of town for buiness travel'">Out of town for buiness travel</option>
+                                                            <option :value="'Multiple logs'">Multiple logs</option>
+                                                            <option :value="'Out of office on officials'">Out of office on officials</option>
+                                                        </select>
+                                                        <div class="form-field__bar"></div>
+                                                    </div>
+                                                <span class="errors">{{ errors.first('position') }}</span>
+                                                </div>
+                                                <!-- <div class="mdb-form-field">
+                                                    <div class="form-field__control">
+                                                        <input type="text" class="form-field__input inline-input" v-model="reason" v-validate="'required'" name="reason" @keydown.enter.prevent="appendTable">
+                                                        <div class="form-field__bar"></div>
+                                                    </div>
+                                                    <span class="errors">{{ errors.first('reason') }}</span>
+                                                </div> -->
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-primary" @click.prevent="appendTable">add</button>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- <tr v-for="(item, index) in entries" :key="index">
+                                            <td>
+                                                <div>
+                                                    <span style="padding: 0 12px;">
+                                                        <a v-if="!$parent.disabledinput" @click="removeRow(index)"><i class="fas fa-trash text-danger"></i></a>
+                                                    </span>
+                                                    {{item.supdate | customDateFormat}}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {{item.timein}}
+                                            </td>
+                                            <td>
+                                                {{item.timeout}}
+                                            </td>
+                                            <td>
+                                                {{item.timein2}}
+                                            </td>
+                                            <td>
+                                                {{item.timeout2}}
+                                            </td>
+                                            <td colspan="2">
+                                                {{item.reason}}
+                                            </td>
+                                        </tr> -->
 
-
-                        <!-- UNSETTLED CHECK MOVEMENT -->
-                        <div class="panel panel-default">
-                            <div class="panel-heading form-subtitle">
-                                <h5 class="form-subtitle panel-title">
-                                    <a data-toggle="collapse" data-parent="#override-accordion" :href="'#4'">
-                                        <em>
-                                            <span><i class="far fa-plus-square" style="direction: rtl; font-size: 19px;"></i></span>
-                                        UNSETTLED CHECK MOVEMENT
-                                        </em>
-                                    </a>
-                                </h5>
-                            </div>
-                            <div :id="4" :class="'panel-collapse collapse'">
-                                <div class="panel-body">
-                                    <br>
-                                    <div class="col-md-4">
-                                        <div class="group">
-                                            <label class="checkbox-lbl mdblbl inline-blocklbl mdblblradio">Account Closed
-                                            <input :disabled="$parent.disabledinput" type="checkbox" value="Account Closed" v-model="check_type">
-                                            <span class="mdbcheckmark"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="group">
-                                            <label class="checkbox-lbl mdblbl inline-blocklbl mdblblradio">DAIF Check
-                                            <input :disabled="$parent.disabledinput" type="checkbox" value="DAIF Check" v-model="check_type">
-                                            <span class="mdbcheckmark"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="group">
-                                            <label class="checkbox-lbl mdblbl inline-blocklbl mdblblradio">Pulled Out-long Term
-                                            <input :disabled="$parent.disabledinput" type="checkbox" value="Pulled Out-long Term" v-model="check_type">
-                                            <span class="mdbcheckmark"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="group">
-                                            <label class="checkbox-lbl mdblbl inline-blocklbl mdblblradio">Pulled Out-Error Details
-                                            <input :disabled="$parent.disabledinput" type="checkbox" value="Pulled Out-Error Details" v-model="check_type">
-                                            <span class="mdbcheckmark"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="mdb-table-overflow">
-                                                <table width="100%" class="table table-hover mdb-table" style="margin-bottom: 0">
-                                                        <thead>
-                                                            <tr>
-                                                                <th class="text-center" width="200px">Bank</th>
-                                                                <th class="text-center">Check No</th>
-                                                                <th class="text-center">Check Date</th>
-                                                                <th class="text-center" colspan="2">Amount</th>
-                                                            </tr>
-                                                            <tr v-show="!$parent.disabledinput">
-                                                                <td>
-                                                                    <div class="mdb-form-field form-group-limit">
-                                                                        <div class="form-field__control form-field--is-filled">
-                                                                            <input type="text" name="bank" v-model="check_fields.bank" class="form-field__input inline-input" 
-                                                                            v-on:keyup.enter="appendTable2"
-                                                                            >
-                                                                            <div class="form-field__bar"></div>
-                                                                        </div>
-                                                                        <span class="errors">{{ errors.first('bank') }}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <div class="mdb-form-field form-group-limit">
-                                                                        <div class="form-field__control form-field--is-filled">
-                                                                            <input type="text" name="checkno" v-model="check_fields.checkno" class="form-field__input inline-input"
-                                                                            v-on:keyup.enter="appendTable2"
-                                                                            >
-                                                                            <div class="form-field__bar"></div>
-                                                                        </div>
-                                                                        <span class="errors">{{ errors.first('checkno') }}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td>
-                                                                    <Datepicker :value="check_fields.check_date" wrapper-class="mdb-form-field" input-class="form-field__input datePicker inline-input" 
-                                                                    @selected="selectDateCheck" :typeable="false" :format="'MM/dd/yyyy'">
-                                                                        <div slot="afterDateInput" class="form-field__bar"></div>
-                                                                    </Datepicker>
-                                                                </td>
-                                                                <td>
-                                                                    <div class="mdb-form-field form-group-limit">
-                                                                        <div class="form-field__control form-field--is-filled">
-                                                                            <input type="text" name="amount" v-model="check_fields.amount" class="form-field__input inline-input" 
-                                                                            v-on:keyup.enter="appendTable2"
-                                                                            >
-                                                                            <div class="form-field__bar"></div>
-                                                                        </div>
-                                                                        <span class="errors">{{ errors.first('amount') }}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td class="text-right">
-                                                                    <button class="btn btn-primary" @click.prevent="appendTable2">add</button>
-                                                                </td>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        <tr v-for="(item, index) in check_tbl" :key="index">
-                                                            <td>
-                                                                <span style="padding: 0px 12px;" v-if="!$parent.disabledinput">
-                                                                    <a @click="removeRow2(index)"><i class="fas fa-trash text-danger"></i></a>
-                                                                </span>
-                                                                {{ item.bank }}
-                                                            </td>
-                                                            <td>{{ item.checkno }}</td>
-                                                            <td>{{ item.check_date }}</td>
-                                                            <td colspan="2">{{ item.amount }}</td>
-                                                        </tr> 
-                                                        </tbody>
-                                                </table>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                    <div class="col-md-5">
-                                        <br>
-                                        <div class="mdb-form-field form-group-limitx">
-                                            <div class="form-field__control">
-                                                <input type="text" :disabled="$parent.disabledinput" v-model="paying_habit"  v-validate="" name="paying habit"  class="form-field__input">
-                                                <label class="form-field__label">Paying Habit (Past 3 Months)</label>
-                                                <div class="form-field__bar"></div>
-                                            </div>
-                                            <span class="errors">{{ errors.first('paying habit') }}</span>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </div>
-                        </div>
-
-
+                                    </tbody>
+                            </table>
 
                     </div>
                 </div>

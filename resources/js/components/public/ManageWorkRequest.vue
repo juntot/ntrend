@@ -40,7 +40,8 @@
                 <div class="col-md-4">
                     <div class="mdb-form-field">
                         <div class="form-field__control">
-                            <input type="text" class="form-field__input" :value="computedfullname +' '+userinfo.mname" name="Name" :readonly="true">
+                            <!-- <input type="text" class="form-field__input" :value="computedfullname +' '+userinfo.mname" name="Name" :readonly="true"> -->
+                             <input type="text" class="form-field__input" :value="computedfullname" name="Name" :readonly="true">
                             <label class="form-field__label">Full Name</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -176,7 +177,7 @@
                             <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="3" name="radio" >
                             <span class="checkmark"></span>
                             </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">System Autorization
+                            <label class="mdblbl inline-blocklbl mdblblradio">System Authorization
                             <input :disabled="$parent.disabledinput" type="checkbox" value="System Autorization" v-model="request_type">
                             <span class="mdbcheckmark"></span>
                             </label>
@@ -460,7 +461,7 @@
                 <div class="modal-footer">
 
 
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addWorkRequest" :disabled="isDisable || !isFormValid || !request_type.length > 0" v-if="!workID && $parent.$data.forapprover != 'approval'">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addWorkRequest" :disabled="disabledIfNoApprover || isDisable || !isFormValid || !request_type.length > 0" v-if="!workID && $parent.$data.forapprover != 'approval'">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateWorkRequest" :disabled="isDisable || !isFormValid" v-if="workID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteWorkRequest" :disabled="isDisable" v-if="workID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionWorkRequest(1)" v-if="workID && $parent.$data.forapprover == 'approval' && selected.status == 0">
@@ -727,6 +728,9 @@ export default {
         }
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         isFormValid(){
             return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },

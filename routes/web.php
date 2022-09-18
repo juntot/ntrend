@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Mail;
 |
 */
 Route::get('/api/mail', function(){
-    $email = 'gonzales.junrey@wealthbank.com.ph';
-    Mail::to($email)->send(new \App\Mail\FormMail('gonzales.junrey@wealthbank.com.ph','00001', 'fomr type'));
+    $email = 'ubec.creative@gmail.com';
+    Mail::to($email)->send(new \App\Mail\FormMail('body', 'subject'));
     return 'awsss';
 });
 
@@ -377,6 +377,7 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::post('/api/update_emp_avatar','EmployeeController@updateEmpAvatar');
             Route::post('/api/updateemp','EmployeeController@updateEmp');
             Route::post('/api/del-emp','EmployeeController@delEmp');
+            Route::post('/api/del-permanent-emp','EmployeeController@delEmpPermanent');
             Route::post('/api/activate-emp','EmployeeController@activateEmp');
             Route::post('/api/upload_employee', 'EmployeeController@uploadXls');
 
@@ -550,6 +551,8 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
 
 
             // OVrride Settings
+            Route::post('/api/get-seop', 'OverrideController@getSapEndpoint');
+            Route::post('/api/update-seop', 'OverrideController@updateSapEndpoint');
             Route::get('/api/get-override-setting-company', 'SettingsController@getOverrideSetting');
             Route::post('/api/add-override-company', 'SettingsController@addOverrideSetting');
             Route::post('/api/update-override-company', 'SettingsController@updateOverrideSetting');
@@ -582,6 +585,8 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             // Route::get('/api/getreport-eundertime', 'ReportController@getReporteUndertime');
             // Route::get('/api/getreport-esaldisc', 'ReportController@getReporteSalDisc');
 
+            // CHART REPORTS
+            Route::get('/api/get-ir-chart/{datefrom?}/{dateto?}/{reporttype?}/{branch?}/{status?}/{company?}', 'ReportChartController@getIRChart');
 
             // ============================ NOTIFICATIONS =========================================
             Route::get('/api/get-leave-credits', 'NotificationController@getLeaveCredits');

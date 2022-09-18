@@ -7,17 +7,39 @@ use DB;
 use App\Services\UserSession;
 use App\Services\MailServices;
 use App\Services\CurlService;
+use App\Services\FormApproverService;
 use Carbon\Carbon;
 
 class OverrideController extends Controller
 {
     
     public $cookie;
+    
+    // UPDATE SAP API 
+    function getSapEndpoint(){
+        $api = DB::table('API_table')
+        ->whereNotNull('endpoint')
+        ->first();
+        return $api->endpoint;
+    }
+
+    // UPDATE SAP API 
+    function updateSapEndpoint(){
+        DB::table('API_table')
+        // ->where('id', 1)
+        ->update(request()->all());
+    }
+
 
     // LOGIN
     public function overrideLogin(){
         
         $postfields = [];
+        $api = DB::table('API_table')
+        ->whereNotNull('endpoint')
+        ->first();
+
+        
         
         $getData = DB::table('override_setting')
             ->select('json')
@@ -41,6 +63,7 @@ class OverrideController extends Controller
                 // $arr = json_encode($temp);
             }
 
+        
 
 
         // $postfields = [
@@ -48,11 +71,20 @@ class OverrideController extends Controller
         //     "UserName" => "manager",
         //     "Password" => "ntmc1234",
         // ];
-        $result = CurlService::httpCurl(
-            'https://119.93.149.92:50000/b1s/v1/Login',
-            'POST',
-            $postfields
-        );
+        // 'https://143.44.162.45:50000/b1s/v1/Login',
+        
+        $result = '';
+        try {
+            $result = CurlService::httpCurl(
+                $api->endpoint.'/Login',
+                'POST',
+                $postfields
+            );
+        } catch (\Throwable $th) {
+            //throw $th;
+            return $result;
+        }
+        
         // $this->cookie = ;
         session(['sap' => $result['data']]);
         return response('Response', $result['statusCode']);
@@ -77,16 +109,24 @@ class OverrideController extends Controller
         
         
         
-        $result = CurlService::httpCurlGet(
-            'https://119.93.149.92:50000/b1s/v1/'.str_replace ( ' ', '%20', $path),
-            'GET',
-            [],
-            array(
-                'Cookie: '.session()->get('sap'),
-                "Content-Type: application/json",
-                "Accept: application/json",
-            )
-        );
+        $result = '';
+        $api = DB::table('API_table')
+        ->whereNotNull('endpoint')
+        ->first();
+        try {
+            $result = CurlService::httpCurlGet(
+                $api->endpoint.'/'.str_replace ( ' ', '%20', $path),
+                'GET',
+                [],
+                array(
+                    'Cookie: '.session()->get('sap'),
+                    "Content-Type: application/json",
+                    "Accept: application/json",
+                )
+            );
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
         
         return $result;
     }
@@ -243,8 +283,10 @@ class OverrideController extends Controller
     // GET  APPROVERS LIST NAME AND EMAIL
     public function getOverrideApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformapprover eform right join employee emp on eform.empID_ = emp.empID where eform.Leave0Form = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Override0Form = 1 and eform.empID_ = :empiD', 
-        [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Override0Form = 1 and eform.empID_ = :empiD', 
+        // [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Override0Form');
         return $data;
     }
 
@@ -267,7 +309,7 @@ class OverrideController extends Controller
                             and eform.Override0Form = 1
                             and eleave.recstat != 1
                             ORDER BY eleave.overrideID desc
-                            limit 1000',
+                            limit 2000',
                             [UserSession::getSessionID()]);
         $response = [];
         foreach ($data as $value) {
@@ -315,7 +357,7 @@ class OverrideController extends Controller
         $user = UserSession::getSessionID();
 
         // get list of approvers email
-        $mailReceivers = MailServices::getApproverEmail('overrideID', request('overrideID'), 'formoverride', 'Override0Form');
+        $mailReceivers = FormApproverService::getApproverEmail('overrideID', request('overrideID'), 'formoverride', 'Override0Form');
         
         // check for affected rows
         $rows = DB::select('select count(overrideID) as count from formoverride 

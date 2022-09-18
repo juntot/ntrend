@@ -46,7 +46,7 @@ class ReportController extends Controller
         $forms = [];
         if(count($data)>0):
             foreach ($data[0] as $key=>$value) {
-                if($value != 0 && $key != 'empID_'):
+                if($value != 0 && $key != 'empID_' && $key != 'DTR_Report'):
                     $navname = str_replace('0', ' ', (str_replace('_' ,'-' , (str_replace('8','&', $key)) )) );
                     $forms[] = ['formtitle' => $navname];
                 endif;
@@ -247,10 +247,14 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eccard.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 eccard.status IN('.$status.')
                             AND
@@ -287,10 +291,14 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eformloan.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 eformloan.status IN('.$status.')
                             AND
@@ -325,10 +333,14 @@ class ReportController extends Controller
                                 on branch.branchID = emp.branchID_
                             inner join department dept
                                 on dept.deptID = emp.deptID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (efadvantage.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 efadvantage.status IN('.$status.')
                             AND
@@ -344,13 +356,38 @@ class ReportController extends Controller
                 break;
             // Incident Report
             case 'incidentreport':
+                
+                if (str_contains($status, '9')) { 
+                    $status = $status.","."1";
+                }
+                if (str_contains($status, '8')) { 
+                    $status = $status.","."1".","."2";
+                    
+                }
                 $data = DB::select('select eIReport.*,
                             DATE_FORMAT(eIReport.datefiled, "%m/%d/%Y") as datefiled,
                             CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname, dept.deptname,
                             (
                                 select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
                                 where subemp.empID = eIReport.approvedby
-                            ) as approvedby
+                            ) as approvedby,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = eIReport.personsinvolve
+                            ) as search_employee,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = eIReport.empID_
+                            ) as reportedby,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = eIReport.endorse1
+                            ) as search_endorse_employee,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = eIReport.endorse2
+                            ) as search_endorse_employee2
+
                             from formincidentreport eIReport right join employee emp
                                 on emp.empID = eIReport.empID_
                             inner join positiontbl pos
@@ -359,10 +396,14 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eIReport.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 eIReport.status IN('.$status.')
                             AND
@@ -488,10 +529,14 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (emiis.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 emiis.status IN('.$status.')
                             AND
@@ -526,10 +571,14 @@ class ReportController extends Controller
                                 on branch.branchID = emp.branchID_
                             inner join department dept
                                 on dept.deptID = emp.deptID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eprf.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 eprf.status IN('.$status.')
                             AND
@@ -574,10 +623,14 @@ class ReportController extends Controller
                                 on branch.branchID = emp.branchID_
                             inner join department dept
                                 on dept.deptID = emp.deptID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                             (ecanvas.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 ecanvas.status IN('.$status.')
                             AND
@@ -622,10 +675,14 @@ class ReportController extends Controller
                             on dept.deptID = emp.deptID_
                         inner join branchtbl branch
                             on branch.branchID = emp.branchID_
+                        inner join companytbl comp
+                            on comp.compID = emp.compID_
                         WHERE
                             (esaldisc.discrepancydate BETWEEN :dateFrom AND :dateTo)
                         AND
                             emp.branchID_ IN('.$branch.')
+                        AND
+                            emp.compID_ IN('.$company.')
                         AND
                             esaldisc.status IN('.$status.')
                         AND
@@ -656,10 +713,14 @@ class ReportController extends Controller
                         on branch.branchID = emp.branchID_
                     inner join department dept
                         on dept.deptID = emp.deptID_
+                    inner join companytbl comp
+                        on comp.compID = emp.compID_
                     WHERE
                         (eaccredit.datefiled BETWEEN :dateFrom AND :dateTo)
                     AND
                         emp.branchID_ IN('.$branch.')
+                    AND
+                        emp.compID_ IN('.$company.')
                     AND
                         eaccredit.status IN('.$status.')
                     AND
@@ -692,10 +753,14 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (etravel.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 etravel.status IN('.$status.')
                             AND
@@ -765,10 +830,14 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eurgent.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 eurgent.status IN('.$status.')
                             AND
@@ -800,10 +869,14 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eoffset.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 eoffset.status IN('.$status.')
                             AND
@@ -855,10 +928,14 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on emp.branchID_ = branch.branchID
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (ework.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
                             AND
                                 ework.status IN('.$status.')
                             AND

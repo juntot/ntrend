@@ -21,6 +21,7 @@ import SupplierAccreditation from './views/public/SupplierAccreditation';
 import PRS from './views/public/PRS';
 import OverrideForm from './views/public/OverrideForm';
 import Transmittal from './views/public/Transmittal';
+import EnrollmentProgram from './views/public/EnrollmentProgram';
 
 
 // FOR FORM APPROVERS
@@ -59,10 +60,12 @@ import JobPosition from './views/JobPosition';
 import Department from './views/Department';
 import Branch from './views/Branch';
 import AdminPaySlip from './views/PaySlip';
+import AdminDtr from './views/AdminDtr';
 // END
 
 import Policy from './views/public/Policy';
 import PaySlip from './views/public/PaySlip';
+import MyCalendar from './views/public/MyCalendar';
 import Directory from './views/Directory';
 import Videos from './views/Videos';
 import CompanyProfile from './views/public/CompanyProfile';
@@ -208,6 +211,11 @@ export default{
             path: '/override-form',
             component: OverrideForm,
             name: 'Override Request Form'
+        },
+        {
+            path: '/enrollment-program',
+            component: EnrollmentProgram,
+            name: 'Enrollment Program Form'
         },
         // TRansmittal
         {
@@ -386,6 +394,11 @@ export default{
             path: '/manage-branch',
             component: Branch,
         },
+        // DTR ADMIN
+        {
+            path: '/admin-dtr',
+            component: AdminDtr,
+        },
         // PAYSLIP ADMIN
         {
             path: '/admin-payslip',
@@ -396,10 +409,17 @@ export default{
             path: '/policy/:policy_id',
             component: Policy,
         },
+        // MYCALENDAR
+        {
+            path: '/mycalendar',
+            component: MyCalendar,
+            name: 'My Calendar'
+        },
         // PAYSLIP
         {
             path: '/payslip',
-            component: PaySlip
+            component: PaySlip,
+            props: { newsletterPopup: 'false' }
         },
         // DIRECTORY
         {

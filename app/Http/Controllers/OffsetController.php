@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class OffsetController extends Controller
@@ -122,7 +123,9 @@ class OffsetController extends Controller
     // GET Offset FORM EMPLOYEE APPROVERS
     public function getOffsetApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Offset = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Offset = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Offset = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Offset');
         return $data;
     }
 

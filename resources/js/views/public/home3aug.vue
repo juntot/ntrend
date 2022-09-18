@@ -1051,11 +1051,39 @@ export default {
 		hideGreetings(){
 			this.showGreeting = false;
 			localStorage.setItem('greetings', moment().format('YYYY-MM-DD'));
+			fireworks.stop();
 			
 		},
 		// greetings confeeit
 		greetingConfetti(){
-			// if(!localStorage.getItem('greetings') || this.showGreeting) {	
+			// if(!localStorage.getItem('greetings') || this.showGreeting) {
+
+					// // fireworks
+					setTimeout(()=>{
+						const container = document.querySelector('.fireworks-container')
+						fireworks = new Fireworks(container,{ 
+							acceleration: 1.005,
+							rocketsPoint: 3,
+							// friction: .9,
+							particles: 300,
+							// gravity: 3.1,
+							// sound: {
+							// 	enable: true,
+							// 	files: [
+							// 			"https://fireworks.js.org/sounds/explosion0.mp3",
+							// 			"https://fireworks.js.org/sounds/explosion1.mp3",
+							// 			"https://fireworks.js.org/sounds/explosion2.mp3"
+							// 	],
+							// 	volume: {
+							// 			"min": 4,
+							// 			"max": 90
+							// 	}
+							// },
+					});
+					fireworks.start();
+					}, 500);
+					
+					
 					var confettiElement = document.getElementById('my-canvas');
 					var confettiSettings = { target: confettiElement, rotate: true, size: 2 };
 					var confetti = new ConfettiGenerator(confettiSettings);

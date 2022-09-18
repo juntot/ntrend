@@ -73,6 +73,11 @@
 
 					</div>
 					<div class="col-md-9x col-lg-9x col-sm-9x text-right notifs" style="position: relative;">
+							<span class="notif-icon-container">
+							<router-link to="/mycalendar" @click.native="hideMobileNav" class="accordion-menu collapseall">
+									<i class="fas fa-calendar-alt"></i>
+							</router-link>
+							</span>
 							<span @click="hardRefresh" class="notif-icon-container">
 								<i class="fas fa-sync-alt"></i>
 							</span>
@@ -216,6 +221,7 @@
 						<hr>
 						<div>
 							<p>ID No: @{{userinfo.empID}}</p>
+							<p>Status: @{{userinfo.employee_status}}</p>
 							<p>Date Hired: @{{userinfo.dhired}}</p>
 							<!-- <p>Employee Status: </p> -->
 							<p>Job Title: @{{userinfo.posname}}</p>
@@ -269,6 +275,31 @@
 											</h4>
 										</div>
 									</div>
+									<!-- MANAGE DTR -->
+									<div class="panel panel-default" v-if="userinfo.uploadDtr || userinfo.viewDTRReport">
+										<div class="panel-heading">
+											<h4 class="panel-title">
+											<a data-toggle="collapse" data-parent="#accordion" href="#collapsedtr">Manage DTR</a>
+											</h4>
+										</div>
+										<div id="collapsedtr" class="panel-collapse collapse inx">
+											<div class="panel-body">
+												<div class="policy-navs">
+													<a v-if="userinfo.uploadDtr" href="https://ams.northtrend.com/upload" target="_tab" @click.native="hideMobileNav" class="accordion-menu collapseall">Upload Employee Logs</a>
+													<a v-if="userinfo.viewDTRReport" href="https://ams.northtrend.com/report" target="_tab" @click.native="hideMobileNav" class="accordion-menu collapseall">View Employee Log</a>
+												</div>
+
+												<!-- <ul class="sidebarpanel">
+													<li v-for="item in forms">
+														<router-link :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall">
+															@{{item.navname}}
+														</router-link>
+													</li>
+												</ul> -->
+											</div>
+										</div>
+									</div>
+									<!-- end -->
 									<!-- BRANCH -->
 									<div class="panel panel-default" v-if="userinfo.addPayslip">
 										<div class="panel-heading">
@@ -293,26 +324,26 @@
 									</div>
 									<!-- FORMS -->
 									<div class="panel panel-default">
-									<div class="panel-heading">
-										<h4 class="panel-title">
-										<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">FORMS</a>
-										</h4>
-									</div>
-									<div id="collapse1" class="panel-collapse collapse inx">
-										<div class="panel-body">
-											<div class="policy-navs" v-for="(form, index) in forms" :key="index">
-												<div>@{{index}}</div>
-												<router-link v-for="item in form" :key="item.detail_id" :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall">@{{item.navname}}</router-link>
-											</div>
-											<!-- <ul class="sidebarpanel">
-												<li v-for="item in forms">
-													<router-link :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall">
-														@{{item.navname}}
-													</router-link>
-												</li>
-											</ul> -->
+										<div class="panel-heading">
+											<h4 class="panel-title">
+											<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">FORMS</a>
+											</h4>
 										</div>
-									</div>
+										<div id="collapse1" class="panel-collapse collapse inx">
+											<div class="panel-body">
+												<div class="policy-navs" v-for="(form, index) in forms" :key="index">
+													<div>@{{index}}</div>
+													<router-link v-for="item in form" :key="item.detail_id" :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall">@{{item.navname}}</router-link>
+												</div>
+												<!-- <ul class="sidebarpanel">
+													<li v-for="item in forms">
+														<router-link :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall">
+															@{{item.navname}}
+														</router-link>
+													</li>
+												</ul> -->
+											</div>
+										</div>
 									</div>
 									<!-- FORM APPROVAL -->
 									<div class="panel panel-default" v-if="hasForApproval">
@@ -389,6 +420,13 @@
 											quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
 										</div>
 									</div>
+									<!-- <div class="panel panel-default">
+										<div class="panel-heading">
+											<h4 class="panel-title">
+											<router-link to="/mycalendar" @click.native="hideMobileNav" class="accordion-menu collapseall">MY CALENDAR</router-link>
+											</h4>
+										</div>
+									</div> -->
 									<div class="panel panel-default">
 										<div class="panel-heading">
 											<h4 class="panel-title">
@@ -668,7 +706,7 @@
 
 			</section>
 			<section id="content" class="col-md-8 col-lg-9 col-sm-8 col-xs-12 content nopadding relative-pos margin-top-20">
-				<router-view></router-view>
+				<router-view :user-id="userinfo.empID"></router-view>
 			</section>
 
 		</article>
@@ -724,8 +762,9 @@
 	<script src="{{URL::asset('resources/assets/js/zoom/image-zoom.min.js')}}"></script>
 
 	<!-- confetti & fireworks -->
-	<script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script>
-	<script src="https://unpkg.com/fireworks-js@latest/dist/fireworks.js"></script>
+	<!-- <script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script> -->
+	<script src="{{URL::asset('resources/assets/js/confetti/confetti.js')}}"></script>
+	<!-- <script src="https://unpkg.com/fireworks-js@latest/dist/fireworks.js"></script> -->
 
 	<script src="{{URL::to('/public/js/public-app.js')}}"></script>
 	<!-- <script src="./public/js/public-app.js"></script> -->

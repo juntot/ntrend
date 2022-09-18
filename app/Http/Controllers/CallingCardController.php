@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class CallingCardController extends Controller
@@ -76,7 +77,9 @@ class CallingCardController extends Controller
     // GET LEAVE FORM EMPLOYEE APPROVERS
     public function getCallingCardApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Calling0Card0Request = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Calling0Card0Request = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Calling0Card0Request = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Calling0Card0Request');
         return $data;
     }
 

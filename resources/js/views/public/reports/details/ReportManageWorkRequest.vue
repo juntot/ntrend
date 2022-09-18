@@ -40,7 +40,7 @@
                 <div class="col-md-4">
                     <div class="mdb-form-field">
                         <div class="form-field__control">
-                            <input type="text" class="form-field__input" :value="computedfullname +' '+userinfo.mname" name="Name" :readonly="true">
+                            <input type="text" class="form-field__input" :value="computedfullname" name="Name" :readonly="true">
                             <label class="form-field__label">Full Name</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -176,7 +176,7 @@
                             <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="3" name="radio" >
                             <span class="checkmark"></span>
                             </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">System Autorization
+                            <label class="mdblbl inline-blocklbl mdblblradio">System Authorization
                             <input :disabled="$parent.disabledinput" type="checkbox" value="System Autorization" v-model="request_type">
                             <span class="mdbcheckmark"></span>
                             </label>

@@ -59,7 +59,7 @@
                                     
                             </thead>
                             <tbody>
-                                    <tr v-for="(item, index) in entries">
+                                    <tr v-for="(item, index) in entries" :key="index">
                                         <td>
                                             <div>
                                                 <span style="padding: 0 12px;">
@@ -223,6 +223,9 @@ export default {
 
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         isFormValid(){
             return !Object.keys(this.fields).some((key )=>{ 
                 

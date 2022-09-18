@@ -233,6 +233,22 @@ export default {
         //         <span class="mdbcheckmark"></span>
         //         </label>
         //     `
+        },{
+            title: "Upload DTR Log",
+            className:      'details-control',
+            orderable:      false,
+            data:           'uploadDtr',
+        //     defaultContent: `
+        //         <label class="mdblbl inline-blocklbl">
+        //         <input type="checkbox" class="canverify"> 
+        //         <span class="mdbcheckmark"></span>
+        //         </label>
+        //     `
+        },{
+            title: "View DTR Report",
+            className:      'details-control',
+            orderable:      false,
+            data:           'viewDTRReport',
         }
         // ,{
         //     title: "View Reports",

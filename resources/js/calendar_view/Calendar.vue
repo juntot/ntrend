@@ -1,3 +1,4 @@
+
 <template>
     <div>
         <v-app id="inspire">

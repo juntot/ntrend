@@ -202,11 +202,31 @@ class EmployeeController extends Controller
         DB::table('users')->where('empID', request('empID'))->update(['status'=>0]);
         return http_response_code(200);
     }
+    
     public function activateEmp(){
         DB::table('employee')->where('empID', request('empID'))->update(['status'=>1]);
         DB::table('users')->where('empID', request('empID'))->update(['status'=>1]);
         return http_response_code(200);
     }
+
+    public function delEmpPermanent(){
+        $empID = request('empID')."";
+        $payslips = DB::select('select pdf_loc from payslips where empID_ = :empid', ['empid'=>request('empID')]);
+        if(count($payslips) > 0) {
+            foreach ($payslips as $key => $value) {
+                UserSession::delAttachment($value->pdf_loc);
+            }
+        }
+        // DB::table('payslips')->where('empID_', request('empID'))->delete();
+        // DB::table('employee')->where('empID', request('empID'))->delete();
+        // DB::table('users')->where('empID', request('empID'))->delete();
+        
+        DB::select('CALL sp_DeletePermanentUser(?)', array($empID));
+        // DB::select('CALL sp_DeletePermanentUser('.$empID.')');
+
+        return http_response_code(200);
+    }
+
     // store image to local disk
     public function newAvatar(){
         $attachment = null;
@@ -251,7 +271,8 @@ class EmployeeController extends Controller
                     emp.SSS, emp.TIN, emp.PhHealth, emp.HDMF, emp.mobile, emp.birthdate, emp.SL, emp.VL, emp.BL, emp.DL,
                     emp.emergency_contactperson, emp.emergency_contactnum, emp.employee_status,
                     DATE_FORMAT(emp.dhired, "%M %e, %Y") as dhired, emp.birthdate,
-                    user.canPost, user.isAdmin, user.addDept, user.addPos, user.addBranch, user.addEmp, user.addPayslip, user.viewReports, user.status,
+                    user.canPost, user.isAdmin, user.addDept, user.addPos, user.addBranch, user.addEmp, user.addPayslip, 
+                    user.uploadDtr, user.viewDTRReport, user.viewReports, user.status,
                     emp.deptID_, emp.branchID_, pos.posID, emp.compID_, pos.posname, branch.branchname, dept.deptname, comp.compname
                     from employee emp
                     inner join users user on emp.empID = user.empID
@@ -270,7 +291,8 @@ class EmployeeController extends Controller
     public function getEmployees()
     {
         $data = DB::select('select emp.empID, emp.avatar,emp.mname, emp.fname, emp.lname, emp.gender,  emp.email, emp.dhired, emp.birthdate,
-                    user.canPost, user.isAdmin, user.addDept, user.addPos, user.addBranch, user.addEmp, user.addPayslip, user.viewReports, user.status,
+                    user.canPost, user.isAdmin, user.addDept, user.addPos, user.addBranch, user.addEmp, user.addPayslip, 
+                    user.uploadDtr, user.viewDTRReport, user.viewReports, user.status, 
                     emp.deptID_, emp.branchID_, emp.posID_, emp.compID_, emp.mobile,
                     emp.SSS, emp.TIN, emp.PhHealth, emp.HDMF, emp.SL, emp.VL, emp.BL, emp.DL,
                     emp.emergency_contactperson, emp.emergency_contactnum, emp.employee_status,

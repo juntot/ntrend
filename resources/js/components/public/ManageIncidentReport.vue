@@ -1,3 +1,16 @@
+<style scoped>
+textarea::-webkit-scrollbar{
+    width: 15px !important;
+}
+
+.show_more_btn{
+    cursor: pointer;
+    text-decoration: underline;
+    color: blue;
+    font-style: italic;
+    float: right;
+}
+</style>
 <template>
     <div>
         
@@ -103,7 +116,7 @@
                 <div class="mdb-form-field form-group-limit">
                     <div class="form-field__control">
                         <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="text" class="form-field__input" v-model="refs" name="reference">
-                        <label class="form-field__label">IR Reference</label>
+                        <label class="form-field__label">IR Reference #</label>
                         <div class="form-field__bar"></div>
                     </div>
                 </div>
@@ -117,42 +130,42 @@
                     <div>
                         <label class="mdblblradio">
                             <span class="checklbl">Inventory Discrepancy</span>
-                            <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Inventory Discrepancy" v-model="incidenttype" name="incident type">
+                            <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Inventory Discrepancy" v-model="incidenttype" name="incident type">
                             <span class="checkmark"></span>
                         </label>
                     </div>
                     <div>
                         <label class="mdblblradio">
                             <span class="checklbl">Habitual Tardiness</span>
-                            <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Habitual Tardiness" v-model="incidenttype" name="incident type">
+                            <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Habitual Tardiness" v-model="incidenttype" name="incident type">
                             <span class="checkmark"></span>
                         </label>
                     </div>
                     <div>
                         <label class="mdblblradio">
                             <span class="checklbl">Habitual Absences</span>
-                            <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Habitual Absences" v-model="incidenttype" name="incident type">
+                            <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Habitual Absences" v-model="incidenttype" name="incident type">
                             <span class="checkmark"></span>
                         </label>
                     </div>
                     <div>
                         <label class="mdblblradio">
                             <span class="checklbl">Absence w/o official leave</span>
-                            <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Absence w/o official leave" v-model="incidenttype" name="incident type">
+                            <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Absence w/o official leave" v-model="incidenttype" name="incident type">
                             <span class="checkmark"></span>
                         </label>
                     </div>
                     <div>
                         <label class="mdblblradio">
                             <span class="checklbl">Insubordination</span>
-                            <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Insubordination" v-model="incidenttype" name="incident type">
+                            <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Insubordination" v-model="incidenttype" name="incident type">
                             <span class="checkmark"></span>
                         </label>
                     </div>
                     <div>
                         <label class="mdblblradio">
                             <span class="checklbl">Non-compliance to policies/procedures</span>
-                            <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Non-compliance to policies/procedures" v-model="incidenttype" name="incident type">
+                            <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Non-compliance to policies/procedures" v-model="incidenttype" name="incident type">
                             <span class="checkmark"></span>
                         </label>
                     </div>
@@ -161,21 +174,21 @@
                 <div>
                     <label class="mdblblradio">
                         <span class="checklbl">Delivery Discrepancy</span>
-                        <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Delivery Discrepancy" v-model="incidenttype" name="incident type">
+                        <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Delivery Discrepancy" v-model="incidenttype" name="incident type">
                         <span class="checkmark"></span>
                     </label>
                 </div>
                 <div>
                     <label class="mdblblradio">
                         <span class="checklbl">Theft</span>
-                        <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Theft" v-model="incidenttype" name="incident type">
+                        <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Theft" v-model="incidenttype" name="incident type">
                         <span class="checkmark"></span>
                     </label>
                 </div>
                 <div>
                     <label class="mdblblradio">
                         <span class="checklbl">Falsification/Tampering of Documents</span>
-                        <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Falsification/Tampering of Documents" v-model="incidenttype" name="incident type">
+                        <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Falsification/Tampering of Documents" v-model="incidenttype" name="incident type">
                         <span class="checkmark"></span>
                     </label>
                 </div>
@@ -184,21 +197,21 @@
                     <div>
                         <label class="mdblblradio">
                             <span class="checklbl">Loss/Damage of Company Property</span>
-                            <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Loss/Damage of Company Property"  v-model="incidenttype" name="incident type">
+                            <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Loss/Damage of Company Property"  v-model="incidenttype" name="incident type">
                             <span class="checkmark"></span>
                         </label>
                     </div>
                     <div>
                         <label class="mdblblradio">
                             <span class="checklbl">Non remittance/short of collections</span>
-                            <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Non remittance/short of collections"  v-model="incidenttype" name="incident type">
+                            <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="Non remittance/short of collections"  v-model="incidenttype" name="incident type">
                             <span class="checkmark"></span>
                         </label>
                     </div>
                     <div>
                         <label class="mdblblradio">
                             <span class="checklbl">Others</span>
-                            <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="others"  v-model="incidenttype" name="incident type">
+                            <input :disabled="explanation || $parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="radio" value="others"  v-model="incidenttype" name="incident type">
                             <span class="checkmark"></span>
                         </label>
                     </div>
@@ -211,9 +224,16 @@
             <div class="col-md-12">
                 <div class="mdb-form-field">
                     <div class="form-field__control mdb-bgcolor">
-                        <textarea :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" class="form-field__textarea"  cols="4" rows="4" v-validate="'required'" v-model="details" name="additional-details"></textarea>
-                        <label class="form-field__label">(Complete description and details of the incident specifically how and why the incident occurred.)</label>
-                        <div class="form-field__bar"></div>
+                        <!-- <div v-show="showBlockMessageDetailSection" style="white-space: pre-line; padding: 15px;">
+                            {{ details }}
+                        </div> -->
+                        <div>
+                            <textarea :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" class="form-field__textarea"  cols="4" rows="4" v-validate="'required'" v-model="details" name="additional-details"></textarea>
+                            <span v-show="showBlockMessageDetailSection" class="show_more_btn" @click="showMore">show more</span>
+                            <label class="form-field__label">(Complete description and details of the incident specifically how and why the incident occurred.)</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        
                     </div>
                     <em>Important Note: All pertinent documents supporting the occurrence of the incident should be attached in this form.</em>
                     <h6><span class="errors">{{ errors.first('additional-details') }}</span></h6>
@@ -226,9 +246,20 @@
             <div class="col-md-12">
                 <div class="mdb-form-field">
                     <div class="form-field__control mdb-bgcolor">
-                        <textarea :disabled="$parent.disabledinput || userinfo.empID != selected.personsinvolve || !selected.personsinvolve" class="form-field__textarea"  cols="4" rows="4" v-model="explanation" name="additional-info"></textarea>
-                        <label class="form-field__label">Add explanation here</label>
-                        <div class="form-field__bar"></div>
+                        <!-- <div v-show="showBlockMessageExplanationSection" style="white-space: pre-line; padding: 15px;">
+                            {{ explanation }}
+                        </div> -->
+                        <!-- <div v-show="!showBlockMessageExplanationSection">
+                            <textarea :disabled="$parent.disabledinput || userinfo.empID != selected.personsinvolve || !selected.personsinvolve" class="form-field__textarea"  cols="4" rows="4" v-model="explanation" name="additional-info"></textarea>
+                            <label class="form-field__label">Add explanation here</label>
+                            <div class="form-field__bar"></div>
+                        </div> -->
+                        <div>
+                            <textarea :disabled="$parent.disabledinput || userinfo.empID != selected.personsinvolve || !selected.personsinvolve" class="form-field__textarea"  cols="4" rows="4" v-model="explanation" name="additional-info"></textarea>
+                            <span v-show="showBlockMessageExplanationSection" class="show_more_btn" @click="showMore">show more</span>
+                            <label class="form-field__label">Add explanation here</label>
+                            <div class="form-field__bar"></div>
+                        </div>
                     </div>
                     <h6><span class="errors">{{ errors.first('additional-info') }}</span></h6>
                 </div>
@@ -316,12 +347,12 @@
             <div class="col-lg-12" v-show="actionTaken == 'Coaching and Immediate Deduction'">
                 <div class="mdb-form-field form-group-limit">
                     <div class="form-field__control">
-                        <input type="text" class="form-field__input" v-model="deduction_amt" v-validate="'required'" name="deduct amount"
+                        <input type="text" class="form-field__input" v-model="deduction_amt" v-validate="" name="deduct amount"
                         :disabled="$parent.$data.forapprover != 'approval' || (selected.approvedby && userinfo.empID != selected.approvedby)">
                         <label class="form-field__label">Total Deduction Amount</label>
                         <div class="form-field__bar"></div>
                     </div>
-                    <span class="errors">{{ errors.first('deduct amount') }}</span>
+                    <!-- <span class="errors">{{ errors.first('deduct amount') }}</span> -->
                 </div>
             </div>
             <div v-if="$parent.disabledinput || true">
@@ -329,10 +360,16 @@
                     <h5 class="form-subtitle"></h5>
                     <div class="mdb-form-field">
                             <div class="form-field__control mdb-bgcolor">
-                                <textarea class="form-field__textarea"  cols="4" rows="4" v-model="remarks" name="additional-info"
-                                :disabled="$parent.$data.forapprover != 'approval' || (selected.approvedby && userinfo.empID != selected.approvedby)"></textarea>
-                                <label class="form-field__label">{{actionTaken}} Remarks</label>
-                                <div class="form-field__bar"></div>
+                                <!-- <div v-show="showBlockMessageInitialApproverRemarks" style="white-space: pre-line; padding: 15px;">
+                                    {{remarks}}
+                                </div> -->
+                                <div >
+                                    <textarea class="form-field__textarea"  cols="4" rows="4" v-model="remarks" name="additional-info"
+                                    :disabled="$parent.$data.forapprover != 'approval' || (selected.approvedby && userinfo.empID != selected.approvedby)"></textarea>
+                                    <span v-show="showBlockMessageInitialApproverRemarks" class="show_more_btn" @click="showMore">show more</span>
+                                    <label class="form-field__label">{{actionTaken}} Remarks</label>
+                                    <div class="form-field__bar"></div>
+                                </div>
                             </div>
                     </div>
                 </div>
@@ -348,7 +385,7 @@
             </div>
             
             <!-- FIRST ENDORSER -->
-            <div v-show="status >= 1 && status<= 3">
+            <div v-show="status >= 1 && status<= 3 && endorse1">
                 <div class="col-lg-12">
                     <h5 class="form-subtitle"><em>First Endorser</em></h5>
                 </div>
@@ -420,7 +457,7 @@
                                 <label class="form-field__label">Deduction Amount</label>
                                 <div class="form-field__bar"></div>
                             </div>
-                            <span class="errors">{{ errors.first('deduct amount') }}</span>
+                            <!-- <span class="errors">{{ errors.first('deduct amount') }}</span> -->
                         </div>
                     </div>
                     <div v-if="$parent.disabledinput || true">
@@ -428,9 +465,15 @@
                             <h5 class="form-subtitle"></h5>
                             <div class="mdb-form-field">
                                     <div class="form-field__control mdb-bgcolor">
-                                        <textarea :disabled="$parent.$data.forapprover != 'approval'" class="form-field__textarea"  cols="4" rows="4" v-model="endorse1_remarks" name="additional-info"></textarea>
-                                        <label class="form-field__label">{{actionTaken1}} Remarks</label>
-                                        <div class="form-field__bar"></div>
+                                        <!-- <div v-show="showBlockMessageEndorserRemarks" style="white-space: pre-line; padding: 15px;">
+                                            {{endorse1_remarks}}
+                                        </div> -->
+                                        <div>
+                                            <textarea :disabled="$parent.$data.forapprover != 'approval'" class="form-field__textarea"  cols="4" rows="4" v-model="endorse1_remarks" name="additional-info"></textarea>
+                                            <span v-show="showBlockMessageEndorserRemarks" class="show_more_btn" @click="showMore">show more</span>
+                                            <label class="form-field__label">{{actionTaken1}} Remarks</label>
+                                            <div class="form-field__bar"></div>
+                                        </div>
                                     </div>
                             </div>
                         </div>
@@ -448,7 +491,7 @@
             <!-- END -->
             
             <!-- SECONDS ENDORSER -->
-            <div v-show="status >= 2 && status <= 3">
+            <div v-show="status >= 2 && status <=3 && endorse2">
                 <div class="col-lg-12">
                     <h5 class="form-subtitle"><em>Second Endorser</em></h5>
                 </div>
@@ -491,7 +534,7 @@
                             <label class="form-field__label">Deduction Amount</label>
                             <div class="form-field__bar"></div>
                         </div>
-                        <span class="errors">{{ errors.first('deduct amount') }}</span>
+                        <!-- <span class="errors">{{ errors.first('deduct amount') }}</span> -->
                     </div>
                 </div>
                 <div v-if="$parent.disabledinput || true">
@@ -499,9 +542,15 @@
                         <h5 class="form-subtitle"></h5>
                         <div class="mdb-form-field">
                                 <div class="form-field__control mdb-bgcolor">
-                                    <textarea :disabled="$parent.$data.forapprover != 'approval'" class="form-field__textarea"  cols="4" rows="4" v-model="endorse2_remarks" name="additional-info"></textarea>
-                                    <label class="form-field__label">{{actionTaken2}} Remarks</label>
-                                    <div class="form-field__bar"></div>
+                                    <!-- <div v-show="showBlockMessageEndorserRemarks" style="white-space: pre-line; padding: 15px;">
+                                        {{endorse2_remarks}}
+                                    </div> -->
+                                    <div>
+                                        <textarea :disabled="$parent.$data.forapprover != 'approval'" class="form-field__textarea"  cols="4" rows="4" v-model="endorse2_remarks" name="additional-info"></textarea>
+                                        <span v-show="showBlockMessageEndorserRemarks" class="show_more_btn" @click="showMore">show more</span>
+                                        <label class="form-field__label">{{actionTaken2}} Remarks</label>
+                                        <div class="form-field__bar"></div>
+                                    </div>
                                 </div>
                         </div>
                     </div>
@@ -529,7 +578,8 @@
             </div>
             <div class="clearfix"></div>
             <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addIncidentReport" :disabled="isDisable || !isFormValid" v-if="!incidentID && $parent.$data.forapprover != 'approval'">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addIncidentReport" :disabled="
+                     disabledIfNoApprover || isDisable || !isFormValid" v-if="!incidentID && $parent.$data.forapprover != 'approval'">
                     <!-- update -->
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateIncidentReport" 
                     :disabled="isDisable || !isFormValid" 
@@ -542,7 +592,8 @@
                         userinfo.empID != selected.personsinvolve
                     ">
                     <!-- main approver buttons -->
-                    <!-- first level -->
+                    
+                    <!-- first level approve main approver-->
                     <input type="submit" class="btn btn-primary" value="Approve" 
                     :disabled="!actionTaken || 
                     (actionTaken == 'Further Investigation' && !endorse1) || 
@@ -550,7 +601,8 @@
                     " 
                     @click.prevent="requestActionIncidentReport(1)" 
                     v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && status == 0 ">
-
+                    
+                    <!-- reject main approver -->
                     <input type="submit" class="btn btn-primary" value="Reject" 
                         @click.prevent="requestActionIncidentReport(4)" 
                         v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && status == 0 
@@ -564,7 +616,8 @@
                     " 
                     @click.prevent="requestActionIncidentReport(1)" 
                     v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse1 && status == 1 ">
-
+                    
+                    <!-- reject 1st endorser-->
                     <input type="submit" class="btn btn-primary" value="Reject" 
                         @click.prevent="requestActionIncidentReport(4)" 
                         v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse1 && status == 1 ">
@@ -576,6 +629,7 @@
                     @click.prevent="requestActionIncidentReport(3)" 
                     v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse2 && status == 2 ">
                     
+                    <!-- reject final endorser-->
                     <input type="submit" class="btn btn-primary" value="Reject" 
                         @click.prevent="requestActionIncidentReport(4)" 
                         v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse2 && status >= 2 ">
@@ -786,7 +840,7 @@ export default {
                 }
                 params['reciever_emails'] = this.$parent.reciever_emails;
                 axios.post('api/addIncidentReport', params).then((response)=>{
-                    this.$parent.addRow({...response.data, reportedby: this.computedfullname, search_employee: this.search_employee});
+                    this.$parent.addRow({...response.data, datefiled: moment(response.data.datefiled).format('MM/DD/YYYY'),  reportedby: this.computedfullname, search_employee: this.search_employee});
                     this.closeModal();
                 }).catch((err)=>{console.log(err);});
             }
@@ -806,7 +860,7 @@ export default {
                 
                 params['incidentID'] = this.selected.incidentID;
                 axios.post('api/updateIncidentReport', params).then((response)=>{
-                    this.$parent.updateRow({...response.data, reportedby:this.computedfullname, search_employee: this.search_employee});
+                    this.$parent.updateRow({...response.data, datefiled: this.datefiled, reportedby:this.computedfullname, search_employee: this.search_employee});
                     this.closeModal();
                 }).catch((err)=>{console.log(err);});
             }
@@ -857,7 +911,7 @@ export default {
             // if approve and action taken is not to be endorsed close the status
             if(status === 1 && this.status == 0 && this.actionTaken != 'Further Investigation'){
                 params['status'] = 3;
-                params['deduction_amt'] =  '';
+                // params['deduction_amt'] =  '';
                 params['deduction_amt2'] =  '';
             }
             // 2nd approver catherine
@@ -884,12 +938,12 @@ export default {
             
             params['endorse2_remarks'] = this.endorse2_remarks;
 
-            // console.log(params);
+            // console.log(params);s
             // return;
             // change approve by to username;
-            axios.post('api/actionformIncidentReport', params).then(async (response)=>{
-                if(params.status == 0)
-                await this.$parent.updateRow({...response.data, ...this.selected, approvedby: this.userinfo.fullname});
+            axios.post('api/actionformIncidentReport', params).then((response)=>{
+                // if(params.status == 0)
+                this.$parent.updateRow({...this.selected, ...response.data, approvedby: this.userinfo.fullname});
 
                 // if(params.status == 1)
                 // await this.$parent.updateRow({...response.data, ...this.selected, approvedby: this.userinfo.fullname});
@@ -909,8 +963,9 @@ export default {
             
             }
             
-            this.MDBINPUT();
+            
             $("#myModal").modal("show");
+            this.MDBINPUT();
         },
 
         selectDateOccured(val){
@@ -935,6 +990,8 @@ export default {
             });
             
             $("#myModal").modal("hide");
+
+            $('textarea').height('100');
             
         },
         MDBINPUT(){
@@ -959,10 +1016,41 @@ export default {
                         }
                     );
              });
-        }
+        },
+
+        showMore(e){
+            let element = $(e.target).prev('textarea')[0];
+            // $(element).css("height", element.scrollHeight+3+"px");
+            $(element).css("height", "200px");
+            $(e.target).css("display", "none");
+        },
+
+        showLess(e){
+            let element = $(e.target).prev('textarea')[0];
+            $(element).css("height", element.scrollHeight+"px");
+        },
+
 
     },
     computed:{
+        showBlockMessageDetailSection(){
+            return this.details && (this.$parent.disabledinput || (this.userinfo.empID !== this.selected.empID_ && this.selected.empID_));
+        },
+        showBlockMessageExplanationSection(){
+            return this.explanation && (this.$parent.disabledinput || (this.userinfo.empID != this.selected.personsinvolve || !this.selected.personsinvolve));
+        },
+
+        showBlockMessageInitialApproverRemarks(){
+            return this.$parent.$data.forapprover != 'approval' || (this.selected.approvedby && this.userinfo.empID != this.selected.approvedby);
+        },
+        
+        showBlockMessageEndorserRemarks(){
+            return this.$parent.disabledinput || this.$parent.$data.forapprover != 'approval';
+        },
+
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
 
         isFormValid(){
                 return !Object.keys(this.fields).some(key => this.fields[key].invalid);

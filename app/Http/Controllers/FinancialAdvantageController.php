@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use Carbon\Carbon;
 use DB;
 
@@ -33,9 +34,10 @@ class FinancialAdvantageController extends Controller
             // request()->merge(['status' => 0, 'faID' => $data[0]->faID]);
             $response = array_merge($response, ['status' => 0, 'faID' => $data]);
 
+        $mailReceivers = FormApproverService::getApproverEmail('faID', $data, 'formfinancialadvantage', 'Financial0Advance');
         // mail notification
         MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'FINANCIAL ADVANCE REQUEST');
-        MailServices::formNotify(request('reciever_emails'), request('empID_'), 'financial advance request', $data, 'fadvantage');
+        MailServices::formNotify($mailReceivers, request('empID_'), 'financial advance request', $data, 'fadvantage');
         return $response;
     }
     // UPDATE
@@ -61,9 +63,14 @@ class FinancialAdvantageController extends Controller
 
     // DELETE
     public function deleteFinancialAdvantage($faID  = null){
-        DB::table('formfinancialadvantage')->where('faID', '=', $faID)
+        $affected = DB::table('formfinancialadvantage')->where('faID', '=', $faID)
         ->update(['recstat' => 1]);
         // ->delete();
+
+        $mailReceivers = FormApproverService::getApproverEmail('faID', $faID, 'formfinancialadvantage', 'Financial0Advance');
+        if($affected) {
+            MailServices::send_email_Notify($mailReceivers, UserSession::getSessionID(), 'FINANCIAL ADVANTAGE REQUEST', 'Deleted his/her');
+        }
     }
 
     // GET
@@ -82,7 +89,9 @@ class FinancialAdvantageController extends Controller
     // GET LEAVE FORM EMPLOYEE APPROVERS
     public function getFinancialAdvantageApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Financial0Advance = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Financial0Advance = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Financial0Advance = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        
+        $data = FormApproverService::getFormApproverByUser('Financial0Advance');
         return $data;
     }
 
@@ -100,7 +109,8 @@ class FinancialAdvantageController extends Controller
                             ) as approvedby,
                             emp.email,
                             branch.branchname, pos.posname, dept.deptname
-                            from formfinancialadvantage efadvantage left join eformapproverbyemp eform
+                            from formfinancialadvantage efadvantage 
+                            left join eformapproverbyemp eform
                                 on efadvantage.empID_ = eform.empID_
                             right join employee emp
                                 on emp.empID = efadvantage.empID_
@@ -110,8 +120,9 @@ class FinancialAdvantageController extends Controller
                                 on branch.branchID = emp.branchID_
                             inner join department dept
                                 on dept.deptID = emp.deptID_
-                            where efadvantage.recstat != 1 and
-                            eform.approverID_ = :approverID
+                            where eform.approverID_ = :approverID
+                            and eform.Financial0Advance  = 1
+                            and efadvantage.recstat != 1
                             order by efadvantage.faID desc
                             ', [UserSession::getSessionID()]);
         return $data;

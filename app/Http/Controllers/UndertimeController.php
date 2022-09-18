@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class UnderTimeController extends Controller
@@ -72,7 +73,8 @@ class UnderTimeController extends Controller
     // GET UNDERTIME FORM EMPLOYEE APPROVERS
     public function getUndertimeApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Undertime0Request = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Undertime0Request = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Undertime0Request = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        $data = FormApproverService::getFormApproverByUser('Undertime0Request');
         return $data;
     }
 

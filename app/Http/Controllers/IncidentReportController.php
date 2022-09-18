@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use Carbon\Carbon;
 use DB;
 
@@ -19,6 +20,8 @@ class IncidentReportController extends Controller
             'empID_' => UserSession::getSessionID(),
             'datefiled' => $now
         ]);
+
+        
         $data = DB::table('formincidentreport')->insertGetId(request()->except(['isDisable', 'incidentID', 'remarks', 'approvedby', 'reciever_emails', 'actionTaken', 'explanation']));
             // GET LAST INDEX
             request()->merge(['status' => 0, 'incidentID' => $data]);
@@ -34,12 +37,22 @@ class IncidentReportController extends Controller
             }
             
         }
+
+        $reciever_emails = $this->getIncidentReportApprover(UserSession::getSessionID());
+
+        foreach ($reciever_emails as $value) {
+            # code...
+            $tagEmpApprovers[] = $value->email;
+        }
+        $tagEmpApprovers[] = request('personsinvolve_email');
+
         
-        // mail notification for requestor approvers
-        // MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'INCIDENT REPORT REQUEST');
+        // form notification for requestor approvers
+        MailServices::formNotify($tagEmpApprovers, request('empID_'), 'incident report request', $data, 'incident report');
 
         // notificaiton for tagged persons approvers
-        // MailServices::send_email_Notify($tagEmpApprovers, request('personsinvolve'), 'INCIDENT REPORT', 'is tagged by '.$tagbyName[0]->fullname.' from his/her ', 'Incident Report Request');
+        MailServices::send_email_Notify($tagEmpApprovers, request('personsinvolve'), 'INCIDENT REPORT', 'was tagged by '.$tagbyName[0]->fullname.' from his/her ', 'Incident Report Request');
+        
         return request()->except(['isDisable']);
     }
 
@@ -55,9 +68,41 @@ class IncidentReportController extends Controller
 
     // DELETE
     public function deleteIncidentReport($incidentID  = null){
-        DB::table('formincidentreport')->where('incidentID', '=', $incidentID)
+        $affected = DB::table('formincidentreport')
+        ->where('incidentID', '=', $incidentID)
         ->update(['recstat' => 1]);
         // ->delete();
+        
+        $record = DB::table('formincidentreport')
+                ->select('personsinvolve','personsinvolve_email')
+                ->where('incidentID', $incidentID)
+                ->first();
+
+        if($affected) {
+            $personinvolveApprovers = $this->getIncidentReportApprover($record->personsinvolve);
+            $tagbyName = UserSession::getEmpKey();
+            
+            $tagEmpApprovers = [$record->personsinvolve_email];
+            if(count($personinvolveApprovers)){
+                foreach ($personinvolveApprovers as $value) {
+                    $tagEmpApprovers[] = $value->email;
+                }
+                
+            }
+
+            // get approvers email direct
+            $reciever_emails = $this->getIncidentReportApprover(UserSession::getSessionID());
+
+            foreach ($reciever_emails as $value) {
+                # code...
+                $tagEmpApprovers[] = $value->email;
+            }
+
+            $tagEmpApprovers[] = $record->personsinvolve_email;
+
+            MailServices::send_email_Notify($tagEmpApprovers, request('empID_'), 'LEAVE REQUEST', 'Deleted his/her');
+        }
+
     }
 
     // GET
@@ -99,7 +144,9 @@ class IncidentReportController extends Controller
         if(!$userID)
         $userID = UserSession::getSessionID();
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Incident0Report = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Incident0Report = 1 and eform.empID_ = :empiD', [$userID]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Incident0Report = 1 and eform.empID_ = :empiD', [$userID]);
+
+        $data = FormApproverService::getFormApproverByUser('Incident0Report');
         return $data;
     }
 
@@ -179,6 +226,7 @@ class IncidentReportController extends Controller
             'closeDate' => $now, 
         ]);
 
+        // return request()->all();
 
         DB::table('formincidentreport')
         ->where('incidentID', request('incidentID'))
@@ -187,16 +235,27 @@ class IncidentReportController extends Controller
          // MAIL NOTIFICATION
          if(request('status') == 1)
          {
+            //  approve but first endorsement
             //  MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'INCIDENT REPORT REQUEST', 'APPROVED');
-            //  MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'leave request', 'approved', request('incidentID'), 'leave');
+            MailServices::send_email_Notify(request('endorse1_email'), request('approvedby'), '', 'Endorse to you an Incident Report Request for Further Investigation ', 'Incident Report Request');
          }
          elseif(request('status') == 2){
+            //  2nd endorsement
             //  MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'INCIDENT REPORT REQUEST', 'REJECTED');
-            //  MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'leave request', 'rejected', request('incidentID'), 'leave');
+            MailServices::send_email_Notify(request('endorse2_email'), request('endorse1'), '', 'Endorse to you an Incident Report Request for Further Investigation ', 'Incident Report Request');
+         }
+         elseif(request('status') == 3){
+            //  close
+            //  endorse
+            //  MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'INCIDENT REPORT REQUEST', 'REJECTED');
+            $requestorEmail = [ MailServices::getEmailsByEmpId(request('empID_')), request('personsinvolve_email')];
+            MailServices::send_email_Notify($requestorEmail, request('approvedby'), '', 'Mark Close an Incident Report Request ', 'Incident Report Request');
          }
          else{
+            //  rejected 4 status
             //  MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'INCIDENT REPORT REQUEST', 'CANCELLED');
-            //  MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'leave request', 'cancelled', request('incidentID'), 'leave');
+            $requestorEmail = [ MailServices::getEmailsByEmpId(request('empID_')), request('personsinvolve_email')];
+            MailServices::send_email_Notify($requestorEmail, request('approvedby'), '', 'Rejected an Incident Report Request ', 'Incident Report Request');
          }
         return request()->all();
     }

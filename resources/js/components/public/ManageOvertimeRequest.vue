@@ -129,7 +129,7 @@
                 </div>
                 <div class="clearfix"></div>
                 <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addOvertime" :disabled="isDisable || !isFormValid" v-if="!overtimeID && $parent.$data.forapprover != 'approval'">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addOvertime" :disabled="disabledIfNoApprover || isDisable || !isFormValid" v-if="!overtimeID && $parent.$data.forapprover != 'approval'">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateOvertime" :disabled="isDisable || !isFormValid" v-if="overtimeID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteOvertime" :disabled="isDisable" v-if="overtimeID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionOvertime(1)" v-if="overtimeID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel ">
@@ -277,6 +277,9 @@ export default {
         }
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         isFormValid(){
             return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },

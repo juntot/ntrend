@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class UrgentCheckController extends Controller
@@ -68,7 +69,9 @@ class UrgentCheckController extends Controller
     // FOR APPROVERS ====================================================================================================================================
     // GET LEAVE FORM EMPLOYEE APPROVERS
     public function getUrgentCheckApprover(){
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Urgent0Check = 1');
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Urgent0Check = 1');
+
+        $data = FormApproverService::getFormApproverByUser('Urgent0Check');
         return $data;
     }
 

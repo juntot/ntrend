@@ -8,6 +8,23 @@
         <div class="col-md-12 nopadding">
             <br>
             <div class="col-md-12 bgc-white">
+                <br>
+                <p class="orange-text nomargin">API URL</p>
+                <div class="col-md-12 nopadding">
+                    <div class="mdb-form-field">
+                        <div class="form-field__control">
+                            <input type="text" 
+                            v-validate="'required'" 
+                            @change.prevent="updateAPIpoint"
+                            v-model="endpoint" 
+                            class="form-field__input" name="branch name" 
+                            placeholder="https://example.com">
+                            <label class="form-field__label"></label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('branch name') }}</span>
+                    </div>
+                </div>
                 <p class="orange-text">Company</p>
                 <div class="col-md-6 nopadding with-margin-bottom">
                     <button class="btn btn-primary" data-toggle="modal" data-target="#myModal" 
@@ -25,7 +42,7 @@
                     <tbody class="tbl_bodyoverride">
                         <tr v-for="(val, index) in compRows" :key="index" @click="selected = val">
                             <td>{{val.name}}</td>
-                            <td>user</td>
+                            <td>{{val.user}}</td>
                             <td  :id="val.id" :data-type="'company'">{{'12345' | filterPass}}</td>
                             <td>
                                 <button type="button" class="btn btn-primary retest-connection">Test Connection</button>
@@ -165,6 +182,7 @@ export default {
     data(){
         return{
             loader: false,
+            endpoint: '',
             errMsg: `Please wait while checking your credentials`,
             selected: {
                 name: '',
@@ -214,6 +232,14 @@ export default {
         }  
     },
     methods:{
+        updateAPIpoint(){
+            axios.post('api/update-seop', {
+                endpoint: this.endpoint
+            })
+            .then(()=>{
+
+            });
+        },
         add(){
             if(!this.overrideFields.name) return true;
 
@@ -372,7 +398,11 @@ export default {
     mounted(){
         this.MDBINPUT();
         $('.modal').on("hidden.bs.modal", this.closeModal);
-        
+        axios.post('api/get-seop')
+        .then(({data})=>{
+            this.endpoint = data;
+        });
+
         axios.get('api/get-override-setting-company')
         .then(({data})=>{
             data.forEach( val => {

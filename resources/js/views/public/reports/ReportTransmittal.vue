@@ -136,7 +136,7 @@ export default {
                             obj.fullname, obj.branchname,
                             obj.search_employee, obj.receiver_pos,
                             obj.receiver_dept, obj.receiver_branch,
-                            obj.contactnum, ob.address,
+                            obj.contactnum, obj.address,
                             obj.request_type,
                             obj.datefiled, moment(obj.confirmdate).format('DD/MM/YYYY HH:mm:ss A'),
                             obj.additionalInfo, obj.REMARKS, 

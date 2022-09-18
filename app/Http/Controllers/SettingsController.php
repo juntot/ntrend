@@ -406,7 +406,7 @@ class SettingsController extends Controller
         return $nav_list;
         // return $nav_user;
     }
-
+    
 
     // OVERRIDE SETTINGS
     function getOverrideSetting() {

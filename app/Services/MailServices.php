@@ -19,8 +19,12 @@ class MailServices{
                     <span style="color:#F97000">'.$result[0]->fullname.'</span>
                     <br><br>Regarding his/her
                     <span style="color:#F97000">'.$formType.'</span>';
+        try {
+            Mail::to($email)->send(new FormMail($message, $subject));
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
         
-        Mail::to($email)->send(new FormMail($message, $subject));
         
     }
 
@@ -31,8 +35,12 @@ class MailServices{
         $message = 'Your <span style="color:#F97000">'.$formType.'</span> has been reviewed
                     <br><br>and it is <span style="color:#F97000">'.$status.'</span> by
                     <span style="color:#F97000">'.$result[0]->fullname.'</span>';
-
-        Mail::to($email)->send(new FormMail($message, $subject));
+        try {
+            Mail::to($email)->send(new FormMail($message, $subject));
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
+        
     }
 
     // form notifications
@@ -102,7 +110,11 @@ class MailServices{
         $message = '<span style="color:#F97000">'.$result[0]->fullname.' </span> '.$message.'
                      <span style="color:#F97000">'.$formType.'</span>';
 
-        Mail::to($email)->send(new FormMail($message, $subject));
+        try {
+            Mail::to($email)->send(new FormMail($message, $subject));
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
 
     // check supplmentary for implementation
@@ -142,11 +154,12 @@ class MailServices{
         join '.$form.' form
         on form.empID_ = eform.empID_  
         where form.'.$id.' = :id
-        and '.$colName.' = 1', 
+        and eform.'.$colName.' = 1', 
         [$idVal]);
         
         $emails = [];
         foreach ($result as $value) {
+            if($value->email)
             $emails[] = $value->email;
         }
         return $emails;

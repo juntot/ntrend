@@ -1,3 +1,17 @@
+<style>
+.td-approve {
+  color: #2979ff !important;
+}
+.td-reject {
+  color: #ab003c !important;
+}
+.td-close {
+  color: #00a732 !important;
+}
+.td-endorse {
+  color: #651fff !important;
+}
+</style>
 <template>
     <div>
         <div id="loader2" v-if="loader">
@@ -81,6 +95,7 @@ export default {
     methods:{
         addRow(val)
         {
+            
             this.rows.unshift(val);
         },
         deleteRow(val)
@@ -97,6 +112,7 @@ export default {
         },
         updateRow(val)
         {
+            
             let row = this.$data.rows;
             row.forEach((item, index)=>{
                 if(item.incidentID == val.incidentID)
@@ -169,14 +185,20 @@ export default {
             "order": [[ 0, "desc" ]],
             "rowCallback": function(row, data, index) {
                 var cellValue = data["status"];
-                    if (cellValue=="Pending") {
-                       $(row).addClass("tr-pending");
+                    if (cellValue==1 && !data['endorse2']) { // approved
+                       $(row).addClass("td-approve");
                     }
-                    if (cellValue=="Approved") {
-                       $(row).addClass("tr-approved");
+                    if (cellValue==2 || (cellValue == 1 && data['endorse1'])) { // rejected
+                       $(row).addClass("td-endorse");
                     }
-                    if (cellValue=="Rejected") {
-                       $(row).addClass("tr-rejected");
+                    // if (cellValue==2) { // rejected
+                    //    $(row).addClass("td-endorse");
+                    // }
+                    if (cellValue==3) { // executed
+                       $(row).addClass("td-close");
+                    }
+                    if (cellValue==4) { // executed
+                       $(row).addClass("td-reject");
                     }
 
                 }
@@ -222,13 +244,15 @@ export default {
             title: "Date Filed", data: 'datefiled'
         },
         {
-            title: "Reported By", data: 'reportedby'
+            title: "Person Involved", data: 'search_employee'
         },
         {
             title: "Nature of incident", data: 'incidenttype'
-        },{
-            title: "Details of incident", data: 'details', className: "row-limit"
-        },{
+        },
+        // {
+        //     title: "Details of incident", data: 'details', className: "row-limit"
+        // },
+        {
             title: "Status", data: 'status',
             render: function(data){
                 /**
@@ -239,8 +263,8 @@ export default {
                  * 4 rejected
                  */
                 return data == 0 ? 'Pending':
-                       data == 1 ? '1st Endorsed':
-                       data == 2 ? '2nd Endorsed': 
+                       data == 1 || data == 2 ? 'Further Investigation':
+                    //    data == 2 ? '2nd Endorsed': 
                        data == 3 ? 'Closed': 'Rejected';
             }
         }];

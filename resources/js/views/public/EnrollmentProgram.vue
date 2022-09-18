@@ -1,17 +1,3 @@
-<style>
-.td-approve {
-  color: #2979ff !important;
-}
-.td-reject {
-  color: #ab003c !important;
-}
-.td-close {
-  color: #00a732 !important;
-}
-.td-endorse {
-  color: #651fff !important;
-}
-</style>
 <template>
     <div>
         <div id="loader2" v-if="loader">
@@ -22,9 +8,9 @@
 		</div>
         <div class="col-lg-12 margin-15">
             <div class="col-lg-6 col-md-6  with-margin-bottom nopadding">
-                <!-- <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">ADD NEW</button> -->
+                <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">ADD NEW</button>
             </div>
-            <table id="incidentReport" class="mdl-data-table" style="width:100%"></table>
+            <table id="overrideform" class="mdl-data-table" style="width:100%"></table>
 
             <!-- Modal -->
             <div id="myModal" class="modal fade" role="dialog" ref="vuemodal">
@@ -36,7 +22,7 @@
                             <!-- <h4 class="modal-title">Modal Header</h4> -->
                         </div>
                         <div class="modal-body">
-                            <ManageIncidentReport :userinfo="$root.userinfo" :selected="selected"></ManageIncidentReport>
+                            <ManageEnrollmentProgramForm :userinfo="$root.userinfo" :selected="selected"></ManageEnrollmentProgramForm>
                         </div>
                     </div>
                 </div>
@@ -47,44 +33,37 @@
     </div>
 </template>
 <script>
-import ManageIncidentReport from '../../components/public/ManageIncidentReport';
-// let incidenttype = [
-//         'Inventory Discrepancy', 'Habitual Tardiness', 'Habitual Absences', 'TYREPLUSAbsence w/o official leave', 'Insubordination',
-//         'Non-compliance to policies/procedures', 'Delivery Discrepancy', 'Theft', 'Falsification/Tampering of Documents', 'Loss/Damage of Company Property',
-//         'Non remittance/short of collections', 'Others'
-//     ];
-// let status = ['Pending', 'Approved', 'Rejected'];
+import ManageEnrollmentProgramForm from '../../components/public/ManageEnrollmentProgramForm';
+let status = ['Pending', 'Approved', 'Rejected'];
 
 export default {
     components:{
-        ManageIncidentReport
+        ManageEnrollmentProgramForm
     },
     data(){
         return{
-            formtitle: '',
             forapprover: '',
-            isCancel: false,
+            formtitle: '',
             rows: [],
-            disabledinput: true,
+            disabledinput: false,
             dtHandle: null,
             loader: true,
-            empID_: '', //requestedby
-            selected: {}
+            approvers: [],
+            reciever_emails: [],
+            selected: {},
         }
     },
     watch:{
         rows(val, old){
             let row = val;
-
-            // row.forEach((item, index)=>{
-            //     if(!isNaN(item.incidenttype) && !isNaN(item.status)){
-            //         row[index]['incidenttype'] = incidenttype[item.incidenttype - 1];
-            //         row[index]['status'] = status[item.status];
-            //     }
-            // });
             this.dtHandle.clear();
             this.dtHandle.rows.add(row);
             this.dtHandle.draw();
+        },
+        approvers(val, old){
+            val.forEach(item=>{
+                this.reciever_emails.push(item.email);
+            })
         }
     },
     methods:{
@@ -96,11 +75,12 @@ export default {
         {
             let row = this.$data.rows;
             row.forEach((item, index)=>{
-                if(item.incidentID == val)
+                if(item.overrideID == val)
                 {
                     this.$data.rows.splice(index, 1);
                     $("#myModal").modal("hide");
                 }
+
             });
 
         },
@@ -108,13 +88,12 @@ export default {
         {
             let row = this.$data.rows;
             row.forEach((item, index)=>{
-                if(item.incidentID == val.incidentID)
+                if(item.overrideID == val.overrideID)
                 {
                     this.$data.rows.splice(index, 1);
                     this.$data.rows.unshift(val);
                 }
             });
-
 
         },
         setUpdate(data){
@@ -122,23 +101,31 @@ export default {
         },
 
         closeModal(){
-            this.isCancel = false;
+            this.disabledinput = false;
             this.selected = {};
-        }
+        },
+
     },
     created(){
-
+         // SAP API
+        // axios.get(SAP+'/login')
+        // .then(({data})=>{
+        //     console.log(data);
+        //     // ?$select=CardCode,CardName,CardType&$filter=startswith(CardCode, 'C') &$orderby=CardCode&$top=10&$skip=1,
+        //     // this.customer_list = data.value;
+        // });
     },
-
     mounted(){
 
-        this.forapprover = ((this.$route.path).slice(1)).toLowerCase().split('-')[0];
+
+        // this.forapprover = ((this.$route.path).slice(1)).toLowerCase().split('-')[];
         // this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
         this.formtitle = this.$route.name;
-
-        axios.get('api/approvalIncidentReportRequest').then((response)=>{
+        
+        axios.get('api/getoverride').then((response)=>{
             this.loader = false;
             this.rows=response.data;
+
 
             $.extend(jQuery.fn.dataTableExt.oSort, {
                 "date-uk-pre": function (a) {
@@ -167,9 +154,8 @@ export default {
                     return b - a;
                 }
             });
-
-            this.dtHandle=$('#incidentReport').DataTable({
-            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [3] }],
+            this.dtHandle=$('#overrideform').DataTable({
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [2] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
@@ -178,19 +164,18 @@ export default {
             "scrollX": true,
             "order": [[ 0, "desc" ]],
             "rowCallback": function(row, data, index) {
-                
-                var cellValue = data["status"];
-                    if (cellValue==1 && !data['endorse2']) { // approved
-                       $(row).addClass("td-approve");
+                var cellValue = data.status;
+                    if (cellValue==0) {
+                       $(row).addClass("tr-pending");
                     }
-                    if (cellValue==2 || (cellValue == 1 && data['endorse1'])) { // rejected
-                       $(row).addClass("td-endorse");
+                    if (cellValue==1) {
+                       $(row).addClass("tr-verified");
                     }
-                    if (cellValue==3) { // executed
-                       $(row).addClass("td-close");
+                    if (cellValue==2) {
+                       $(row).addClass("tr-approved");
                     }
-                    if (cellValue==4) { // executed
-                       $(row).addClass("td-reject");
+                    if (cellValue==3) {
+                       $(row).addClass("tr-rejected");
                     }
 
                 }
@@ -200,18 +185,21 @@ export default {
             let rows = this.rows.length;
             let self = this;
             // Add event listener for opening and closing details
-            $("#incidentReport tbody").on('click', 'tr', function() {
+            $("#overrideform tbody").on('click', 'tr', function() {
                 var tr = $(this).closest('tr');
                 var row = table.row( tr );
-                // CHECK IF STATUS IS APPROVED TO BE READY FOR CANCELLATION
-                if((row.data().status) >= 3){
-                    self.isCancel = true;
+                if(
+                    row.data().status == 1 ||
+                   row.data().status == 2 ||
+                   row.data().status == 3)
+                {
+                    self.disabledinput = true;
+                    // return;
                 }
                 let dataforedit = row.data();
                 self.selected = row.data();
-                self.empID_ = row.data().empID_;
-                self.setUpdate(dataforedit);
 
+                self.setUpdate(dataforedit);
 
             });
 
@@ -220,37 +208,38 @@ export default {
 
         });
 
+        // APPROVERS
+        axios.get('api/getOverrideApprover').then((response)=>{
+            this.approvers =  response.data;
+        })
+        .catch((err)=>{});
 
         let columnDefs = [
+            {
+            title: "Override #", data: 'overrideID', visible: true,
+        },{
+            title: "Division", data: 'division'
+        },
         {
-            title: "INCIDENT ID", data: 'incidentID', visible: true,
-        },{
-            title: "Reported By", data: 'fullname'
-        },{
-            title: "Nature of incident", data: 'incidenttype'
-        },{
-            title: "Person Involved", data: 'search_employee'
+            title: "Date Override", data: 'dateoverride',
+        },
+        {
+            title: "Customer Name", data: 'customer_name'
         },
         // {
-        //     title: "Date Filed", data: 'datefiled'
+        //     title: "Creator", data: 'empID_'
         // },
+        {
+            title: 'Amount of order', data: 'amount_order'
+        },
         {
             title: "Status", data: 'status',
             render: function(data){
-                /**
-                 * 0 pending
-                 * 1 endorse 1
-                 * 2 endorse 2
-                 * 3 close
-                 * 4 rejected
-                 */
-                return data == 0 ? 'Pending':
-                       data == 1 || data == 2 ? 'Futher Investigation':
-                    //    data == 2 ? 'Endorsed': 
-                       data == 3 ? 'Closed': 'Rejected';
+                return data == 0? 'Pending':
+                       data == 1 ? 'Endorsed':
+                       data == 2 ? 'Approved': 'Rejected'
             }
         }];
-
 
         // MODAL
         $('#myModal').on("hidden.bs.modal", this.closeModal);

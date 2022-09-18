@@ -1,3 +1,11 @@
+<style>
+/* hide overlapping labels for multi select dropdowns */
+button.multiselect span.multiselect-selected-text{
+    display: inline-block;
+    width: 100%;
+    overflow: hidden;
+}
+</style>
 <template>
     <div>
         <div id="loader2" v-if="loader">
@@ -94,18 +102,22 @@
             <div class="clearfix"></div>
             <div class="col-lg-12 col-md-12">
                 <input type="submit" class="btn btn-primary" @click.prevent="getReport" value="Generate Report" :disabled="isDisabled || disabledBtn">
-                <!-- <input type="submit" class="btn btn-primary" @click.prevent="getReport" value="Generate Chart" :disabled="isDisabled || disabledBtn"> -->
+                <input type="submit" class="btn btn-primary" v-if="showGenerateChartBtn" @click.prevent="generateChart" value="Generate Chart" :disabled="isDisabled">
             </div>
             
         </div>
         <div class="clearfix"></div>
         <div>
                 <!-- dynamic call components -->
+                <div v-show="showGenerateChartBtn" >
+                    <!-- <canvas id="myChart"></canvas> -->
+                    <IRChart v-show="showChart"></IRChart>
+                </div>
                 <div v-for="(compo, index) in $options.components" :key="index" v-show="reportComponent[index] == selectedRepType && !ishiddenComponent">
                     <!-- <{{index}}></{{index}}> -->
-                    <component :is="index" :title="title" />
+                    <component :is="index" :title="title" v-if="index != 'IRChart'" />
                 </div>
-                <!-- <canvas id="reportChart" width="400" height="400"></canvas> -->
+                
         </div>
 
     </div>
@@ -132,7 +144,7 @@ import ReportWorkRequest                from './reports/ReportWorkRequest';
 import ReportOvertimeRequest            from './reports/ReportOvertimeRequest';
 import ReportOverrideForm               from './reports/ReportOverrideForm';
 import ReportTransmittal                from './reports/ReportTransmittal';
-
+import IRChart                          from './reports/IRChart';
 // let brand = ['NTMC', 'APBW', 'PHILCREST', 'TYREPLUS'];
 // let status = ['Pending', 'Approved', 'Rejected'];
 
@@ -176,6 +188,7 @@ export default {
         ReportOvertimeRequest,
         ReportOverrideForm,
         ReportTransmittal,
+        IRChart,
     },
     data(){
         return{
@@ -184,6 +197,7 @@ export default {
             title: '',
             // disabledinput: false,
             disabledBtn: false,
+            showChart: false,
             dtHandle: null,
             loader: false,
             datefrom: moment(new Date()).format('YYYY-MM-DD'),
@@ -206,6 +220,9 @@ export default {
             selectedRepType: 'select',
             selectedStatus: [],
             selectedCompany:[],
+
+            selectedBranchText:[],
+            selectedStatusText:[],
 
             // setSelectedRepTypeText: '',
             docReady: false,
@@ -242,6 +259,11 @@ export default {
         isDisabled(){
             return this.selectedBranch.length < 1 || this.selectedStatus.length < 1 || this.selectedRepType == 'select';
         },
+
+        showGenerateChartBtn(){
+            // show dashboard chart if incident report is selected from form type
+            return this.selectedRepType == 'incidentreport' ||  false;
+        }
 
     },
     methods:{
@@ -306,13 +328,37 @@ export default {
 
                 ];
 
-            }else{
+            }else if(el.target.value == 'incidentreport'){
+                /**
+                 * 0 pending
+                 * 1 endorse 1
+                 * 2 endorse 2
+                 * 3 close
+                 * 4 rejected
+                 * 9 approved by the immidedate approver but not as a whole request
+                 */
+                options =  [
+                    // {label: '1st Endorsement', title: '1st Endorsement', value: 1},
+                    // {label: '2nd Endorsement', title: '2nd Endorsement', value: 2},
+                    {label: 'Pending', title: 'Pending', value: 0},
+                    {label: 'Approved', title: 'Approved', value: 9},
+                    {label: 'Further Investigation', title: 'Further Investigation', value: 8},
+                    {label: 'Closed', title: 'Closed', value: 3},
+                    {label: 'Rejected', title: 'Rejected', value: 4},
+                ];
+            }
+            else{
                 options =  [
                     {label: 'Approved', title: 'Approved', value: 1},
                     {label: 'Rejected', title: 'Rejected', value: 2},
                     {label: 'Pending', title: 'Pending', value: 0}
                 ];
             }
+
+           
+            if(el.target.value != 'incidentreport')
+            this.showChart = false;
+
             this.selectedStatus = [];
             let self = this;
             // $('.multiselect2').multiselect('destroy');
@@ -331,27 +377,39 @@ export default {
                     if(element){
                         let brands = $('.multiselect2 option:selected');
                         let selected = [];
+                        let selectedText = [];
+
                         $(brands).each(function(index, brand){
                             selected.push([$(this).val()]);
+                            selectedText.push($(this).text().toLowerCase());
                         });
                         self.selectedStatus = selected;
+                        self.selectedStatusText = selectedText;
                     }else{
                         let brands = $('.multiselect2 option:selected');
                         let selected = [];
+                        let selectedText = [];
+
                         $(brands).each(function(index, brand){
                             selected.push([$(this).val()]);
+                            selectedText.push($(this).text().toLowerCase());
                         });
                         self.selectedStatus = selected;
+                        self.selectedStatusText = selectedText;
                     }
                 },
                 onChange: function(element, checked) {
                     let brands = $('.multiselect2 option:selected');
                     let selected = [];
+                    let selectedText = [];
+
                     $(brands).each(function(index, brand){
                         selected.push([$(this).val()]);
+                        selectedText.push($(this).text().toLowerCase());
                     });
 
                     self.selectedStatus = selected;
+                    self.selectedStatusText = selectedText;
                 }
             });
             // $('.multiselect2').multiselect('rebuild');
@@ -370,6 +428,28 @@ export default {
             })
             .catch(err => console.log(err));
         },
+
+        generateChart(){
+
+// ${this.datefrom}/${this.dateto}/${this.selectedRepType}/${this.selectedBranch}/${this.selectedStatus}/${this.selectedCompany}
+            axios.get(`api/get-ir-chart/${this.datefrom}/${this.dateto}/${this.selectedRepType}/${this.selectedBranch}/${this.selectedStatus}/${this.selectedCompany}`,
+            {
+                // params: {
+                //     branch: this.selectedBranchText,
+                // }
+            })
+            .then(res=>{
+                this.showChart = true;
+                bus.$emit(`${typeofReportBus[this.selectedRepType]}ReportChart`, res.data, { 
+                    pie: this.selectedStatusText,
+                    bar: this.selectedBranchText
+                });
+                
+            })
+            .catch(err => console.log(err));
+            
+        },
+
         closeModal(){
             $('.multiple').removeClass('form-field__control');
         },
@@ -408,7 +488,35 @@ export default {
 
     mounted(){
 
-        const ctx = document.getElementById('reportChart');
+// const labels = [
+//     'January',
+//     'February',
+//     'March',
+//     'April',
+//     'May',
+//     'June',
+//   ];
+
+//   const data = {
+//     labels: labels,
+//     datasets: [{
+//       label: 'My First dataset',
+//       backgroundColor: 'rgb(255, 99, 132)',
+//       borderColor: 'rgb(255, 99, 132)',
+//       data: [0, 10, 5, 2, 20, 30, 45],
+//     }]
+//   };
+
+//   const config = {
+//     type: 'line',
+//     data: data,
+//     options: {}
+//   };
+//   const myChart = new Chart(
+//     document.getElementById('myChart'),
+//     config
+//   );
+        // const ctx = document.getElementById('reportChart');
         // const myChart = new Chart(ctx, {
         //     type: 'bar',
         //     data: {
@@ -475,27 +583,36 @@ export default {
                         if(element){
                             let brands = $('.multiselect1 option:selected');
                             let selected = [];
+                            let selectedText = [];
                             $(brands).each(function(index, brand){
+                                selectedText.push($(this).text().toLowerCase());
                                 selected.push([$(this).val()]);
                             });
                             self.selectedBranch = selected;
+                            self.selectedBranchText = selectedText;
                         }else{
                             let brands = $('.multiselect1 option:selected');
                             let selected = [];
+                            let selectedText = [];
                             $(brands).each(function(index, brand){
+                                selectedText.push($(this).text().toLowerCase());
                                 selected.push([$(this).val()]);
                             });
                             self.selectedBranch = selected;
+                            self.selectedBranchText = selectedText;
                         }
                     },
                     onChange: function(element, checked) {
                         let brands = $('.multiselect1 option:selected');
                         let selected = [];
+                        let selectedText = [];
                         $(brands).each(function(index, brand){
+                            selectedText.push($(this).text().toLowerCase());
                             selected.push([$(this).val()]);
                         });
 
                         self.selectedBranch = selected;
+                        self.selectedBranchText = selectedText;
                     }
                 });
 
@@ -574,6 +691,7 @@ export default {
                     let selected = [];
                     $(brands).each(function(index, brand){
                         selected.push([$(this).val()]);
+                        
                     });
                     self.selectedStatus = selected;
                 }else{

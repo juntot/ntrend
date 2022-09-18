@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class LeaveController extends Controller
@@ -30,11 +31,13 @@ class LeaveController extends Controller
             // request()->merge(['status' => 0, 'leaveID' => $data[0]->leaveID]);
             $response = array_merge($response, ['status' => 0, 'leaveID' => $data]);
 
-
+            
+        $mailReceivers = FormApproverService::getApproverEmail('leaveID', $data, 'formleave', 'Leave0Form');
 
         // mail notification
-        MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'LEAVE REQUEST');
-        MailServices::formNotify(request('reciever_emails'), request('empID_'), 'leave request', $data, 'leave');
+        MailServices::sendNotify($mailReceivers, request('empID_'), 'LEAVE REQUEST');
+        MailServices::formNotify($mailReceivers, request('empID_'), 'leave request', $data, 'leave');
+
         return $response;
     }
 
@@ -64,8 +67,11 @@ class LeaveController extends Controller
         ->where(['leaveID'=>$leaveID, 'status'=>0])
         ->update(['recstat'=>1]);
         // ->delete();
+
+        $mailReceivers = FormApproverService::getApproverEmail('leaveID', $leaveID, 'formleave', 'Leave0Form');
+        
         if($affected) {
-            MailServices::send_email_Notify(request('reciever_emails'), request('empID_'), 'LEAVE REQUEST', 'Deleted his/her');
+            MailServices::send_email_Notify($mailReceivers, request('empID_'), 'LEAVE REQUEST', 'Deleted his/her');
         }
         
     }
@@ -79,7 +85,6 @@ class LeaveController extends Controller
         DATE_FORMAT(form.dateend, "%m/%d/%Y") as dateend,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formleave form left join employee emp on
         form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
-
         return $data;
     }
 
@@ -87,7 +92,8 @@ class LeaveController extends Controller
     // GET LEAVE FORM EMPLOYEE APPROVERS
     public function getLeaveApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformapprover eform right join employee emp on eform.empID_ = emp.empID where eform.Leave0Form = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Leave0Form = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Leave0Form = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        $data = FormApproverService::getFormApproverByUser('Leave0Form');
         return $data;
     }
 

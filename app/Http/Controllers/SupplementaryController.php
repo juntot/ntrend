@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class SupplementaryController extends Controller
@@ -51,7 +52,10 @@ class SupplementaryController extends Controller
         // MAIL NOTIFICATION
         // MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'ATTENDANCE SUPPLEMENTARY REQUEST');
         // MailServices::formNotify(request('reciever_emails'), request('empID_'), 'attendance supplementary request', $data, 'supplementary');
-        MailServices::send_email_Notify(request('reciever_emails'), request('empID_'), 'Attendance Supplementary', 'requesting for your confirmation for his/her');
+        
+        $mailReceivers = FormApproverService::getApproverEmail('supID', $data, 'formsupplementary', 'Supplementary');
+
+        MailServices::send_email_Notify($mailReceivers, request('empID_'), 'Attendance Supplementary', 'requesting for your confirmation for his/her');
         MailServices::form_post_Notify(request('reciever_emails'), request('empID_'), 'Attendance Supplementary', $data, 'supplementary', 'requesting for your confirmation for his/her');
         
         
@@ -99,9 +103,14 @@ class SupplementaryController extends Controller
 
     // DELETE
     public function deleteSupplementary($supID  = null){
-        DB::table('formsupplementary')->where('supID', '=', $supID)
+        $affected = DB::table('formsupplementary')->where('supID', '=', $supID)
         ->update(['recstat'=>1]);
         // ->delete();
+
+        $mailReceivers = FormApproverService::getApproverEmail('supID', $supID, 'formsupplementary', 'Supplementary');
+        if($affected) {
+            MailServices::send_email_Notify($mailReceivers, UserSession::getSessionID(), 'SUPPLEMENTARY REQUEST', 'Deleted his/her');
+        }
     }
 
     // GET
@@ -205,7 +214,7 @@ class SupplementaryController extends Controller
             }
             request()->merge(['witnesses' => $user[0]->fullname ]);
             
-            $formApprover =  MailServices::getApproverEmail('supID', request('supID'), 'formsupplementary', 'Supplementary');
+            $formApprover =  FormApproverService::getApproverEmail('supID', request('supID'), 'formsupplementary', 'Supplementary');
 
             MailServices::sendNotify($formApprover, request('empID_'), 'ATTENDANCE SUPPLEMENTARY REQUEST');
             MailServices::formNotify($formApprover, request('empID_'), 'attendance supplementary request', request('supID'), 'supplementary');
@@ -220,8 +229,10 @@ class SupplementaryController extends Controller
     // GET SUPPLEMENTARY FORM EMPLOYEE APPROVERS
     public function getSupplementaryApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Supplementary = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID
-                where eform.Supplementary = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID
+        //         where eform.Supplementary = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Supplementary');
         return $data;
     }
 
@@ -276,7 +287,7 @@ class SupplementaryController extends Controller
         and
             esup.recstat != 1
         ORDER BY esup.supID desc
-        limit 1000
+        limit 2000
         ', [UserSession::getSessionID()]);
 
         // check if data has vale
@@ -298,6 +309,7 @@ class SupplementaryController extends Controller
 
     // IE APPROVE / REJECTED
     public function actionFormSupplementary(){
+        
         DB::table('formsupplementary')
         ->where('supID', request('supID'))
         ->update([

@@ -174,9 +174,12 @@ class NotificationController extends Controller
                     // $db_approval = DB::select("select count(leaveID) from '.$formcode.' where empID_ = :empID and ", [UserSession::getSessionID()]);
                     $data = '';
                     if($formcode == 'formsupplementary'){
+                        // 0 pending, 1 verified by witness, 2 appprover, 3 rejected
                         $data = DB::select('select count(eleave.empID_) as count
                                 from '.$formcode.' eleave left join eformapproverbyemp eform
                                     on eleave.empID_ = eform.empID_
+                                inner join employee emp
+                                    on emp.empID = eleave.empID_
                                 where eform.approverID_ = :approverID and
                                 eleave.recstat != 1 
                                 and eform.'.$formcol.' = 1
@@ -193,6 +196,8 @@ class NotificationController extends Controller
                         $data = DB::select('select count(eleave.empID_) as count
                                 from '.$formcode.' eleave left join eformapproverbyemp eform
                                     on eleave.empID_ = eform.empID_
+                                inner join employee emp
+                                    on emp.empID = eleave.empID_
                                 where eform.approverID_ = :approverID 
                                 and eform.'.$formcol.' = 1
                                 and eleave.recstat != 1 

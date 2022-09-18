@@ -7,6 +7,7 @@ use DB;
 use Carbon\Carbon;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 class TransmittalController extends Controller
 {
 
@@ -143,8 +144,10 @@ class TransmittalController extends Controller
     // GET  APPROVERS LIST NAME AND EMAIL
     public function getOverrideApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformapprover eform right join employee emp on eform.empID_ = emp.empID where eform.Leave0Form = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Override0Form = 1 and eform.empID_ = :empiD', 
-        [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Override0Form = 1 and eform.empID_ = :empiD', 
+        // [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Override0Form');
         return $data;
     }
 
@@ -220,7 +223,7 @@ class TransmittalController extends Controller
             'confirmdate' => $now,
         ]);
         // get list of approvers email
-        // $mailReceivers = MailServices::getApproverEmail('overrideID', request('overrideID'), 'formoverride', 'Override0Form');
+        // $mailReceivers = FormApproverService::getApproverEmail('overrideID', request('overrideID'), 'formoverride', 'Override0Form');
         
         // update
         DB::table('formtransmittal')

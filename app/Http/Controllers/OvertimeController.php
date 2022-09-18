@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class OvertimeController extends Controller
@@ -26,9 +27,11 @@ class OvertimeController extends Controller
             // request()->merge(['status' => 0, 'overtimeID' => $data[0]->overtimeID]);
             $response = array_merge($response, ['status' => 0, 'overtimeID' => $data]);
 
+        $mailReceivers = FormApproverService::getApproverEmail('overtimeID', $data, 'formovertime', 'Overtime0Request');
+
         // MAIL NOTIFICATION
         MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'UNDERTIME REQUEST');
-        MailServices::formNotify(request('reciever_emails'), request('empID_'), 'undertime request', $data, 'undertime');
+        MailServices::formNotify($mailReceivers, request('empID_'), 'undertime request', $data, 'undertime');
         return $response;
     }
     // UPDATE
@@ -51,9 +54,16 @@ class OvertimeController extends Controller
 
     // DELETE
     public function deleteOvertime($overtimeID  = null){
-        DB::table('formovertime')->where('overtimeID', '=', $overtimeID)
+        $affected = DB::table('formovertime')
+        ->where('overtimeID', '=', $overtimeID)
         ->update(['recstat'=>1]);
         // ->delete();
+
+        $mailReceivers = FormApproverService::getApproverEmail('overtimeID', $overtimeID, 'formovertime', 'Overtime0Request');
+        if($affected) {
+            MailServices::send_email_Notify($mailReceivers, UserSession::getSessionID(), 'OVERTIME REQUEST', 'Deleted his/her');
+        }
+
     }
 
     // GET
@@ -72,7 +82,9 @@ class OvertimeController extends Controller
     // GET UNDERTIME FORM EMPLOYEE APPROVERS
     public function getOvertimeApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Undertime0Request = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Overtime0Request = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Overtime0Request = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Overtime0Request');
         return $data;
     }
 

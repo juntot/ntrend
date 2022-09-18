@@ -162,12 +162,12 @@
                     LIST OF APPROVERS: 
                </p>
                <div class="clearfix"></div>
-               <span class="approverlist alert-info" v-for="approver in $parent.approvers">{{approver.approvers}}</span>
+               <span class="approverlist alert-info" v-for="(approver, index) in $parent.approvers" :key="index">{{approver.approvers}}</span>
                <br><br>
             </div>
             <div class="clearfix"></div>
             <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addLaptopRequest" :disabled="isDisable || !isFormValid" v-if="submitBtn">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addLaptopRequest" :disabled="disabledIfNoApprover || isDisable || !isFormValid" v-if="submitBtn">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateLaptopRequest" :disabled="isDisable || !isFormValid" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteLaptopRequest" :disabled="isDisable" v-if="updateDeleteBtn && !this.$parent.$data.forapprover">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionLaptopRequest(1)" v-if="approveRejecBtn">
@@ -353,6 +353,9 @@ export default {
 
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         isFormValid(){
             return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },

@@ -266,7 +266,7 @@ export default {
             render: ( data, type, row, meta ) => {
                 // uncommment to enable multiple approver
                 // return data && data.includes(this.$root.$data.userinfo.fullname) ? 'verified': 'pending'
-                return data > 1 ? 'verified': 'pending'
+                return data ? 'verified': 'pending'
 
                 // console.log(this.$root.$data.userinfo.fullname,);
             }
