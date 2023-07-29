@@ -108,7 +108,7 @@ class NotificationController extends Controller
 
         // leave cred ================================================================================
         $leaveCred = DB::select('select SL, VL, BL, DL from employee where empID = :empid', [UserSession::getSessionID()]);
-
+        
 
         // post notif =================================================================================
         $active_user = UserSession::getEmpKey();
@@ -181,17 +181,16 @@ class NotificationController extends Controller
                                 inner join employee emp
                                     on emp.empID = eleave.empID_
                                 where eform.approverID_ = :approverID and
-                                eleave.recstat != 1 
+                                eleave.recstat = 0 
                                 and eform.'.$formcol.' = 1
                                 and eleave.status = 1', [UserSession::getSessionID()]);
                     }else if($formcode == 'formtransmittal'){
                         $data = DB::select('select count(eleave.empID_) as count
                                 from '.$formcode.' eleave 
                                 where eleave.approvedby = :approverID and
-                                eleave.recstat != 1 
+                                eleave.recstat = 0 
                                 and eleave.status = 0', [UserSession::getSessionID()]);
                     }
-                    
                     else{
                         $data = DB::select('select count(eleave.empID_) as count
                                 from '.$formcode.' eleave left join eformapproverbyemp eform
@@ -200,7 +199,7 @@ class NotificationController extends Controller
                                     on emp.empID = eleave.empID_
                                 where eform.approverID_ = :approverID 
                                 and eform.'.$formcol.' = 1
-                                and eleave.recstat != 1 
+                                and eleave.recstat = 0 
                                 and eleave.status = 0', [UserSession::getSessionID()]);
                     }
 
@@ -230,7 +229,7 @@ class NotificationController extends Controller
                 AND
                     (form.witnesses not like ? or form.witnesses is null)
                 AND
-                    form.recstat != 1
+                    form.recstat = 0
                 AND
                     form.status <= 1'
             ,[

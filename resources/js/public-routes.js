@@ -22,6 +22,8 @@ import PRS from './views/public/PRS';
 import OverrideForm from './views/public/OverrideForm';
 import Transmittal from './views/public/Transmittal';
 import EnrollmentProgram from './views/public/EnrollmentProgram';
+import DeliverySystem from './views/public/DeliverySystem';
+import MeetingMinute from './views/public/MeetingMinute';
 
 
 // FOR FORM APPROVERS
@@ -49,7 +51,8 @@ import ApproverSupplierAccreditation from './views/approver/ApproverSupplierAccr
 import ApproverPRS from './views/Approver/ApproverPRS';
 import ApproverOverrideForm from './views/Approver/ApproverOverrideForm';
 import ApproverTransmittal from './views/Approver/ApproverTransmittal';
-
+import ApproverEnrollmentProgramForm from './views/Approver/ApproverEnrollmentProgramForm';
+import ApproverMeetingMinute from './views/Approver/ApproverMeetingMinute';
 
 // REPORTS
 import Reports from './views/public/Reports'
@@ -77,7 +80,7 @@ import PageNotFound from './views/404';
 export default{
 
     mode: 'history',
-    // base: '/ntrends/',
+    base: '/ntrends/',
     routes:[
         {
             path: '/',
@@ -215,7 +218,7 @@ export default{
         {
             path: '/enrollment-program',
             component: EnrollmentProgram,
-            name: 'Enrollment Program Form'
+            name: 'Sales Program Enrollment Form'
         },
         // TRansmittal
         {
@@ -223,6 +226,17 @@ export default{
             component: Transmittal,
             name: 'Transmittal Form'
             
+        },
+        {
+            path: '/delivery-system',
+            component: DeliverySystem,
+            name: 'Delivery System'
+        },
+
+        {
+            path: '/minutes-of-meeting',
+            component: MeetingMinute,
+            name: 'Minutes of Meeting'
         },
 
         // ==================================  FOR FORM APPROVERS  ==================================
@@ -366,6 +380,18 @@ export default{
             component: ApproverTransmittal,
             name: 'Approval Transmittal Form'
             
+        },
+        // Enrollment progral
+        {
+            path: '/approval-enrollment-program',
+            component: ApproverEnrollmentProgramForm,
+            name: 'Approval Sales Program Enrollment Form'
+        },
+
+        {
+            path: '/approval-meeting-minutes',
+            component: ApproverMeetingMinute,
+            name: 'Approval Meeting Minutes'
         },
 
         // ============================================ REPORTS =====================================================

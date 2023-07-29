@@ -4,62 +4,13 @@
             <h2>OVERRIDE SETTINGS</h2>
         </div>
         <div class="clearfix"></div>
-        <!-- dates -->
-        <div class="col-md-12 nopadding">
-            <br>
-            <div class="col-md-12 bgc-white">
-                <br>
-                <p class="orange-text nomargin">API URL</p>
-                <div class="col-md-12 nopadding">
-                    <div class="mdb-form-field">
-                        <div class="form-field__control">
-                            <input type="text" 
-                            v-validate="'required'" 
-                            @change.prevent="updateAPIpoint"
-                            v-model="endpoint" 
-                            class="form-field__input" name="branch name" 
-                            placeholder="https://example.com">
-                            <label class="form-field__label"></label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('branch name') }}</span>
-                    </div>
-                </div>
-                <p class="orange-text">Company</p>
-                <div class="col-md-6 nopadding with-margin-bottom">
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#myModal" 
-                    @click.prevent="type = 'company'">Add New</button>
-                </div>
-                <table id="override-company-tbl" class="mdl-data-table" style="width: 100%">
-                    <thead>
-                        <tr>
-                            <th>Company Name</th>
-                            <th>User</th>
-                            <th>Password</th>
-                            <th>Operation</th>
-                        </tr>
-                    </thead>
-                    <tbody class="tbl_bodyoverride">
-                        <tr v-for="(val, index) in compRows" :key="index" @click="selected = val">
-                            <td>{{val.name}}</td>
-                            <td>{{val.user}}</td>
-                            <td  :id="val.id" :data-type="'company'">{{'12345' | filterPass}}</td>
-                            <td>
-                                <button type="button" class="btn btn-primary retest-connection">Test Connection</button>
-                                <button type="button" class="btn btn-danger remove-override">Delete</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <br>
-            </div>
-        </div>
+
         <div class="col-md-12 nopadding">
             <br>
             <div class="col-md-12 bgc-white">
                 <p class="orange-text">Division</p>
                 <div class="col-md-6 nopadding with-margin-bottom">
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#myModal"
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#myModalOverrideSetting"
                     @click.prevent="
                         type = 'division', 
                         overrideFields.user = 'test', 
@@ -87,7 +38,7 @@
         <div class="clearfix"></div>
         <br>
          <!-- Modal -->
-            <div id="myModal" class="modal fade" role="dialog">
+            <div id="myModalOverrideSetting" class="modal fade" role="dialog">
                 <div class="modal-dialog">
 
                     <!-- Modal content-->
@@ -143,7 +94,7 @@
             </div>
 
         <!-- Modal2 -->
-            <div id="myModal2" class="modal fade" role="dialog">
+            <div id="myModalOverrideSetting2" class="modal fade" role="dialog">
                 <div class="modal-dialog">
 
                     <!-- Modal content-->
@@ -184,15 +135,15 @@ export default {
             loader: false,
             endpoint: '',
             errMsg: `Please wait while checking your credentials`,
-            selected: {
-                name: '',
-                user: 'test',
-                pwd: 'test',
-            },
-            compRows: [],
+            // selected: {
+            //     name: '',
+            //     user: 'test',
+            //     pwd: 'test',
+            // },
+            // compRows: [],
             divRows: [],
 
-            branchRows: [],
+            // branchRows: [],
             overrideFields: {
                 name: '',
                 user: '',
@@ -328,13 +279,13 @@ export default {
             this.overrideFields['user'] = type=='company'? this.selected.user : 'test';
             this.overrideFields['pwd'] =  type=='company'? this.selected.pwd  : 'test';
             
-            $('#myModal').modal('show');
+            $('#myModalOverrideSetting').modal('show');
             this.MDBINPUT();
             
         },
         testConnection(){
             this.loader = true;
-            $('#myModal2').modal('show');
+            $('#myModalOverrideSetting2').modal('show');
             
             // return;
             axios.post('api/override-login', {
@@ -390,6 +341,7 @@ export default {
             this.loader = false;
             this.errMsg = `Please wait while checking your credentials`;
             this.isUpdate = false;
+            $('.modal').modal('hide');
         },
     },
     beforeDestory(){
@@ -427,13 +379,13 @@ export default {
             isremove = true;
         });
 
-        $("tbody.tbl_bodyoverride").on('click', 'button.retest-connection', function() {
-            const data = $(this).closest("tr")   // Finds the closest row <tr> 
-                    .find("td") 
-                    .siblings(":last");
-            self.testConnection();
-            isremove = true;
-        });
+        // $("tbody.tbl_bodyoverride").on('click', 'button.retest-connection', function() {
+        //     const data = $(this).closest("tr")   // Finds the closest row <tr> 
+        //             .find("td") 
+        //             .siblings(":last");
+        //     self.testConnection();
+        //     isremove = true;
+        // });
 
         $("tbody.tbl_bodyoverride").on('click', 'tr', function() {
             if(!isremove) {

@@ -50,7 +50,7 @@ class CallingCardController extends Controller
     // DELETE
     public function deleteCallingCard($ccID  = null){
         DB::table('formcallingcard')->where('ccID', '=', $ccID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
     // GET
@@ -66,7 +66,7 @@ class CallingCardController extends Controller
             cc.tyreplus, cc.approveddate, cc.remarks, cc.status from formcallingcard cc
             INNER JOIN employee emp
             on cc.empID_ = emp.empID
-            where cc.recstat != 1 and
+            where cc.recstat = 0 and
             cc.empID_ = :empid', [UserSession::getSessionID()]);
 
         return $data;
@@ -103,7 +103,7 @@ class CallingCardController extends Controller
                                 on pos.posID = emp.posID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
-                            where eform.approverID_ = :approverID and eccard.recstat != 1', [UserSession::getSessionID()]);
+                            where eform.approverID_ = :approverID and eccard.recstat = 0', [UserSession::getSessionID()]);
         return $data;
     }
 

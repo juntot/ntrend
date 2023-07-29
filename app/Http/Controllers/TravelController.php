@@ -62,7 +62,7 @@ class TravelController extends Controller
     // DELETE
     public function deleteTravel($travelID  = null){
         DB::table('formtravel')->where('travelID', '=', $travelID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -74,7 +74,7 @@ class TravelController extends Controller
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         DATE_FORMAT(form.departuredate, "%m/%d/%Y") as departuredate,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formtravel form left join employee emp on
-        form.approvedby = emp.empID where form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
 
         return $data;
     }
@@ -110,7 +110,7 @@ class TravelController extends Controller
                                 on pos.posID = emp.posID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
-                            where eform.approverID_ = :approverID and etravel.recstat != 1', [UserSession::getSessionID()]);
+                            where eform.approverID_ = :approverID and etravel.recstat = 0', [UserSession::getSessionID()]);
         return $data;
     }
 

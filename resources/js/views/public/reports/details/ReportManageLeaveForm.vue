@@ -153,7 +153,7 @@
                     <div class="col-lg-4">
                         <div>
                             <label class="mdblblradio">
-                            <span class="checklbl">Solo Parent Leave</span>
+                            <span class="checklbl">Maternity Leave</span>
                             <input :disabled="$parent.disabledinput" type="radio" @change="handleChange" v-model="leavetype" value="7" name="radio">
                             <span class="checkmark"></span>
                             </label>
@@ -249,7 +249,7 @@
 // let leavetype = ['Sick Leave', 'Birthday Leave', 'Leave w/o Pay', 'Bereavement Leave', 'Vacation Leave', 'Others'];
 let leavetype = [
     'Sick Leave', 'Birthday Leave', 'Leave w/out Pay', 'Bereavement Leave', 'Vacation Leave',
-    'Descritionary Leave', 'Solo Parent Leave', 'Paternity Leave', 'Others'
+    'Descritionary Leave', 'Maternity Leave', 'Paternity Leave', 'Others'
     ];
 let status = ['Pending', 'Approved', 'Rejected'];
 export default {

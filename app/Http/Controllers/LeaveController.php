@@ -65,7 +65,7 @@ class LeaveController extends Controller
         
         $affected = DB::table('formleave')
         ->where(['leaveID'=>$leaveID, 'status'=>0])
-        ->update(['recstat'=>1]);
+        ->update(['recstat'=>404]);
         // ->delete();
 
         $mailReceivers = FormApproverService::getApproverEmail('leaveID', $leaveID, 'formleave', 'Leave0Form');
@@ -84,9 +84,41 @@ class LeaveController extends Controller
         DATE_FORMAT(form.datestart, "%m/%d/%Y") as datestart,
         DATE_FORMAT(form.dateend, "%m/%d/%Y") as dateend,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formleave form left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
         return $data;
     }
+
+    // get only approve leaves per user
+    public function getMyApproveLeave(){
+        $data = DB::select('Select name, start, start as end, details, "red" as color from ph_holidays where status = 1
+        UNION
+        Select (
+        CASE
+            WHEN form.leavetype = 1 THEN "Sick Leave"
+            WHEN form.leavetype = 2 THEN "Birthday Leave"
+            WHEN form.leavetype = 3 THEN "Leave w/o Pay"
+            WHEN form.leavetype = 4 THEN "Bereavement Leave"
+            WHEN form.leavetype = 5 THEN "Vacation Leave"
+            WHEN form.leavetype = 6 THEN "Descritionary Leave"
+            WHEN form.leavetype = 7 THEN "Solo Parent Leave"
+            WHEN form.leavetype = 8 THEN "Paternity Leave"
+            ELSE "Others"
+        END
+        ) as name, form.datestart as start, form.dateend as end, form.reason as details, "orange" as color
+        from formleave form
+        WHERE
+        form.datestart between :start and :end
+        and form.empID_ = :empID
+        and (form.recstat = 0 and form.status = 1)
+        ',[
+            'start'  => request('start'),
+            'end'    => request('end'),
+            'empID'  => UserSession::getSessionID(),
+        ]);
+        return $data;
+    }
+
+
 
     // FOR APPROVERS ====================================================================================================================================
     // GET LEAVE FORM EMPLOYEE APPROVERS
@@ -116,7 +148,7 @@ class LeaveController extends Controller
                                 on branch.branchID = emp.branchID_
                             where eform.approverID_ = :approverID
                             and eform.Leave0Form = 1
-                            and eleave.recstat != 1',
+                            and eleave.recstat = 0',
                             [UserSession::getSessionID()]);
         // $data = DB::select('select eleave.*,
         //                     DATE_FORMAT(eleave.datefiled, "%m/%d/%Y") as datefiled,
@@ -133,24 +165,26 @@ class LeaveController extends Controller
         //                     inner join branchtbl branch
         //                         on branch.branchID = emp.branchID_
         //                     where eform.approverID_ = :approverID
-        //                     and eleave.recstat != 1',
+        //                     and eleave.recstat = 0',
         //                     [UserSession::getSessionID()]);
         return $data;
     }
 
     // IE APPROVE / REJECTED
     public function actionFormLeave(){
-
+        // return request()->all();
+        $totalDaysFiled = request('totaldays');
         $sqlLeaveUpdate = '';
         switch (request('leavetype')):
             // SL
             case 1:
                 if(request('status') == 1){
-                    $sqlLeaveUpdate = 'update employee set SL = SL - 1 where empID = :empID';
+
+                    $sqlLeaveUpdate = 'update employee set SL = SL - '.$totalDaysFiled.' where empID = :empID';
                 }
                 else if(request('status') == 0){
                     if(strtolower(request('old_status')) == 'approved'){
-                        $sqlLeaveUpdate = 'update employee set SL = SL + 1 where empID = :empID';
+                        $sqlLeaveUpdate = 'update employee set SL = SL + '.$totalDaysFiled.' where empID = :empID';
                     }
                 }
                 break;
@@ -158,40 +192,41 @@ class LeaveController extends Controller
             case 2:
 
                 if(request('status') == 1){
-                    $sqlLeaveUpdate = 'update employee set BL = BL - 1 where empID = :empID';
+                    $sqlLeaveUpdate = 'update employee set BL = BL - '.$totalDaysFiled.' where empID = :empID';
                 }
                 else if(request('status') == 0){
                     if(strtolower(request('old_status')) == 'approved'){
-                        $sqlLeaveUpdate = 'update employee set BL = BL + 1 where empID = :empID';
+                        $sqlLeaveUpdate = 'update employee set BL = BL + '.$totalDaysFiled.' where empID = :empID';
                     }
                 }
                 break;
             //  VL
             case 5:
                 if(request('status') == 1){
-                    $sqlLeaveUpdate = 'update employee set VL = VL - 1 where empID = :empID';
+                    $sqlLeaveUpdate = 'update employee set VL = VL - '.$totalDaysFiled.' where empID = :empID';
                 }
                 else if(request('status') == 0){
                     if(strtolower(request('old_status')) == 'approved'){
-                        $sqlLeaveUpdate = 'update employee set VL = VL + 1 where empID = :empID';
+                        $sqlLeaveUpdate = 'update employee set VL = VL + '.$totalDaysFiled.' where empID = :empID';
                     }
                 }
                 break;
             //  DL
             case 6:
                 if(request('status') == 1){
-                    $sqlLeaveUpdate = 'update employee set DL = DL - 1 where empID = :empID';
+                    $sqlLeaveUpdate = 'update employee set DL = DL - '.$totalDaysFiled.' where empID = :empID';
                 }
                 else if(request('status') == 0){
                     if(strtolower(request('old_status')) == 'approved'){
-                        $sqlLeaveUpdate = 'update employee set DL = DL + 1 where empID = :empID';
+                        $sqlLeaveUpdate = 'update employee set DL = DL + '.$totalDaysFiled.' where empID = :empID';
                     }
                 }
                 break;
         endswitch;
-        if($sqlLeaveUpdate != '')
-        DB::select($sqlLeaveUpdate, [request('empID_')]);
+        
 
+        
+        // return $totalDaysFiled;
 
         DB::table('formleave')
         ->where('leaveID', request('leaveID'))
@@ -199,6 +234,10 @@ class LeaveController extends Controller
                 'status' => request('status'), 'approvedby'=> request('approvedby'),
                 'approveddate'=> date("Y-m-d"), 'remarks' => request('remarks')
             ]);
+
+        // update employee leave credits
+        if($sqlLeaveUpdate != '')
+        DB::select($sqlLeaveUpdate, [request('empID_')]);
 
         // MAIL NOTIFICATION
         if(request('status') == 1)

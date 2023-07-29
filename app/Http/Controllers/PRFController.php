@@ -88,7 +88,7 @@ class PRFController extends Controller
     // DELETE
     public function deletePRF($prfID  = null){
         DB::table('formprf')->where('prfID', '=', $prfID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -100,7 +100,7 @@ class PRFController extends Controller
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formprf form left join employee emp on
         form.approvedby = emp.empID where
-        form.recstat != 1  and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.recstat = 0  and form.empID_ = :empid', [UserSession::getSessionID()]);
 
         // check if data has vale
         if(count($data) > 0)
@@ -148,7 +148,7 @@ class PRFController extends Controller
                                 on branch.branchID = emp.branchID_
                             inner join department dept
                                 on dept.deptID = emp.deptID_
-                            where eform.approverID_ = :approverID and eprf.recstat != 1', [UserSession::getSessionID()]);
+                            where eform.approverID_ = :approverID and eprf.recstat = 0', [UserSession::getSessionID()]);
 
          // check if data has vale
          if(count($data) > 0)

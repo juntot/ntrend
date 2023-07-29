@@ -355,7 +355,7 @@ export default {
             "sPaginationType": "simple_numbers",
             "dom": '<"top with-margin-bottom"f>rt<"mdl-grid"<"mdl-cell mdl-cell--4-col"i><"mdl-cell mdl-cell--8-col"p>><"clear">',
             "scrollX": true,
-            "order": [[ 2, "desc" ]],
+            "order": [[ 0, "desc" ]],
             "rowCallback": function(row, data, index) {
                 var cellValue = data["status"];
                     if (cellValue=="Pending") {
@@ -421,7 +421,10 @@ export default {
             title: "Type", data: 'leavetype'
         },
         {
-            title: "Total(days)", data: 'totaldays'
+            title: "Total(days)", data: 'totaldays',
+            render: function(data){
+                return Number(data).valueOf();
+            }
         },
         {
             title: "Reason", data: 'reason', className: "row-limit"

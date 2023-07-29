@@ -30,6 +30,8 @@
   	<link rel="stylesheet" href="{{URL::asset('resources/assets/css/mdbadmin.css')}}">
 	<link rel="stylesheet" href="{{URL::asset('resources/assets/css/image-zoom.css')}}">
 
+	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+
     <!-- <link rel="stylesheet" href="./public/css/app.css"> -->
     <link rel="stylesheet" href="{{URL::to('/public/css/app.css')}}">
 	<!--[if lt IE 9]>
@@ -179,46 +181,48 @@
 					</div>
 					<div class="col-md-12 even-padding">
 						<hr>
-						<div class="col-md-6 col-sm-12 text-center">
-							<div class="numeric-leaves">
-								<i class="fas fa-plane-departure"></i>
-								@{{(leaveCredits.VL || userinfo.VL) | leaveCreditFilter}}
+							<div class="credit-count" v-if="userinfo.employee_status == 'Regular'">
+								<div class="col-md-6 col-sm-12 text-center">
+									<div class="numeric-leaves">
+										<i class="fas fa-plane-departure"></i>
+										@{{(leaveCredits.VL || userinfo.VL) | leaveCreditFilter}}
+									</div>
+									<div>
+											<router-link to="/leave-form" @click.native="hideMobileNav" class="accordion-menu collapseall">Vacation Leaves</router-link>
+									</div>
+								</div>
+								<div class="col-md-6 col-sm-12 text-center">
+									<div class="numeric-leaves">
+										<i class="fas fa-sad-tear"></i>
+										@{{(leaveCredits.SL || userinfo.SL) | leaveCreditFilter}}
+									</div>
+									<div>
+											<router-link to="/leave-form" @click.native="hideMobileNav" class="accordion-menu collapseall">Sick Leaves</router-link>
+									</div>
+								</div>
+								<div class="clearfix"></div>
+								<hr>
+								<div class="col-md-6 col-sm-12 text-center">
+									<div class="numeric-leaves">
+										<i class="fas fa-birthday-cake"></i>
+										@{{(leaveCredits.BL || userinfo.BL) | leaveCreditFilter}}
+									</div>
+									<div>
+											Birthday Leaves
+									</div>
+								</div>
+								<div class="col-md-6 col-sm-12 text-center">
+									<div class="numeric-leaves">
+										<i class="fas fa-info-circle"></i>
+										@{{(leaveCredits.DL || userinfo.DL) | leaveCreditFilter}}
+									</div>
+									<div>
+										Discretionary Leaves
+									</div>
+								</div>
+								<div class="clearfix"></div>
+								<hr>
 							</div>
-							<div>
-									Vacation Leaves
-							</div>
-						</div>
-						<div class="col-md-6 col-sm-12 text-center">
-							<div class="numeric-leaves">
-								<i class="fas fa-sad-tear"></i>
-								@{{(leaveCredits.SL || userinfo.SL) | leaveCreditFilter}}
-							</div>
-							<div>
-									Sick Leaves
-							</div>
-						</div>
-						<div class="clearfix"></div>
-						<hr>
-						<div class="col-md-6 col-sm-12 text-center">
-							<div class="numeric-leaves">
-								<i class="fas fa-birthday-cake"></i>
-								@{{(leaveCredits.BL || userinfo.BL) | leaveCreditFilter}}
-							</div>
-							<div>
-									Birthday Leaves
-							</div>
-						</div>
-						<div class="col-md-6 col-sm-12 text-center">
-							<div class="numeric-leaves">
-								<i class="fas fa-info-circle"></i>
-								@{{(leaveCredits.DL || userinfo.DL) | leaveCreditFilter}}
-							</div>
-							<div>
-								Discretionary Leaves
-							</div>
-						</div>
-						<div class="clearfix"></div>
-						<hr>
 						<div>
 							<p>ID No: @{{userinfo.empID}}</p>
 							<p>Status: @{{userinfo.employee_status}}</p>
@@ -288,18 +292,27 @@
 													<a v-if="userinfo.uploadDtr" href="https://ams.northtrend.com/upload" target="_tab" @click.native="hideMobileNav" class="accordion-menu collapseall">Upload Employee Logs</a>
 													<a v-if="userinfo.viewDTRReport" href="https://ams.northtrend.com/report" target="_tab" @click.native="hideMobileNav" class="accordion-menu collapseall">View Employee Log</a>
 												</div>
-
-												<!-- <ul class="sidebarpanel">
-													<li v-for="item in forms">
-														<router-link :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall">
-															@{{item.navname}}
-														</router-link>
-													</li>
-												</ul> -->
 											</div>
 										</div>
 									</div>
 									<!-- end -->
+									<!-- MANAGE DTR -->
+									<div class="panel panel-default" v-if="userinfo.addDelivery">
+										<div class="panel-heading">
+											<h4 class="panel-title">
+											<a data-toggle="collapse" data-parent="#accordion" href="#collapseDS">Delivery System</a>
+											</h4>
+										</div>
+										<div id="collapseDS" class="panel-collapse collapse inx">
+											<div class="panel-body">
+												<div class="policy-navs">
+													<router-link to="/delivery-system" @click.native="hideMobileNav" class="accordion-menu collapseall">A/R Invoices</router-link>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- end -->
+
 									<!-- BRANCH -->
 									<div class="panel panel-default" v-if="userinfo.addPayslip">
 										<div class="panel-heading">
@@ -333,7 +346,7 @@
 											<div class="panel-body">
 												<div class="policy-navs" v-for="(form, index) in forms" :key="index">
 													<div>@{{index}}</div>
-													<router-link v-for="item in form" :key="item.detail_id" :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall">@{{item.navname}}</router-link>
+													<router-link v-for="item in form" :key="item.detail_id" :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall title-case">@{{ (item.navname) }}</router-link>
 												</div>
 												<!-- <ul class="sidebarpanel">
 													<li v-for="item in forms">
@@ -754,9 +767,14 @@
 	<script src="https://unpkg.com/v-tooltip@2.0.2"></script> -->
 	<script src="{{URL::asset('resources/assets/js/velocity/velocity.min.js')}}"></script>
 
-	<script src="{{URL::asset('resources/assets/js/pdfJS/pdf.min.js')}}"></script>
+	<!-- <script src="{{URL::asset('resources/assets/js/pdfJS/pdf.min.js')}}"></script> -->
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script> -->
-	<script src="{{URL::asset('resources/assets/js/pdfJS/pdf.worker.min.js')}}"></script>
+	<!-- <script src="{{URL::asset('resources/assets/js/pdfJS/pdf.worker.min.js')}}"></script> -->
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.worker.min.js" integrity="sha512-rbVtx+EMuGKVSQEruVomHnv+X9xKJ/zc9seGck0x/0GgLmaWrKcKqnxPUkGFWgCHWBQQ44DkOCSe9DNcwsaJ7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf_viewer.min.js" integrity="sha512-u73EQIcgaUO+rlqp5rLbzK2d/hIOwV6kkHSpvceuoFc0zFJ3jp70N5Hv+RKenAMoIiEBD9f4b9zZKmChTRaXqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 
 	<!-- <script src="{{URL::asset('resources/assets/js/zoom/image-zoom.js')}}"></script> -->
 	<script src="{{URL::asset('resources/assets/js/zoom/image-zoom.min.js')}}"></script>
@@ -765,6 +783,18 @@
 	<!-- <script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script> -->
 	<script src="{{URL::asset('resources/assets/js/confetti/confetti.js')}}"></script>
 	<!-- <script src="https://unpkg.com/fireworks-js@latest/dist/fireworks.js"></script> -->
+
+
+
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.colVis.min.js"></script>
+
 
 	<script src="{{URL::to('/public/js/public-app.js')}}"></script>
 	<!-- <script src="./public/js/public-app.js"></script> -->

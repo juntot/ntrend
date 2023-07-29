@@ -25,8 +25,11 @@
                                         <li><a href="#about" data-toggle="tab" @click.prevent="removeClass(), initTablePos">Leave Balance</a></li>
                                         
                                         <li><a href="#supplementaryForm" data-toggle="tab" @click.prevent="removeClass">Supplementary Form</a></li>
-                                        <li><a href="#override" data-toggle="tab" @click.prevent="removeClass">API Override Settings</a></li>
+                                        <li><a href="#sap_setting" data-toggle="tab" @click.prevent="removeClass">API Settings</a></li>
+                                        <li><a href="#override" data-toggle="tab" @click.prevent="removeClass">Override Settings</a></li>
                                         <li><a href="#transmittalSett" data-toggle="tab" @click.prevent="removeClass">Transmittal Address</a></li>
+                                        <li><a href="#ARdelivery" data-toggle="tab" @click.prevent="removeClass">A/R Delivery</a></li>
+                                        <li><a href="#SOautoClose" data-toggle="tab" @click.prevent="removeClass">Auto Close SAP Documents</a></li>
                                         <!-- <li><a href="#contact" data-toggle="tab" @click.prevent="removeClass">Employees</a></li> -->
                                         
                                     </ul>
@@ -66,7 +69,11 @@
                                                 <!-- <EmployeeSettings/> -->
                                             </div>
                                         </div>
-
+                                        <div class="tab-pane" id="sap_setting">
+                                            <div class="">
+                                                <SAPSettings/>
+                                            </div>
+                                        </div>
                                         <div class="tab-pane" id="override">
                                             <div class="">
                                                 <OverrideSettings/>
@@ -75,6 +82,16 @@
                                         <div class="tab-pane" id="transmittalSett">
                                             <div class="">
                                                 <transmittalSett/>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="ARdelivery">
+                                            <div>
+                                                <ARDeliverySetting/>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="SOautoClose">
+                                            <div>
+                                                <SOAutoClose/>
                                             </div>
                                         </div>
                                     </div>
@@ -96,19 +113,25 @@ import SL_VLSettings from './settings_details/SL_VLSettings'
 import FormSettings from './settings_details/FormSettings'
 // import EmployeeSettings from './settings_details/EmployeeSettings'
 import Posts from './settings_details/Posts'
+import SAPSettings from './settings_details/SAPSettings'
 import OverrideSettings from './settings_details/OverrideSettings'
 import AdminWitnessSup from './AdminWitnessSup'
 import transmittalSett from './settings_details/TransmittalAdressSettings.vue'
+import ARDeliverySetting from './settings_details/ARDeliverySetting.vue'
+import SOAutoClose from './settings_details/SOAutoClose'
 export default {
     components:{
         GeneralSettings,
         SL_VLSettings,
         FormSettings,
         // EmployeeSettings,
+        SAPSettings,
         AdminWitnessSup,
         Posts,
         OverrideSettings,
-        transmittalSett
+        transmittalSett,
+        ARDeliverySetting,
+        SOAutoClose
     },
     data(){
         return{

@@ -250,6 +250,12 @@ export default {
             orderable:      false,
             data:           'viewDTRReport',
         }
+        ,{
+            title: "Access Delivery System",
+            className:      'details-control',
+            orderable:      false,
+            data:           'addDelivery',
+        }
         // ,{
         //     title: "View Reports",
         //     className:      'details-control',

@@ -235,15 +235,17 @@ const app = new Vue({
     filters:{
         leaveCreditFilter: (value) => {
             if (!value) return '00'
-            value = '0'+value;
+            value = '0'+Number(value).valueOf();
+            // value = '0'+value;
             // return this.leaveCredits;
             // value = this.leaveCredits[value] || this.userinfo[value]
             // value = '0'+value;
-            return value.slice(-2);
+            // return value.slice(-2);
+            return value.slice(1);
         },
         moment: function (date) {
     		return moment(date).fromNow();
-  		}
+  		},
     },
     async created(){
         

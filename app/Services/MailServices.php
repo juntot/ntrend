@@ -6,7 +6,9 @@ namespace App\Services;
 use DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\FormMail;
+use App\Mail\DeliverySysMail;
 use App\Services\UserSession;
+use Swift_Mailer;
 
 class MailServices{
 
@@ -175,6 +177,70 @@ class MailServices{
 
         if($result) {
             return $result[0]->email;
+        }
+    }
+
+
+    // delivery system controller
+    public static function sendDeliverySysMail($email, $from, $bcc = '', $subject = '', $message = ''){
+        try {
+
+            // https://stackoverflow.com/questions/56630267/laravel-multiple-mail-configurations-and-multiple-concurrent-users
+
+            // Backup your default mailer
+            $backup = Mail::getSwiftMailer();
+
+            // Setup your gmail mailer
+            $transport = \Swift_SmtpTransport::newInstance('mail.smpt2go.com', 465, 'ssl');
+            $transport->setUsername('ntmitd@smtp2go.com');
+            $transport->setPassword('n0rthr3nd');
+            // Any other mailer configuration stuff needed...
+            $swift_mailer = new \Swift_Mailer($transport);
+
+            // Set the mailer as gmail
+            // Mail::setSwiftMailer($swift_mailer);
+
+            
+
+            // // Send your message
+            // Mail::send(new DeliverySysMail($message, $subject), $data, function($message) use($params)
+            // {
+            //     $message->from($params['email']);
+            //     if($bcc)
+            //     $message->bcc($bcc);
+
+            //     $message->to($params['toEmail'])
+            //             ->subject($params['subject']);
+            // });
+
+
+
+            // ANOTHER WAY
+            // https://laravel-news.com/allowing-users-to-send-email-with-their-own-smtp-settings-in-laravel
+            $view = app()->get('view');
+            $events = app()->get('events');
+            $mailer = new Mailer($view, $swift_mailer, $events);
+
+            $mailer->to($email);
+            if($bcc)
+            $mailer->bcc($bcc);
+
+            $mailer->send(new DeliverySysMail($message, $subject));
+
+
+            // Restore your original mailer
+            Mail::setSwiftMailer($backup);
+
+
+            
+            // $mailer = Mail::to($email);
+            
+            // if($bcc)
+            // $mailer->bcc($bcc);
+
+            // $mailer->send(new DeliverySysMail($message, $subject));
+        } catch (\Throwable $th) {
+            throw $th;
         }
     }
 }

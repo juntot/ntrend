@@ -587,6 +587,24 @@
                     </div>
                 </div>
                 <div class="clearfix"></div>
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <select :disabled="$parent.disabledinput" v-model="commitmentfollowup" name="commitmentfollowup" v-validate="'required'" class="form-field__input" 
+                            >
+                                <option :value="'No need follow-up'" >No need follow-up</option>
+                                <option :value="'For follow-up'" >For follow-up</option>
+                                <option :value="'Settled'" >Settled</option>
+                                <option :value="'For CL increase'" >For CL increase</option>
+                                <option :value="'For CL allocation'" >For CL allocation</option>
+                            </select>
+                            <label class="form-field__label">Commitment For Followup</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('commitmentfollowup') }}</span>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
                 <div class="col-lg-12">
                 <h5 class="form-subtitle"></h5>
                     <div class="mdb-form-field">
@@ -730,6 +748,7 @@ export default {
         commit_cl: '',
         paying_habit: '',
         check_type: [],
+        commitmentfollowup: '',
         additional_info: '',
         remarks: '',
         

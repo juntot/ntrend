@@ -42,7 +42,7 @@ class DepartmentController extends Controller
 
 
     public function getDept(){
-    	$data = DB::select('select deptID, deptname from department where status = 1');
+    	$data = DB::select('select deptID, deptname from department where status = 1 order by deptname');
     	return $data;
     }
 

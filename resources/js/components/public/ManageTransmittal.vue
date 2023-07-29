@@ -1,3 +1,8 @@
+<style lang="css">
+.transmittalTblFormPrint tr td{
+    padding: 0 12px;
+}
+</style>
 <template>
     <div>
             
@@ -346,76 +351,90 @@
                 <h4 class="text-right" style="color: #3f51b5">{{transID ? 'Pouch# '+transID: ''}}</h4>
                 <div class="row">
                     <div class="col-lg-12">
+                        <div class="text-center">
+                            <img src="storage/app/public/images/comp_logo.png" alt="compay logo" style="width: 300px; height: auto;"/>
+                            <br><br>
+                            <p class="font-weight-bold" style="font-size: 25px;">TRANSMITTAL FORM</p>
+                            <br><br>
+                        </div>
                         <h5 class="font-weight-bold">SENDER INFORMATION:</h5>
                     </div>
-                    <div class="col-sm-4 col-md-4 col-lg-4">
-                        <div class="form-group">
-                            <label for="usr">From:</label>
-                            <input type="text" class="form-control" id="usr" :value="computedfullname" :readonly="true">
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-md-4 col-lg-4">
-                        <div class="form-group">
-                            <label for="usr">Sender Branch:</label>
-                            <input type="text" class="form-control" id="usr" :value="computedbranchname" :readonly="true">
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-md-4 col-lg-4">
-                        <div class="form-group">
-                            <label for="usr">Status:</label>
-                            <input type="text" class="form-control" id="usr" :value="computedStatus" :readonly="true">
-                        </div>
-                    </div>
-                    <!-- reciever -->
-                    <div class="col-lg-12">
-                        <h5 class="font-weight-bold">RECEIVER INFORMATION:</h5>
-                    </div>
-                    <div class="col-sm-4 col-md-4 col-lg-4">
-                        <div class="form-group">
-                            <label for="usr">To:</label>
-                            <input type="text" class="form-control" id="usr" :value="search_employee" :readonly="true">
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-md-4 col-lg-4">
-                        <div class="form-group">
-                            <label for="usr">Receiver Position:</label>
-                            <input type="text" class="form-control" id="usr" :value="receiver_pos" :readonly="true">
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-md-4 col-lg-4">
-                        <div class="form-group">
-                            <label for="usr">Receiver Department:</label>
-                            <input type="text" class="form-control" id="usr" :value="receiver_dept" :readonly="true">
-                        </div>
-                    </div>
-                    <div class="clearfix"></div>
-                    <div class="col-sm-12 col-md-12 col-lg-12">
-                        <div class="form-group">
-                            <label for="usr" style="font-weight:bold;">Address: </label>
-                            <!-- <input type="text" class="form-control" id="usr" :value="address" :readonly="true"> -->
-                            {{address}}
-                        </div>
-                    </div>
-                    <div class="clearfix"></div>
-                    <div class="col-sm-4 col-md-4 col-lg-4">
-                        <div class="form-group">
-                            <label for="usr">Receiver Branch:</label>
-                            <input type="text" class="form-control" id="usr" :value="receiver_branch" :readonly="true">
-                        </div>
-                    </div>
-                    <div class="clearfix"></div>
-                    <div class="col-sm-4 col-md-4 col-lg-4">
-                        <div class="form-group">
-                            <label for="usr">Contact Number:</label>
-                            <input type="text" class="form-control" id="usr" :value="contactnum" :readonly="true">
-                        </div>
-                    </div>
-                    <div class="col-sm-4 col-md-4 col-lg-4">
-                        <div class="form-group">
-                            <label for="usr">Date & Time Prepared:</label>
-                            <input type="text" class="form-control" id="usr" :value="datefiled | customDateFormat" :readonly="true">
-                        </div>
-                    </div>
+                    <table width="100%" class="transmittalTblFormPrint">
+                        <tr>
+                            <td>
+                                <div class="form-group">
+                                    <label for="usr">From:</label>
+                                    <input type="text" class="form-control" id="usr" :value="computedfullname" :readonly="true">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label for="usr">Sender Branch:</label>
+                                    <input type="text" class="form-control" id="usr" :value="computedbranchname" :readonly="true">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label for="usr">Status:</label>
+                                    <input type="text" class="form-control" id="usr" :value="computedStatus" :readonly="true">
+                                </div>
+                            </td>
+                        </tr>
+                        <!-- receiver -->
+                        <tr>
+                            <td colspan="3">
+                                <h5 class="font-weight-bold">RECEIVER INFORMATION:</h5>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="form-group">
+                                    <label for="usr">To:</label>
+                                    <input type="text" class="form-control" id="usr" :value="search_employee" :readonly="true">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label for="usr">Receiver Position:</label>
+                                    <input type="text" class="form-control" id="usr" :value="receiver_pos" :readonly="true">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label for="usr">Receiver Department:</label>
+                                    <input type="text" class="form-control" id="usr" :value="receiver_dept" :readonly="true">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <label for="usr" style="font-weight:bold;">Address: </label>
+                                <!-- <input type="text" class="form-control" id="usr" :value="address" :readonly="true"> -->
+                                {{address}}
+                            </td>
+                        </tr>
+                        <!-- reciever address -->
+                        <tr>
+                            <td>
+                                <div class="form-group">
+                                    <label for="usr">Receiver Branch:</label>
+                                    <input type="text" class="form-control" id="usr" :value="receiver_branch" :readonly="true">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label for="usr">Contact Number:</label>
+                                    <input type="text" class="form-control" id="usr" :value="contactnum" :readonly="true">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group">
+                                    <label for="usr">Date & Time Prepared:</label>
+                                    <input type="text" class="form-control" id="usr" :value="datefiled | customDateFormat" :readonly="true">
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                     <div class="clearfix"></div>
                     <div class="col-sm-4 col-md-4 col-lg-4" v-if="confirmdate">
                         <div class="form-group">
@@ -432,14 +451,13 @@
                     </div>
                     <div class="col-lg-12">
                         <p class="font-weight-bold">
-                            others:
+                            OTHERS:
                         </p>
                         <p>
                             {{others}}
                         </p>
                     </div>
                     <div class="clearfix"></div>
-                    <!-- item details -->
                     <div class="col-lg-12">
                         <h5 class="font-weight-bold">ITEM DETAILS:</h5>
                     </div>

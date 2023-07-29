@@ -8,7 +8,7 @@
 		</div>
         <div class="col-lg-12 margin-15">
             <div class="col-md-6">
-                    <div :class="openFilter?'dropdown open':'dropdown'">
+                    <div :class="openFilter?'dropdown open z-1':'dropdown z-1'">
                     <button class="btn btn-primary dropdown-toggle" type="button" @click.prevent="openFilter = !openFilter">
                         Filter Status
                     <span class="caret"></span></button>

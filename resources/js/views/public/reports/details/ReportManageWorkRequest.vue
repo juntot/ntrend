@@ -266,8 +266,8 @@
                             <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="11" name="radio" >
                             <span class="checkmark"></span>
                             </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">Setup Telephone
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Setup Telephone" v-model="request_type">
+                            <label class="mdblbl inline-blocklbl mdblblradio">Layout Design
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Layout Design" v-model="request_type">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
@@ -488,7 +488,7 @@ let worktype = ['System Access (SAP, HRIS etc.)',
                 'Install Apps(Spark, Skype, etc.)',
                 'Setup Workstation',
                 'Setup Printer'
-                ,'Setup Telephone',
+                ,'Layout Design',
                 'Cleaning / Maintenance',
                 'Repair',
                 'Format',

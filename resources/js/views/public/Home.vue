@@ -710,11 +710,12 @@ export default {
 			let offset = this.offsetHeight - this.clientHeight;
             $('textarea#textarea-post').css('height', 'auto').css({'height': $('textarea#textarea-post').scrollHeight + offset, "max-height": '200px'});
 		},
-		handleScroll () {
-			// console.log($(window).scrollTop() + $(window).height(), ($(document).height()-10));
-			 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+		handleScroll (e) {
+			// console.log(Math.abs($(window).scrollTop() + $(window).height()), ($(document).height()-10));
+			if(Math.abs(window.innerHeight + window.scrollY) >= Math.abs(document.body.offsetHeight-10)){
+			// if($(window).scrollTop() + $(window).height() == $(document).height()) {
+			//  if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
 				 	$('#loader-announcement').show();
-
 					this.page++;
 					axios.get('api/getAnnouncement?page='+this.page).then((response)=>{
 						setTimeout(function(){
@@ -1127,6 +1128,7 @@ export default {
 		},
     mounted(){	
 		// scroll
+		// window.addEventListener('scroll', this.handleScroll);
 		window.addEventListener('scroll', this.handleScroll);
 		// remove white background for content
 		document.getElementById('content').classList.remove("content");

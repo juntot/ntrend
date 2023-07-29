@@ -52,7 +52,7 @@ class UrgentCheckController extends Controller
     // DELETE
     public function deleteUrgentCheck($urgentID  = null){
         DB::table('formurgentcheck')->where('urgentID', '=', $urgentID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -62,7 +62,7 @@ class UrgentCheckController extends Controller
         $data = DB::select('select form.*,
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formurgentcheck form left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1  and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0  and form.empID_ = :empid', [UserSession::getSessionID()]);
         return $data;
     }
 
@@ -94,7 +94,7 @@ class UrgentCheckController extends Controller
                                 on pos.posID = emp.posID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
-                            where eform.approverID_ = :approverID and eurgent.recstat != 1', [UserSession::getSessionID()]);
+                            where eform.approverID_ = :approverID and eurgent.recstat = 0', [UserSession::getSessionID()]);
         return $data;
     }
 

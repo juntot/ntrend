@@ -91,7 +91,7 @@ class OffsetController extends Controller
     // DELETE
     public function deleteOffset($offsetID  = null){
         DB::table('formoffset')->where('offsetID', '=', $offsetID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -101,7 +101,7 @@ class OffsetController extends Controller
         $data = DB::select('select form.*,
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formoffset form left join employee emp on
-        form.approvedby = emp.empID where form.recstat !=1  and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0  and form.empID_ = :empid', [UserSession::getSessionID()]);
         // check if data has vale
         if(count($data) > 0)
         {
@@ -149,7 +149,7 @@ class OffsetController extends Controller
                                 on branch.branchID = emp.branchID_
                             where eform.approverID_ = :approverID 
                             and eform.Offset = 1
-                            and eoffset.recstat != 1', [UserSession::getSessionID()]);
+                            and eoffset.recstat = 0', [UserSession::getSessionID()]);
 
         // check if data has vale
         if(count($data) > 0)

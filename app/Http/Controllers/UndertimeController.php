@@ -53,7 +53,7 @@ class UnderTimeController extends Controller
     // DELETE
     public function deleteUndertime($undertimeID  = null){
         DB::table('formundertime')->where('undertimeID', '=', $undertimeID)
-        ->update(['recstat'=>1]);
+        ->update(['recstat'=>404]);
         // ->delete();
     }
 
@@ -64,7 +64,7 @@ class UnderTimeController extends Controller
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         DATE_FORMAT(form.date_undertime, "%m/%d/%Y") as date_undertime,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formundertime form left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
 
         return $data;
     }
@@ -95,7 +95,7 @@ class UnderTimeController extends Controller
                                 on branch.branchID = emp.branchID_
                             where eform.approverID_ = :approverID 
                             and eform.Undertime0Request = 1
-                            and eundertime.recstat != 1', [UserSession::getSessionID()]);
+                            and eundertime.recstat = 0', [UserSession::getSessionID()]);
         return $data;
     }
 

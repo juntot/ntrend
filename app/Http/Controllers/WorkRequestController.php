@@ -120,7 +120,7 @@ class WorkRequestController extends Controller
     // DELETE
     public function deleteWorkRequest($workID  = null){
         DB::table('formworkrequest')->where('workID', '=', $workID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -138,7 +138,7 @@ class WorkRequestController extends Controller
             from formworkrequest form
             left join employee emp on
                 form.approvedby = emp.empID
-            where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+            where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
         return $data;
     }
 
@@ -186,7 +186,7 @@ class WorkRequestController extends Controller
                                 on emp.branchID_ = branch.branchID
                             where eform.approverID_ = :approverID 
                             and eform.Work0Request = 1
-                            and ework.recstat != 1', [UserSession::getSessionID()]);
+                            and ework.recstat = 0', [UserSession::getSessionID()]);
 
         return $data;
     }

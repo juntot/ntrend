@@ -28,7 +28,7 @@ import EmployeeSettings from './views/settings_details/EmployeeSettings'
 export default{
 
     mode: 'history',
-    // base: '/ntrends/',
+    base: '/ntrends/',
     routes:[
         // graph
         {

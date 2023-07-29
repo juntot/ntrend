@@ -1,5 +1,9 @@
 <?php
 use Illuminate\Support\Facades\Mail;
+use App\Services\MailServices;
+// use Swift_Mailer;
+// use Illuminate\Support\Facades\Swift_Mailer;
+// require_once 'swift/lib/swift_required.php';
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -10,13 +14,46 @@ use Illuminate\Support\Facades\Mail;
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::get('/api/testmail', function(){
+    $email = 'ubec.creative@gmail.com';
+    $from = 'ubec.creative@gmail.com';
+    $bcc = 'junrey.gonzales.07@gmail.com';
+    $subject = 'testing multi tenant mailer';
+    $message = 'This is a message';
+
+    $backup = Mail::getSwiftMailer();
+
+            // Setup your gmail mailer
+            $transport = new \Swift_SmtpTransport();
+            $transport::newInstance('smtp2go.northtrend.com', 465, 'ssl');
+            $transport->setUsername('ntmitd');
+            $transport->setPassword('n0rthr3nd');
+            // Any other mailer configuration stuff needed...
+            $swift_mailer = new \Swift_Mailer($transport);
+
+            $view = app()->get('view');
+            $events = app()->get('events');
+            $mailer = new Mailer($view, $swift_mailer, $events);
+
+            $mailer->to($email)->send(new DeliverySysMail($message, $subject));
+
+
+            // Restore your original mailer
+            Mail::setSwiftMailer($backup);
+
+    // MailServices::sendDeliverySysMail($email, $from, $bcc, $subject, $message);
+    return 'mail service';
+});
 Route::get('/api/mail', function(){
     $email = 'ubec.creative@gmail.com';
-    Mail::to($email)->send(new \App\Mail\FormMail('body', 'subject'));
+    Mail::to($email)
+         ->send(new \App\Mail\FormMail('body', 'subject'));
     return 'awsss';
 });
 
-
+Route::get('sms/test', 'CronController@testSMS');
+Route::get('cron/so', 'CronController@salesOrder');
+Route::get('cron/invtrans', 'CronController@autoCloseInventoryTrans');
 
 Route::group(['middleware' => 'prevent-back-history'], function(){
 
@@ -121,6 +158,8 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::post('/api/deleteleave/{leaveid?}', 'LeaveController@deleteLeave');
             Route::get('/api/getleavebyemployee', 'LeaveController@getLeaveByEmployee');
             Route::get('/api/getLeaveApprover', 'LeaveController@getLeaveApprover'); //get approvers for leave
+            Route::post('/api/myapproveleave', 'LeaveController@getMyApproveLeave');
+
 
             // UNDERTIME-FORM
             Route::post('/api/addundertime', 'UndertimeController@addUndertime');
@@ -260,6 +299,7 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::post('/api/search-override-emp', 'OverrideController@searchEmp');
             Route::post('/api/addoverride', 'OverrideController@addOverride');
             Route::post('/api/updateoverride', 'OverrideController@updateOverride');
+            Route::post('/api/updateoverride2', 'OverrideController@updateOverride2');
             Route::post('/api/deleteoverride/{overrideID?}', 'OverrideController@deleteOverride');
             Route::get('/api/getoverride', 'OverrideController@getOverride');
             Route::get('/api/getOverrideApprover', 'OverrideController@getOverrideApprover');
@@ -270,6 +310,23 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::post('/api/addtransmittal', 'TransmittalController@addTransmittal');
             Route::post('/api/updatetransmittal', 'TransmittalController@updateTransmittal');
             Route::post('/api/deletetransmittal/{transID?}', 'TransmittalController@deleteTransmittal');
+
+            // SALES ENROLLMENT PROGRAM FORM
+            Route::post('/api/addenrollmentprog', 'SalesPorgramEnrollmentController@addEnrollment');
+            Route::post('/api/updateenrollmentprog', 'SalesPorgramEnrollmentController@updateEnrollment');
+            Route::post('/api/deleteenrollmentprog/{enrollmentID?}', 'SalesPorgramEnrollmentController@deleteEnrollment');
+            Route::get('/api/getenrollmentprog', 'SalesPorgramEnrollmentController@getEnrollment');
+            Route::get('/api/getEnrollmentProgApprover', 'SalesPorgramEnrollmentController@getEnrollmentProgApprover');
+
+            // FORM METTING MINUTE
+            Route::post('/api/search-meeting-emp', 'MeetingMinutesController@searchMeetingEmp');
+            Route::get('/api/get-minute-meeting', 'MeetingMinutesController@getMeetingMinutesByEmployee');
+            Route::post('/api/add-minute-meeting', 'MeetingMinutesController@addMeetingMinutes');
+            Route::post('/api/update-minute-meeting', 'MeetingMinutesController@updateMeetingMinutes');
+            Route::post('/api/acknow-minute-meeting', 'MeetingMinutesController@acknowledgeMeetingMinutes');
+            Route::get('/api/del-minute-meeting/{ccId?}', 'MeetingMinutesController@delMeetingMinutes');
+            // Route::get('/api/getUrgentCheckbyemployee', 'MettingMinuteController@getUrgentCheckByEmployee');
+            // Route::get('/api/getUrgentCheckApprover', 'MettingMinuteController@getUrgentCheckApprover'); // get approvers
 
 
             // FORM APPROVERS ===========================================================================
@@ -360,6 +417,10 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/api/approvaltransmittal', 'TransmittalController@approvalTransmittal');
             Route::post('/api/actiontransmittal', 'TransmittalController@actionTransmittal');
             
+
+            // TRANSMITTAL
+            Route::get('/api/approvalenrollmentprog', 'SalesPorgramEnrollmentController@approvalEnrollmentProgApprover');
+            Route::post('/api/actionenrollmentprog', 'SalesPorgramEnrollmentController@actionFormEnrollment');
 
             // =============================  API  ==============================
 
@@ -605,6 +666,15 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
 
 
 
+            // =========================== DELIVERY SYSTEM =====================================
+            Route::any('/api/get-sap-invoice', 'DeliverySystemController@getSapInvoice');
+            Route::any('/api/get-sap-details', 'DeliverySystemController@getSapDetails');
+            Route::post('/api/update-delivery', 'DeliverySystemController@updateRecord');
+
+            Route::get('/api/get-delivery-branch', 'DeliverySystemController@getDeliveryBranch');
+            Route::post('/api/addupdate-delivery-branch', 'DeliverySystemController@addUpdateDeliveryBranch');
+            Route::post('/api/del-delivery-branch', 'DeliverySystemController@delDeliveryBranch');
+
 
             // =========================== CALENDAR ==================================================
             Route::get('/api/get_events', 'CalendarController@getEvents');
@@ -657,6 +727,21 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/company-profile/api/get-compprofile-nav', 'CompProfileController@getCompProfileNav');
             Route::get('/company-profile/api/compprofile-per-detail/{detail_id?}', 'CompProfileController@CompProfilePerDetail');
             Route::get('/company-profile/api/get-witness-nav', 'WitnessSupController@getWitnessNav');
+
+
+            // CRON SALES ORDER
+            Route::post('api/cron-so-action', 'CronController@SOsettingAction');
+            Route::get('api/cron-so-settings', 'CronController@getSOsettings');
+            Route::post('api/cron-so-updatecomp', 'CronController@SOUpdateComp');
+            Route::post('api/cron-so-dayslimit', 'CronController@SODaysLimit');
+
+
+            // CRON INVENTORY TRANS
+            Route::post('api/cron-invtrans-dayslimit', 'CronController@InvTransDaysLimit');
+
+            // cron notif settings
+            Route::post('api/cron-sms-notif-num', 'CronController@addSMSnum');
+            Route::post('api/cron-sms-notif', 'CronController@allowSMSnotif');
     });
 
 });

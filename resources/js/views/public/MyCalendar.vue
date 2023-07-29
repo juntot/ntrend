@@ -7,7 +7,7 @@
 			{{formtitle}}
 		</div>
     <div class="col-lg-12 margin-15 padding-15">
-        <VuetifyCalendar :getEventDetails="showEventDetails" :getNext="getNextRec" :getPrev="getPrevRec"/>
+        <VuetifyCalendar :getEventDetails="showEventDetails" calendarHeight="890" :getNext="getNextRec" :getPrev="getPrevRec"/>
         <!-- Modal -->
             <div id="user-dtr-records" class="modal fade" role="dialog" ref="vuemodal">
                 <div class="modal-dialog">
@@ -59,6 +59,7 @@ export default {
               _totalhrs: 0,
             },
             loader: false,
+            holidayEvents: [],
         }
     },
     watch: { 
@@ -106,11 +107,24 @@ export default {
         if(!userid_)
         userid_ = this.userId;
 
-        axios.post('https://ams.northtrend.com/dtr-user-report',{
+         axios.post('api/myapproveleave', {
           start: from,
           end: to,
-          user: userid_
-        }) 
+         }).
+          then((res)=>{
+              //   let events_calendar = res.data.map(event=>{
+              //     event['start'] = event.start;
+              //     return event;
+              //   });
+              // this.holidayEvents = events_calendar;
+              this.holidayEvents = res.data;
+          });
+                
+        axios.post('https://ams.northtrend.com/dtr-user-report',{
+                start: from,
+                end: to,
+                user: userid_
+        })
         .then(res=>{
           // console.log(res.data);
           if(res.data){
@@ -126,27 +140,8 @@ export default {
                 logs: curr.logs
               });
 
-              // out2
-              if(curr._out2 && moment(curr._out2).isValid() && curr._out2 != '0000-00-00 00:00:00')
-              acc.push({
-                name: moment(curr._out2).format('hh:mm a'),
-                color: curr.color,
-                start: curr.start,
-                end: curr.end,
-                logs: curr.logs
-              });
+              
 
-              
-              // out
-              if(curr._out && moment(curr._out).isValid() && curr._out != '0000-00-00 00:00:00')
-              acc.push({
-                name: moment(curr._out).format('hh:mm a'),
-                color: curr.color,
-                start: curr.start,
-                end: curr.end,
-                logs: curr.logs
-              });
-              
               // in2
               if(curr._in2 && moment(curr._in2).isValid() && curr._in2 != '0000-00-00 00:00:00')
               acc.push({
@@ -157,11 +152,28 @@ export default {
                 logs: curr.logs
               });
 
+              // out
+              if(curr._out && moment(curr._out).isValid() && curr._out != '0000-00-00 00:00:00')
+              acc.push({
+                name: moment(curr._out).format('hh:mm a'),
+                color: curr.color,
+                start: curr.start,
+                end: curr.end,
+                logs: curr.logs
+              });
               
-
+              // out2
+              if(curr._out2 && moment(curr._out2).isValid() && curr._out2 != '0000-00-00 00:00:00')
+              acc.push({
+                name: moment(curr._out2).format('hh:mm a'),
+                color: curr.color,
+                start: curr.start,
+                end: curr.end,
+                logs: curr.logs
+              });
               return acc;
             }, []);
-            
+            events = [...this.holidayEvents, ...events];
             bus.$emit('plotEvent', events);
           }
           
@@ -185,11 +197,20 @@ export default {
     mounted(){
         // this.forapprover = ((this.$route.path).slice(1)).toLowerCase().split('-')[];
         // this.formtitle = ((this.$router.name)).toUpperCase();
+        
+     
+
+
+
+
         $('#myModal').on("hidden.bs.modal", this.closeModal);
         this.pullRecords(
           moment(new Date()).format('YYYY-MM-01'), 
           moment(new Date()).endOf('month').format('YYYY-MM-DD'),
         );
+        
+
+        
     }
 
 }

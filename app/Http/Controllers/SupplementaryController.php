@@ -32,11 +32,11 @@ class SupplementaryController extends Controller
             {
                foreach($val as $key=>$val2)
                {
-                    $val2['timein'] = date("H:i", strtotime($val2['timein']));
-                    $val2['timeout'] = date("H:i", strtotime($val2['timeout']));
+                    $val2['timein'] = $val2['timein']? date("H:i", strtotime($val2['timein'])) : '';
+                    $val2['timeout'] = $val2['timeout']? date("H:i", strtotime($val2['timeout'])) : '';
 
-                    $val2['timein2'] = date("H:i", strtotime($val2['timein2']));
-                    $val2['timeout2'] = date("H:i", strtotime($val2['timeout2']));
+                    $val2['timein2'] = $val2['timein2']? date("H:i", strtotime($val2['timein2'])) : '';
+                    $val2['timeout2'] = $val2['timeout2']? date("H:i", strtotime($val2['timeout2'])) : '';
 
                     $supdetailsparams[] = array_merge($val2, ['supID_'=>$data]);
                }
@@ -82,11 +82,11 @@ class SupplementaryController extends Controller
         {
            foreach($val as $key=>$val2)
            {
-                $val2['timein'] = date("H:i", strtotime($val2['timein']));
-                $val2['timeout'] = date("H:i", strtotime($val2['timeout']));
+                $val2['timein'] = $val2['timein']? date("H:i", strtotime($val2['timein'])) : '';
+                $val2['timeout'] = $val2['timeout']? date("H:i", strtotime($val2['timeout'])) : '';
 
-                $val2['timein2'] = date("H:i", strtotime($val2['timein2']));
-                $val2['timeout2'] = date("H:i", strtotime($val2['timeout2']));
+                $val2['timein2'] = $val2['timein2']? date("H:i", strtotime($val2['timein2'])) : '';
+                $val2['timeout2'] = $val2['timeout2']? date("H:i", strtotime($val2['timeout2'])) : '';
 
                 $supdetailsparams[] = array_merge($val2, ['supID_' => request('supID')]);
            }
@@ -104,7 +104,7 @@ class SupplementaryController extends Controller
     // DELETE
     public function deleteSupplementary($supID  = null){
         $affected = DB::table('formsupplementary')->where('supID', '=', $supID)
-        ->update(['recstat'=>1]);
+        ->update(['recstat'=>404]);
         // ->delete();
 
         $mailReceivers = FormApproverService::getApproverEmail('supID', $supID, 'formsupplementary', 'Supplementary');
@@ -119,7 +119,7 @@ class SupplementaryController extends Controller
         $data = DB::select('select form.*,
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formsupplementary form left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
         // check if data has vale
         if(count($data) > 0)
         {
@@ -128,7 +128,12 @@ class SupplementaryController extends Controller
            {
                 $supID = $data[$keys]->supID;
                 // never add supdetailsID to avoid error in update
-                $supdetails = DB::select('select supID_, supdate, timein, timeout, timein2, timeout2, reason from formsupdetails where supID_ = :supid', [$supID]);
+                $supdetails = DB::select("select supID_, supdate, 
+                TIME_FORMAT(timein, '%h:%i %p') as timein, 
+                TIME_FORMAT(timeout, '%h:%i %p') as timeout, 
+                TIME_FORMAT(timein2, '%h:%i %p') as timein2, 
+                TIME_FORMAT(timeout2, '%h:%i %p') as timeout2, 
+                reason from formsupdetails where supID_ = :supid", [$supID]);
                 $data[$keys]->entries = $supdetails;
            }
 
@@ -163,7 +168,7 @@ class SupplementaryController extends Controller
                 approverID_ = "'.UserSession::getSessionID().'"
         )
         AND
-            form.recstat != 1
+            form.recstat = 0
         AND
             form.status <= 1
         ORDER BY form.supID desc
@@ -176,7 +181,12 @@ class SupplementaryController extends Controller
            {
                 $supID = $data[$keys]->supID;
                 // never add supdetailsID to avoid error in update
-                $supdetails = DB::select('select supID_, supdate, timein, timeout, timein2, timeout2, reason from formsupdetails where supID_ = :supid', [$supID]);
+                $supdetails = DB::select("select supID_, supdate, 
+                TIME_FORMAT(timein, '%h:%i %p') as timein, 
+                TIME_FORMAT(timeout, '%h:%i %p') as timeout, 
+                TIME_FORMAT(timein2, '%h:%i %p') as timein2, 
+                TIME_FORMAT(timeout2, '%h:%i %p') as timeout2, 
+                reason from formsupdetails where supID_ = :supid", [$supID]);
                 $data[$keys]->entries = $supdetails;
            }
 
@@ -262,7 +272,7 @@ class SupplementaryController extends Controller
         //                     and
         //                         esup.status > 0
         //                     and
-        //                         esup.recstat != 1
+        //                         esup.recstat = 0
         //                     ', [UserSession::getSessionID()]);
 
         $data = DB::select('select esup.*,
@@ -285,7 +295,7 @@ class SupplementaryController extends Controller
         and
             esup.status > 0
         and
-            esup.recstat != 1
+            esup.recstat = 0
         ORDER BY esup.supID desc
         limit 2000
         ', [UserSession::getSessionID()]);
@@ -298,7 +308,12 @@ class SupplementaryController extends Controller
            {
                 $supID = $data[$keys]->supID;
                 // never add supdetailsID to avoid error in update
-                $supdetails = DB::select('select supID_, supdate, timein, timeout, timein2, timeout2, reason from formsupdetails where supID_ = :supid', [$supID]);
+                $supdetails = DB::select("select supID_, supdate, 
+                TIME_FORMAT(timein, '%h:%i %p') as timein, 
+                TIME_FORMAT(timeout, '%h:%i %p') as timeout, 
+                TIME_FORMAT(timein2, '%h:%i %p') as timein2, 
+                TIME_FORMAT(timeout2, '%h:%i %p') as timeout2, 
+                reason from formsupdetails where supID_ = :supid", [$supID]);
                 $data[$keys]->entries = $supdetails;
            }
 

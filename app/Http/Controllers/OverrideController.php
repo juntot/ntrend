@@ -113,6 +113,7 @@ class OverrideController extends Controller
         $api = DB::table('API_table')
         ->whereNotNull('endpoint')
         ->first();
+        // return $api->endpoint.'/'.str_replace ( ' ', '%20', $path);
         try {
             $result = CurlService::httpCurlGet(
                 $api->endpoint.'/'.str_replace ( ' ', '%20', $path),
@@ -160,10 +161,11 @@ class OverrideController extends Controller
     public function searchEmp(){
         $data = DB::select('select empID,  CONCAT(fname,", ",lname) as fullname 
         from employee where (fname like :search OR lname like :search2) 
-        AND empID not IN( :empID, "00001" )
+        AND empID not IN("00001" )
         AND status = 1
         order by fname limit 30',
-                [request('keyword').'%', request('keyword').'%', UserSession::getSessionID()]);
+                [request('keyword').'%', request('keyword').'%']);
+        // UserSession::getSessionID()
         return $data;
     }
     // get override
@@ -173,7 +175,7 @@ class OverrideController extends Controller
         DATE_FORMAT(form.dateoverride, "%m/%d/%Y %h:%i %p") as dateoverride,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formoverride form 
         left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid
         ORDER BY form.overrideID desc
         limit 1000
         ', [UserSession::getSessionID()]);
@@ -222,6 +224,7 @@ class OverrideController extends Controller
         
         request()->merge([
             'dateoverride' => $now,
+            'lastupdate' => $now,
             'empID_' => UserSession::getSessionID(),
             'commited_date' => UserSession::formatDate(request()->commited_date),
             'status' => 0,
@@ -249,6 +252,7 @@ class OverrideController extends Controller
         request()->merge(['empID_' => UserSession::getSessionID(), 'status' => 0]);
         // $response = request()->except(['ísDisable']);
         request()->merge([
+            'lastupdate' => $now,
             'dateoverride' => $now,
             'commited_date' => UserSession::formatDate(request()->commited_date),
         ]);
@@ -263,16 +267,45 @@ class OverrideController extends Controller
                 'status', 'recstat'
             ]));
         request()->merge([
-            'dateoverride' => UserSession::formatDate($now, 'm/d/Y h:i A')
+            'lastupdate' => UserSession::formatDate($now, 'm/d/Y h:i A')
         ]);
         return request()->all();
     }
+    public function updateOverride2(){
+        date_default_timezone_set("Asia/Hong_Kong");
+        $now = Carbon::now();
+        // SESSION ID
+        request()->merge(['empID_' => UserSession::getSessionID(), 'status' => 0]);
+        // $response = request()->except(['ísDisable']);
+        request()->merge([
+            'lastupdate' => $now,
+            // 'dateoverride' => $now,
+            'commited_date' => UserSession::formatDate(request()->commited_date),
+        ]);
+        
+        // update
+        DB::table('formoverride')
+            ->where('overrideID', request('overrideID'))
+            ->update(request()->except([
+                'dateoverride',
+                'overrideID', 
+                'approvedby',
+                'empID_', 
+                'status', '
+                recstat'
+            ]));
+        request()->merge([
+            'lastupdate' => UserSession::formatDate($now, 'm/d/Y h:i A')
+        ]);
+        return request()->all();
+    }
+
     // delete override
     public function deleteOverride($leaveID  = null){
         
         $affected = DB::table('formoverride')
         ->where(['overrideID'=>$leaveID, 'status'=>0])
-        ->update(['recstat'=>1]);
+        ->update(['recstat'=>404]);
         // ->delete();
         if($affected) {
             MailServices::send_email_Notify(request('reciever_emails'), UserSession::getSessionID(), 'OVERRIDE REQUEST FORM', 'Deleted his/her');
@@ -307,7 +340,7 @@ class OverrideController extends Controller
                                 on branch.branchID = emp.branchID_
                             where eform.approverID_ = :approverID
                             and eform.Override0Form = 1
-                            and eleave.recstat != 1
+                            and eleave.recstat = 0
                             ORDER BY eleave.overrideID desc
                             limit 2000',
                             [UserSession::getSessionID()]);

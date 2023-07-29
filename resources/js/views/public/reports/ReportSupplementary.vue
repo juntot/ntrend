@@ -123,7 +123,7 @@ export default {
             let rows = [];
             let header = [
                 'SUP-ID','EMPLOYEE ID', 'EMPLOYEE NAME', 'COMPANY', 'DEPARTMENT NAME', 'POSITION', 'DATE FILED', 'WITNESSES',  'APPROVER', 'APPROVED DATE', 'REMARKS', 'STATUS',
-                'SUPPLEMENTARY DATE', 'SUP TIME-IN(AM)', 'SUP TIME-OUT(AM)', 'SUP TIME-IN(PM)', 'SUP TIME-OUT(PM)', 'REASON'
+                'SUPPLEMENTARY DATE', 'SUP TIME-IN(AM)', 'SUP TIME-OUT(AM)', 'SUP TIME-IN(PM)', 'SUP TIME-OUT(PM)', 'REASON', 'DETAILED REASON',
             ];
             rows.push(header);
             this.rows.forEach(obj => {
@@ -138,7 +138,7 @@ export default {
                             obj.approveddate, obj.remarks, obj.status,
                             // entries
                             entry.supdate, entry.timein, entry.timeout,
-                            entry.timein2, entry.timeout2, entry.reason
+                            entry.timein2, entry.timeout2, entry.reason, obj.detailedreason
                         ];
                     // }else{
                     //     records = [
