@@ -94,7 +94,7 @@ export default{
             component: Supplementary,
             name: 'Supplementary',
             // props: {name: this.$root.name}
-        },
+    },
         // Leave Form
         {
             path: '/leave-form',

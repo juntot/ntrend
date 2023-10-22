@@ -190,11 +190,8 @@ export default {
             let rows = [];
             let tempReqType = [];
             rows = defaultRows.filter(data=>{
-                
                 tempReqType = (data.request_type.toLowerCase()).split(',');
                 return this.status.includes(data.status+'') && (tempReqType.some((type) => val.indexOf(type)>=0))
-                
-                // val.includes((data.request_type).toLowerCase()+'');
             });
             
             this.dtHandle.clear();
@@ -286,7 +283,6 @@ export default {
             });
             this.dtHandle=$('#workrequest').DataTable({
             aoColumnDefs: [{ "sType": "date-uk", "aTargets": [3] }],
-            "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
             "sPaginationType": "simple_numbers",

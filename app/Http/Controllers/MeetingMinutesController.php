@@ -31,7 +31,7 @@ class MeetingMinutesController extends Controller
         request()->merge(['empID_' => UserSession::getSessionID()]);
         $id = Carbon::now()->valueOf();
         request()->merge([
-            'datefiled' => UserSession::formatDate(request()->datefiled),
+            'datefiled' => Carbon::now(), // UserSession::formatDate(request()->datefiled),
             'meetingID' => $id,
         ]);
         $response = request()->except(['ísDisable']);
@@ -54,12 +54,21 @@ class MeetingMinutesController extends Controller
     }
 
     // Acknowledge
+    public function removeAttendance(){
+        DB::table('formmeetingminutes')
+            ->where('meetingID', request('meetingID'))
+            ->update(request()->except(['isDisable', 'meetingID', 'reciever_emails', 'empID_', 'fullname']));
+
+        $message= 'Remove his attendance from meeting form and notify you as one of the attendees';
+        // MailServices::send_email_Notify(request('reciever_emails'), UserSession::getSessionID(), '', $message, 'Meeting Minutes Form');
+    }
+
     public function acknowledgeMeetingMinutes(){
         $response = request()->except(['isDisable']);
         
-        request()->merge([
-            'datefiled' => UserSession::formatDate(request()->datefiled),
-        ]);
+        // request()->merge([
+        //     'datefiled' => UserSession::formatDate(request()->datefiled),
+        // ]);
 
         DB::table('formmeetingminutes')
             ->where('meetingID', request('meetingID'))
@@ -77,9 +86,14 @@ class MeetingMinutesController extends Controller
     public function updateMeetingMinutes(){
         // return request()->all();        
         $response = request()->except(['isDisable']);
+        // request()->merge([
+        //     'datefiled' => UserSession::formatDate(request()->datefiled),
+        // ]);
+        if(request('status'))
         request()->merge([
-            'datefiled' => UserSession::formatDate(request()->datefiled),
+            'datetimeclose' => Carbon::now(),
         ]);
+
 
         DB::table('formmeetingminutes')
             ->where('meetingID', request('meetingID'))

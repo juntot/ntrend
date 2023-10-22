@@ -487,16 +487,21 @@ class OverrideController extends Controller
                 return request()->all();
             }
 
-            MailServices::send_email_Notify($mailReceivers, request('empID_'), 'OVERRIDE FORM REQUEST', ' <br><br>Endorse his/her ');
-            // MailServices::form_post_Notify($mailReceivers, request('empID_'), 'override form request', request('workID'), 'workreq', 'confirmed his/her submitted');
+            MailServices::send_email_Notify($mailReceivers, request('empID_'), 'OVERRIDE FORM REQUEST', ' <br><br>Endorse his/her ');            
+            MailServices::form_post_Notify($mailReceivers, request('empID_'), 'override form request', request('workID'), 'workreq', 'confirmed his/her submitted');
         }
         if(request('status') == 2){
             MailServices::send_email_Notify($mailReceivers, request('empID_'), 'OVERRIDE FORM REQUEST', ' <br><br>Approved his/her ');
-        //     MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'leave request', 'rejected', request('leaveID'), 'leave');
+            
+            
+            // DO NOT ENABLE MailServices::formNotifyReviewed ===============
+            // MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'override form request', 'Approved his/her', request('workID'), 'leave');
         }
         if(request('status') == 3){
             MailServices::send_email_Notify($mailReceivers, request('empID_'), 'OVERRIDE FORM REQUEST', ' <br><br>Rejected his/her ');
-        //     MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'leave request', 'rejected', request('leaveID'), 'leave');
+            
+            
+            // MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'override form request', 'rejected', request('workID'), 'leave');
         }
         if(request('status') == 0){
             $message = '';
@@ -508,12 +513,16 @@ class OverrideController extends Controller
                 $message = ' <br><br>Move Back to Pended his/her ';
             }
             MailServices::send_email_Notify($mailReceivers, request('empID_'), 'OVERRIDE FORM REQUEST', $message);
-        //     MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'leave request', 'rejected', request('leaveID'), 'leave');
+            
+            
+            // MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'override form request', 'rejected', request('workID'), 'leave');
         }
+        /* not included
         // else{
-        //     // MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'LEAVE REQUEST', 'CANCELLED');
-        //     MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'leave request', 'cancelled', request('leaveID'), 'leave');
+        //     // MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'override form request', 'CANCELLED');
+        //     MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'override form request', 'cancelled', request('leaveID'), 'leave');
         // }
+        */
 
         
         return request()->all();

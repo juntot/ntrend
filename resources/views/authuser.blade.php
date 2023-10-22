@@ -306,7 +306,7 @@
 										<div id="collapseDS" class="panel-collapse collapse inx">
 											<div class="panel-body">
 												<div class="policy-navs">
-													<router-link to="/delivery-system" @click.native="hideMobileNav" class="accordion-menu collapseall">A/R Invoices</router-link>
+													<router-link to="/delivery-system" @click.native="hideMobileNav" class="accordion-menu collapseall">Delivery System</router-link>
 												</div>
 											</div>
 										</div>
@@ -346,7 +346,9 @@
 											<div class="panel-body">
 												<div class="policy-navs" v-for="(form, index) in forms" :key="index">
 													<div>@{{index}}</div>
-													<router-link v-for="item in form" :key="item.detail_id" :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall title-case">@{{ (item.navname) }}</router-link>
+													<router-link v-for="item in form" :key="item.detail_id" :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall title-case">
+														@{{ (item.navname) }} <span v-show="item.count" class="pending-stat-notif">@{{ item.count }}</span>
+													</router-link>
 												</div>
 												<!-- <ul class="sidebarpanel">
 													<li v-for="item in forms">

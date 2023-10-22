@@ -137,6 +137,25 @@
                 </v-col>
             </div>
         </v-app>
+        <div class="clearfix">
+            <br>
+        </div>
+        <div class="v-sheet theme--light col-lg-12 p-15">
+            Add Important Notes to My Calendar
+            <textarea v-model="my_calendar_notes" class="form-control" rows="5" id="comment"></textarea>
+            <!-- <label >Event Name:</label>
+            <input type="text" class="form-control"  v-model="event_name"> -->
+            <br><br>
+            <button class="btn btn-primary" @click.prevent="setCalendarNotes" style="float:right;">Save</button>
+            <div class="clearfix"></div>
+        </div>
+        <br><br>
+        <!-- <div>
+            <div class="form-group col-md-12">
+                <label for="comment">Comment:</label>
+                
+            </div>
+        </div> -->
 
 <!-- Modal -->
 <div id="myModal" class="modal fade" role="dialog">
@@ -271,6 +290,7 @@ export default {
             events: [],
             // colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
             // names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
+            my_calendar_notes: '',
         };
 	},
 	methods:{
@@ -461,6 +481,12 @@ export default {
         rnd (a, b) {
             return Math.floor((b - a + 1) * Math.random()) + a
         },
+        setCalendarNotes(){
+            axios.post('api/addcalendar-notes', {my_calendar_notes: this.my_calendar_notes})
+            .then(res=>{
+            })
+            .catch(er=>console.log(er));
+        },
 	},
 	filters:{
 		moment: function (date) {
@@ -491,7 +517,11 @@ export default {
 
 	},
     mounted(){
-
+        axios.get('api/getcalendar-notes')
+            .then(res=>{
+                this.my_calendar_notes = res.data;
+        })
+        .catch(er=>console.log(er));
         // EVENT BUS
         // bus.$on('addEvent', this.addEvent);
 

@@ -131,6 +131,26 @@ input:checked + .slider:before {
               </div>
             </div>
             <div class="clearfix"></div>
+            <div class="dflex baseline">
+              <div class="col-md-6">
+                Return Request
+              </div>
+              <div class="col-md-6">
+                <div class="mdb-form-field form-group-limitx">
+                      <div class="form-field__control">
+                          <input type="text" class="form-field__input" v-model="dayslimit_returnrequest" name="comp_name" @change="updateDaysLimitReturnRequest">
+                          <label class="form-field__label">Auto close days limit</label>
+                          <div class="form-field__bar"></div>
+                      </div>
+                      <span class="errors">{{ errors.first('comp_name') }}</span>
+                  </div>
+              </div>
+            </div>
+            <small style="color:#3d4b96; font-size: 14px;">
+              <i>Note: Setting zero value for days limit will disable the autoclose per request</i>
+            </small>
+            <br><br>
+            <div class="clearfix"></div>
         </div> <br>
 
         <div class="col-lg-12 header-title margin-15 p-15 bgc-white">
@@ -175,6 +195,7 @@ export default {
             selectedcomp: [],
             dayslimit: 0,
             dayslimit_invtrans: 0,
+            dayslimit_returnrequest: 0,
             isIstart: false,
             mobilenum: '',
             smsnotif: false,
@@ -229,6 +250,11 @@ export default {
             dayslimit_invtrans: this.dayslimit_invtrans
           });
        },
+       updateDaysLimitReturnRequest(){
+          axios.post('api/cron-returnrequest-dayslimit',{
+            dayslimit_returnrequest: this.dayslimit_returnrequest
+          });
+       },
        updateComp(){
           axios.post('api/cron-so-updatecomp',{
             selectedcomp: this.selectedcomp.toString()
@@ -278,6 +304,7 @@ export default {
           this.selectedcomp = data.selectedcomp.length > 0? data.selectedcomp.split(","): [];
           this.dayslimit = data.dayslimit;
           this.dayslimit_invtrans = data.dayslimit_invtrans;
+          this.dayslimit_returnrequest = data.dayslimit_returnrequest;
           this.isIstart =  data.isStart;
           this.smsnotif = data.smsnotif;
           this.MDBINPUT();

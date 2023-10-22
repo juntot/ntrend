@@ -46,6 +46,12 @@ body, header, article, footer{
   cursor: pointer;
 }
 
+.f-left{
+  float:left;
+}
+.f-right{
+  float:right;
+}
 
 .hidden-overflow{
   /* overflow: hidden; */
@@ -1718,6 +1724,9 @@ ul.nopadding.nomargin.nostyle-list.emplist li:last-child label {
 #printArea .float-list li{
   float: left;
   margin-left: 30px;
+}
+#printArea .borders{
+  border: 1px solid gray;
 }
 
 /* PRINT SECTION */

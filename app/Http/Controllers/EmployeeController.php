@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use DB;
 use Hash;
 use App\Services\UserSession;
+use App\Services\CurlService;
 
 class EmployeeController extends Controller
 {
@@ -82,6 +83,20 @@ class EmployeeController extends Controller
 
         DB::table('eform_reportbyuser')->insertOrIgnore(['empID_'=>request('empID')]);
 
+
+
+        $postfields = request()->except(['isDisable', 'image']);
+
+        try {
+            CurlService::httpCurl(
+                'https://ams.northtrend.com/aws/addemp',
+                'POST',
+                $postfields
+            );
+        } catch (\Throwable $th) {
+            //throw $th;
+            // return $result;
+        }
 
         return request()->except(['isDisable']);
 

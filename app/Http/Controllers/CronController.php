@@ -96,6 +96,9 @@ class CronController extends Controller
 
     public function getResultsSO($postfields, $numdays){
         // dd($postfields);
+        if($numdays < 1)
+        return false;
+
         if(!count($postfields))
         return false;
 
@@ -115,7 +118,7 @@ class CronController extends Controller
             $date_cutoff = Carbon::now()->subDays($numdays)->isoFormat('YYYY-MM-DD');
             // return $date_cutoff;
             //  dd($date_cutoff);
-            $path = "/Orders?$"."select=DocEntry,U_REMARKS,DocDate,DocumentStatus&$"."filter=DocDate le '$date_cutoff' and DocumentStatus eq 'bost_Open'&$"."orderby=DocDate desc";
+            $path = "/Orders?$"."select=DocEntry,U_REMARKS,DocNum,DocDate,DocumentStatus&$"."filter=DocDate le '$date_cutoff' and DocumentStatus eq 'bost_Open'&$"."orderby=DocDate desc";
 
             // $path = "/Orders?$"."select=DocEntry,DocDate,DocumentStatus&$"."filter=DocDate le '2023-05-19' and DocDate ge '2023-03-07' and DocumentStatus eq 'bost_Open'&$"."orderby=DocDate desc";
             // dd($this->api_url.''.str_replace(' ', '%20',$path));
@@ -212,6 +215,7 @@ class CronController extends Controller
                     $message = "AUTO CLOSE ".$close_endpoint." \n".
                     "company: ".$this->postfields['CompanyDB']."\n".
                     "DocEntry: ".$value->DocEntry."\n".
+                    "DocNum: ".$value->DocNum."\n".
                     "Response Code: ".$result_path['status']."\n".
                     "Process: Error when updating remarks";
                     
@@ -227,6 +231,7 @@ class CronController extends Controller
             $message = "AUTO CLOSE ".$close_endpoint." \n".
             "company: ".$this->postfields['CompanyDB']."\n".
             "DocEntry: ".$value->DocEntry."\n".
+            "DocNum: ".$value->DocNum."\n".
             "Response Code: ".$result_path['status']."\n".
             "Process: Error when closing/updating remarks";
             
@@ -344,6 +349,10 @@ class CronController extends Controller
     }
 
     public function getResultsInventoryTrans($postfields, $numdays){
+        
+        if($numdays < 1)
+        return false;
+
         if(!count($postfields))
         return false;
 
@@ -460,10 +469,10 @@ class CronController extends Controller
                 }
                 
                 
-                $result = $this->getResultsReturnRequest($this->postfields, (int)$so_settings->dayslimit_invtrans);
+                $result = $this->getResultsReturnRequest($this->postfields, (int)$so_settings->dayslimit_returnrequest);
                 // dd('$result', $result);
                 if($result){    
-                    return $this->initAutoClose($result, '/InventoryTransferRequests');
+                    return $this->initAutoClose($result, '/ReturnRequest');
                     // break;
                 }
                 // $count++;
@@ -474,6 +483,10 @@ class CronController extends Controller
     }
 
     public function getResultsReturnRequest($postfields, $numdays){
+        
+        if($numdays < 1)
+        return false;
+
         if(!count($postfields))
         return false;
 
@@ -495,7 +508,7 @@ class CronController extends Controller
             //  dd($date_cutoff);
             // $path = "/Orders?$"."select=DocEntry,DocDate,DocumentStatus&$"."filter=DocDate le '$date_cutoff' and DocumentStatus eq 'bost_Open'&$"."orderby=DocDate desc";
 
-            $path = "/InventoryTransferRequests?$"."select=DocEntry,U_REMARKS,DocNum,DocDate&$"."filter=DocDate le '$date_cutoff' and DocumentStatus eq 'bost_Open'&$"."orderby=DocDate desc";
+            $path = "/ReturnRequest?$"."select=DocEntry,U_REMARKS,DocNum,DocDate&$"."filter=DocDate le '$date_cutoff' and DocumentStatus eq 'bost_Open'&$"."orderby=DocDate desc";
             // dd($this->api_url.''.str_replace(' ', '%20',$path));
             $result = CurlService::httpCurlRequest(
                 $this->api_url.''. str_replace(' ', '%20',$path),

@@ -19,6 +19,14 @@ button i.fa-plus-circle{
     margin-left: 10px;
     position: relative;
 }
+.border-success{
+    border: 1px solid green;
+}
+
+.border-danger{
+    border: 1px solid red;
+}
+
 .attendee-list-btn{
     /* content: '\00D7'; */
     padding: 0px 6px;
@@ -50,7 +58,7 @@ button i.fa-plus-circle{
 <template>
     <div>
 
-            <form method="post" >
+            <form method="post">
                 <h3 class="text-center form-title"><span class="dblUnderlined">{{ ($router.currentRoute.name).toUpperCase() }}</span></h3>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limit">
@@ -92,7 +100,7 @@ button i.fa-plus-circle{
                 </div>
                 <div class="col-md-4">
                     <div class="form-group-limit">
-                            <Datepicker :disabled="$parent.disabledinput || userinfo.empID != selected.empID_" :value="meetingdate" @selected="selectMeetingDate" wrapper-class="mdb-form-field" input-class="form-field__input datePicker" :typeable="false" :format="'MM/dd/yyyy'">
+                            <Datepicker :disabled="$parent.disabledinput || (selected.empID_ && userinfo.empID != selected.empID_)" :value="meetingdate" @selected="selectMeetingDate" wrapper-class="mdb-form-field" input-class="form-field__input datePicker" :typeable="false" :format="'MM/dd/yyyy'">
                             <label slot="afterDateInput" class="form-field__label">Meeting Date</label>
                             <div slot="afterDateInput" class="form-field__bar"></div>
                             <span slot="afterDateInput" class="errors">{{ errors.first('mname') }}</span>
@@ -113,7 +121,7 @@ button i.fa-plus-circle{
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limit">
                         <div class="form-field__control form-field--is-filled">
-                            <input :disabled="$parent.disabledinput || userinfo.empID != selected.empID_" type="time" name="starttime" v-model="starttime" class="form-field__input" >
+                            <input :disabled="$parent.disabledinput || (selected.empID_ && userinfo.empID != selected.empID_)" type="time" name="starttime" v-model="starttime" class="form-field__input" >
                             <label class="form-field__label">Start Time</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -123,7 +131,7 @@ button i.fa-plus-circle{
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limit">
                         <div class="form-field__control form-field--is-filled">
-                            <input :disabled="$parent.disabledinput || userinfo.empID != selected.empID_" type="time" name="endtime" v-model="endtime" class="form-field__input" >
+                            <input :disabled="$parent.disabledinput || (selected.empID_ && userinfo.empID != selected.empID_)" type="time" name="endtime" v-model="endtime" class="form-field__input" >
                             <label class="form-field__label">End Time</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -140,6 +148,18 @@ button i.fa-plus-circle{
                     </div>
                 </div>
                 <div class="clearfix"></div>
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limit">
+                        <div class="form-field__control">
+                            <select v-model="meetingtype" name="meetingtype" v-validate="'required'" class="form-field__input" >
+                                <option :value="item" v-for="(item, key) in meetingtypelist" :key="key">{{ item }}</option>
+                            </select>
+                            <label class="form-field__label">Meeting Type</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('meetingtype') }}</span>
+                    </div>
+                </div>
                 <div class="col-md-8" v-if="!meetingID || userinfo.empID == selected.empID_">
                         <div class="mdb-form-field form-group-limitx">
                             <div class="relative-pos">
@@ -176,7 +196,7 @@ button i.fa-plus-circle{
                     <div v-if="userinfo.empID != selected.empID_">
                         <br>
                         <div class="form-field--is-filled form-field__label attendees">
-                            <label class="form-field__label padding-15">Attendees:</label>
+                            <label class="form-field__label padding-15">List of Attendees:</label>
                         </div>
                     </div>
                     <div class="clearfix"></div>
@@ -184,146 +204,181 @@ button i.fa-plus-circle{
 
                   <div :class="alist.acknowledge ? 'attendee-list bg-success': 'attendee-list bg-danger'" v-for="(alist, i) in attendeelist" :key="i">
                     {{ alist.fullname }}
-                    <p v-if="userinfo.empID == selected.empID_" class="attendee-list-btn" @click.prevent="removeAttendee(alist)">&times;</p>
+                    <p v-if="userinfo.empID == selected.empID_ || !meetingID" class="attendee-list-btn" @click.prevent="removeAttendee(alist)">&times;</p>
                   </div>
                 </div>
                 <div class="clearfix"></div>
-                <div class="col-md-12">
-                    <h5 class="form-subtitle">
-                        <em>AGENDA ITEMS</em>
-                    </h5>
-                </div>
-                <div class="clearfix"></div>
-                <div class="col-lg-12">
-                  <div class="mdb-table-overflow">
-                      <table width="100%" class="table table-hover mdb-table" style="margin-bottom: 0">
-                      <thead>
-                        <tr>
-                          <th>Agenda Item</th>
-                          <th>Presenter Name</th>
-                          <th>Remarks</th>
-                          <th>Added By</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="(a, i) in agenda" :key="i">
-                          <td>{{ a.agendaitem }}</td>
-                          <td>{{ a.agendapresenter }}</td>
-                          <td>{{ a.agendaremarks }}</td>
-                          <td>{{ a.agendaaddedby }}
-                            <a v-if="userinfo.empID == a.agendaaddedbyID" @click="removeRow(i, 'agenda')" class="float-right">
-                                <i class="fas fa-trash text-danger"></i>
-                            </a>
-                          </td>
-                        </tr>
-                        <tr v-if="!$parent.disabledinput">
-                          <td>
-                            <input type="text" v-model="agendaitem" placeholder="Agenda Item" class="meeting-input">
-                          </td>
-                          <td>
-                            <input type="text" v-model="agendapresenter" placeholder="Presenter" class="meeting-input">
-                          </td>
-                          <td>
-                              <input type="text" v-model="agendaremarks" placeholder="Remarks" class="meeting-input">
-                          </td>
-                          
-                          <td class="comment-actionx">
-                            <button class="btn btn-primary" @click.prevent="addAgenda">
-                              Add
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div class="col-md-12">
-                    <h5 class="form-subtitle">
-                        <em>ACTION ITEMS</em>
-                    </h5>
-                </div>
-                <div class="col-md-12">
+
+                <!-- 
+                    ACKNOWELDGEMENT SECTION
+                -->
+                <div v-show="isAcknowledge">
+                    <div class="col-md-12">
+                        <h5 class="form-subtitle">
+                            <em>AGENDA ITEMS</em>
+                        </h5>
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="col-lg-12">
                     <div class="mdb-table-overflow">
-                      <table width="100%" class="table table-hover mdb-table" style="margin-bottom: 0">
-                      <thead>
-                        <tr>
-                          <th>Item Description</th>
-                          <th>Responsible</th>
-                          <th>Deadline</th>
-                          <th>Remarks</th>
-                          <th>Status</th>
-                          <th>Added By</th>
-                        </tr>
-                      </thead>
-                      <tbody>  
-                        <tr v-for="(a, i) in actionitems" :key="i">
-                            <td>{{ a.actionitem }}</td>
-                            <td>{{ a.actionresponsible }}</td>
-                            <td>{{ a.actionduedate }}</td>
-                            <td>{{ a.actionremarks }}</td>
+                        <table width="100%" class="table table-hover mdb-table" style="margin-bottom: 0">
+                        <thead>
+                            <tr>
+                            <th>Agenda Item</th>
+                            <th>Presenter Name</th>
+                            <th>Remarks</th>
+                            <th>Added By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(a, i) in agenda" :key="i">
+                            <td>{{ a.agendaitem }}</td>
+                            <td>{{ a.agendapresenter }}</td>
                             <td>
-                                <select :disabled="userinfo.empID != a.actionaddedbyID" name="status" class="meeting-input" v-model="a.actionstatus" placeholder="status">
+                                <a class="ann" href="#" @click.prevent="showPopOverAgendaRemarks(a, i)">
+                                    <i class='fas fa-comment-alt' ></i>
+                                </a>
+                            </td>
+                            <td>{{ a.agendaaddedby }}
+                                <a v-if="userinfo.empID == selected.empID_ || !meetingID" @click="removeRow(i, 'agenda')" class="float-right">
+                                    <i class="fas fa-trash text-danger"></i>
+                                </a>
+                            </td>
+                            </tr>
+                            <tr v-if="!$parent.disabledinput">
+                            <td>
+                                <input type="text" v-model="agendaitem" placeholder="Agenda Item" class="meeting-input">
+                            </td>
+                            <td>
+                                <input type="text" v-model="agendapresenter" placeholder="Presenter" class="meeting-input">
+                            </td>
+                            <td>
+                                <input type="text" v-model="agendaremarks" placeholder="Remarks" class="meeting-input">
+                            </td>
+                            
+                            <td class="comment-actionx">
+                                <button class="btn btn-primary" @click.prevent="addAgenda">
+                                Add
+                                </button>
+                            </td>
+                            </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
+                    <!-- ACTION ITEMS -->
+                    <div class="col-md-12">
+                        <h5 class="form-subtitle">
+                            <em>ACTION ITEMS</em>
+                        </h5>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mdb-table-overflow">
+                        <table width="100%" class="table table-hover mdb-table" style="margin-bottom: 0">
+                        <thead>
+                            <tr>
+                            <th>Description</th>
+                            <th>Responsible</th>
+                            <th>Deadline</th>
+                            <th>Remarks</th>
+                            <th>Status</th>
+                            <th>Added By</th>
+                            <th v-if="actionitems.length>0" >Options</th>
+                            </tr>
+                        </thead>
+                        <tbody>  
+                            <tr v-for="(a, i) in actionitems" :key="i">
+                                <td>{{ a.actionitem }}</td>
+                                <td>{{ a.actionresponsible }}</td>
+                                <td>{{ a.actionduedate }}</td>
+                                <td>
+                                    <!-- action remarks -->
+                                    <a class="ann" href="#" @click.prevent="showPopOverRemarks(a, i)">
+                                        <i class='fas fa-comment-alt' ></i>
+                                    </a>
+                                </td>
+                                <td>
+                                    <select :disabled="userinfo.empID != selected.empID_" name="status" class="meeting-input" v-model="a.actionstatus" @change="changeSelectedActionObj(a, i)" placeholder="status">
+                                        <option value="0">Pending</option>
+                                        <option value="1">On Going</option>
+                                        <option value="2">Completed</option>
+                                    </select>
+                                </td>
+                                <td class="text-center">
+                                    {{ a.actionaddedby }}
+                                </td>
+                                <td v-if="actionitems.length>0">
+                                    <div class="text-center">
+                                            <a class="ann" href="#" @click.prevent="showPopOver(a, i)">
+                                                <!-- additional remarks -->
+                                                <i class="fas fa-sticky-note"></i>
+                                            </a>
+                                            <a v-if="!meetingID || userinfo.empID == selected.empID_" @click="removeRow(i, 'actionitems')">
+                                                <!-- remove -->
+                                                <i class="fas fa-trash text-danger"></i>
+                                            </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr v-if="!$parent.disabledinput || userinfo.empID == selected.empID_">
+                            <td><input type="text" v-model="actionitem" placeholder="Item Description" class="meeting-input"></td>
+                            <td><input type="text" v-model="actionresponsible" placeholder="Responsible" class="meeting-input"></td>
+                            <td>
+                                <Datepicker :disabled="$parent.disabledinput && userinfo.empID != selected.empID_" :value="actionduedate" wrapper-class="meeting-input" input-class="datePicker inline-input" placeholder="Select Date"
+                                @selected="selectActionDueDate" :typeable="false" :format="'MM/dd/yyyy'">
+                                    <!-- <div slot="afterDateInput" class="form-field__bar"></div> -->
+                                </Datepicker>
+                            </td>
+                            <td colspan="">
+                                <input type="text" v-model="actionremarks" placeholder="Remarks" class="meeting-input">
+                            </td>
+                            <td colspan="">
+                                <select name="status" class="meeting-input" v-model="actionstatus" placeholder="status">
                                     <option value="0">Pending</option>
                                     <option value="1">On Going</option>
                                     <option value="2">Completed</option>
                                 </select>
+                                
                             </td>
-                            <td>{{ a.actionaddedby }}
-                                <a v-if="userinfo.empID == a.actionaddedbyID" @click="removeRow(i, 'actionitems')" class="float-right">
-                                    <i class="fas fa-trash text-danger"></i>
-                                </a>
+                            <td class="comment-actionx" colspan="2">
+                                <!-- <button class="btn btn-primary" @click.prevent="showPopOver">
+                                Comments
+                                </button> -->
+                                <!-- <a class="ann" href="#" @click.prevent="showPopOver">
+                                    <i class='fas fa-comment-alt' ></i>
+                                </a> -->
+                                <button class="btn btn-primary" @click.prevent="addActionItem">
+                                Add
+                                </button>
                             </td>
-                        </tr>
-                        <tr v-if="!$parent.disabledinput || userinfo.empID == selected.empID_">
-                          <td><input type="text" v-model="actionitem" placeholder="Item Description" class="meeting-input"></td>
-                          <td><input type="text" v-model="actionresponsible" placeholder="Responsible" class="meeting-input"></td>
-                          <td>
-                            <Datepicker :disabled="$parent.disabledinput && userinfo.empID != selected.empID_" :value="actionduedate" wrapper-class="meeting-input" input-class="datePicker inline-input" placeholder="Select Date"
-                            @selected="selectActionDueDate" :typeable="false" :format="'MM/dd/yyyy'">
-                                <!-- <div slot="afterDateInput" class="form-field__bar"></div> -->
-                            </Datepicker>
-                          </td>
-                          <td colspan="">
-                              <input type="text" v-model="actionremarks" placeholder="Remarks" class="meeting-input">
-                          </td>
-                          <td colspan="">
-                              <select name="status" class="meeting-input" v-model="actionstatus" placeholder="status">
-                                <option value="0">Pending</option>
-                                <option value="1">On Going</option>
-                                <option value="2">Completed</option>
-                              </select>
-                          </td>
-                          <td class="comment-actionx">
-                            <button class="btn btn-primary" @click.prevent="addActionItem">
-                              Add
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                      </table>
+                            </tr>
+                        </tbody>
+                        </table>
+                        </div>
                     </div>
-                </div>
-                <div class="clearfix"></div>
-                <div class="col-md-12">
-                    <h5 class="form-subtitle">
-                        <em>OTHER NOTES</em>
-                    </h5>
-                </div>
-                <div class="col-lg-12">
-                    <h5 class="form-subtitle"></h5>
-                </div>
-                <div class="col-md-12">
-                    <div class="mdb-form-field">
-                            <div class="form-field__control mdb-bgcolor">
-                                <textarea class="form-field__textarea" id="" cols="4" rows="4" v-model="remarks" name="additional-info"></textarea>
-                                <label class="form-field__label">Remarks</label>
-                                <div class="form-field__bar"></div>
-                            </div>
+                    <div class="clearfix"></div>
+                    <div class="col-md-12">
+                        <h5 class="form-subtitle">
+                            <em>ADDITIONAL NOTES</em>
+                        </h5>
                     </div>
-                </div>
-                <div class="clearfix"></div>
+                    <div class="col-lg-12">
+                        <h5 class="form-subtitle"></h5>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mdb-form-field">
+                                <div class="form-field__control mdb-bgcolor">
+                                    <textarea class="form-field__textarea" cols="4" rows="4" v-model="remarks" name="additional-info"></textarea>
+                                    <label class="form-field__label">Additional Notes</label>
+                                    <div class="form-field__bar"></div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
                     <div class="modal-footer">
                         <!-- <em style="color: red;" v-if="!witnesses_list">No witness is set. please contact HR Department &nbsp;&nbsp;</em> -->
+                        <input type="submit" class="btn btn-primary fx-left" value="Print" @click.prevent="printForm">
+
                         <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addMeetingMinute" :disabled="disabledIfNoApprover || isDisable || !isFormValid " v-if="!meetingID">
                         <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateMeetingMinute" :disabled="isDisable || !isFormValid" v-if="meetingID && userinfo.empID == selected.empID_ && $parent.$data.forapprover != 'approval'">
                         <input type="submit" class="btn btn-primary" value="Acknowledge" @click.prevent="acknowledgeMeeting" :disabled="isDisable || !isFormValid" v-if="meetingID && userinfo.empID != selected.empID_ && $parent.$data.forapprover != 'approval'">
@@ -332,7 +387,286 @@ button i.fa-plus-circle{
                         <input type="submit" class="btn btn-primary" value="Reject" @click.prevent="requestActionSupplementary(3)" v-if="meetingID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel" :disabled="selected.status < 1">
                         <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionSupplementary(1)" v-if="meetingID && $parent.$data.forapprover == 'approval' && $parent.$data.isCancel" :disabled="selected.status < 1"> -->
                     </div>
+
+
+                    <!-- acknowledge failoverbutton -->
+                    
+                </div>
+                <div class="modal-footer" v-if="!isAcknowledge">
+                    <input type="submit" class="btn btn-primary" value="Acknowledge" @click.prevent="acknowledgeAttendance" >
+                    <input type="submit" class="btn btn-primary" value="Decline" @click.prevent="declineAttendance" >
+                </div>
+                <!-- 
+                    ACKNOWELDGEMENT SECTION END
+                -->
             </form>
+
+
+            <!-- pop over Agenda Remarks -->
+            
+            <div id="overlay-popup-agendaremarks" class="hide" style="z-index: 1100; position: fixed;top: 50%; right: 0;bottom: 0;left: 0;">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" @click="hidePopOverAgendaRemarks">&times;</button>
+                            <h4 class="modal-title">Agenda Items Remarks</h4>
+                        </div>
+                        <div class="container"></div>
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label for="comment">Details:</label>
+                                <textarea class="form-control" v-model="agendaremarkspopup" rows="5"></textarea>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" @click.prevent="hidePopOverAgendaRemarks">Close</a>
+                            <a href="#" class="btn btn-primary" @click.prevent="saveAgendaRemarks">Save</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+             <!-- pop over Remarks-->
+            <div id="overlay-popup-remarks" class="hide" style="z-index: 1100; position: fixed;top: 50%; right: 0;bottom: 0;left: 0;">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" @click="hidePopOverRemarks">&times;</button>
+                            <h4 class="modal-title">Remarks</h4>
+                        </div>
+                        <div class="container"></div>
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label for="comment">Details:</label>
+                                <textarea class="form-control" v-model="actionremarkspopup" rows="5"></textarea>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" @click.prevent="hidePopOverRemarks">Close</a>
+                            <a href="#" class="btn btn-primary" @click.prevent="saveRemarks">Save</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- pop over Additional Remarks-->
+            <div id="overlay-popup" class="hide" style="z-index: 1100; position: fixed;top: 50%; right: 0;bottom: 0;left: 0;">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" @click="hidePopOver">&times;</button>
+                            <h4 class="modal-title">Additional Remarks</h4>
+                        </div>
+                        <div class="container"></div>
+                        <div class="modal-body">
+                            <div class="form-group col-md-12">
+                                <label for="comment">Details:</label>
+                                <textarea class="form-control" v-model="actionadditionalremarks" rows="5"></textarea>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <a href="#" class="btn btn-default" @click.prevent="hidePopOver">Close</a>
+                            <a href="#" class="btn btn-primary" @click.prevent="saveAdditionalRemarks">Save</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+<!-- print section -->
+            <div id="printArea">
+                <div class="col-lg-12">
+                    <div class="text-center">
+                        <img src="storage/app/public/images/comp_logo.png" alt="compay logo" style="width: 300px; height: auto;"/>
+                        <br><br>
+                        <p class="font-weight-bold" style="font-size: 25px;">{{ ($router.currentRoute.name).toUpperCase() }}</p>
+                        <br><br>
+                    </div>
+                <h5 class="font-weight-bold">
+                    <div style="color:gray;">    
+                        <span style="display:inline-block; padding-right: 100px;">
+                            DATE CLOSE: {{datetimeclose | customDateFormat}}
+                        </span>
+                        <span>
+                            STATUS DURATION: {{ computedDateStatDuration }}
+                        </span>
+                    </div>
+                </h5>
+                </div>
+                <table width="100%" class="transmittalTblFormPrint no-border-input">
+                    <tr>
+                        <td>
+                            <div class="form-group">
+                                <label for="usr">Meeting Name:</label>
+                                <input type="text" class="form-control" :value="meetingname" :readonly="true">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label for="usr">Date Created:</label>
+                                <input type="text" class="form-control" :value="datefiled | customDateFormat" :readonly="true">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label for="usr">Status:</label>
+                                <input type="text" class="form-control" :value="computedActionStatus" :readonly="true">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="form-group">
+                                <label for="usr">Note Taker:</label>
+                                <input type="text" class="form-control" :value="computedfullname" :readonly="true">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label for="usr">Meeting Date:</label>
+                                <input type="text" class="form-control" :value="meetingdate" :readonly="true">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label for="usr">Meeting Location:</label>
+                                <input type="text" class="form-control" :value="location" :readonly="true">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="form-group">
+                                <label for="usr">Start Time:</label>
+                                <input type="text" class="form-control" :value="starttime" :readonly="true">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label for="usr">End Time:</label>
+                                <input type="text" class="form-control" :value="endtime" :readonly="true">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group">
+                                <label for="usr">Duration:</label>
+                                <input type="text" class="form-control" :value="duration" :readonly="true">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <div class="form-group">
+                                <label for="usr">Meeting Type:</label>
+                                <input type="text" class="form-control" :value="meetingtype" :readonly="true">
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <label for="">Attendees:</label>
+                            <div class="clearfix"></div>
+                            <div :class="alist.acknowledge ? 'attendee-list border-success': 'attendee-list border-danger'" v-for="(alist, i) in attendeelist" :key="i">
+                                {{ alist.fullname }}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <hr>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <div class="bold-weight">
+                                <label for="usr">AGENDA:</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr class="bordersx">
+                        <td class="bold-weight">Agenda Item</td>
+                        <td class="bold-weight">Presenter Name</td>
+                        <td class="bold-weight">Remarks</td>
+                        <td class="bold-weight">Added By</td>
+                    </tr>
+                    <tr v-for="(a, i) in agenda" :key="i" class="bordersx">
+                            <td>{{ a.agendaitem }}</td>
+                            <td>{{ a.agendapresenter }}</td>
+                            <td>{{ a.agendaremarks }}</td>
+                            <td>{{ a.agendaaddedby }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <hr>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <div class="bold-weight">
+                                <label for="usr">ACTION ITEMS:</label>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <tr v-for="(a, i) in actionitems" :key="'a'+i" class="bordersx">
+                        <td colspan="4">
+                            <table width="100%" class="transmittalTblFormPrint no-border-input">
+                            <tr class="bordersx">
+                                <td class="bold-weight">Description</td>
+                                <td class="bold-weight">Responsible</td>
+                                <td class="bold-weight">Deadline</td>
+                                <td class="bold-weight">Date Closed</td>
+                                <td class="bold-weight">Aging</td>
+                                <td class="bold-weight">Status</td>
+                            </tr>
+                            <tr>
+                                
+                                <td>{{ a.actionitem }}</td>
+                                <td>{{ a.actionresponsible }}</td>
+                                <td>{{ a.actionduedate }}</td>
+                                <td>{{ a.actionitemclosedate || ''}}</td>
+                                <td>{{  computedActionItemPrintAging(a) }}</td>
+                                <td>{{ a.actionstatus == 1? 'On Going' : a.actionstatus == '2' ? 'Completed' : 'Pending' }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="6">
+                                    <br>
+                                    <div>
+                                        
+                                        <div>
+                                            <label class="bold-weight" for="">Added By:</label>
+                                            {{ a.actionaddedby }}
+                                        </div>
+                                        <label class="bold-weight" for="">Remarks:</label>
+                                        {{ a.actionremarks }}
+                                        <div>
+                                            <label class="bold-weight" for="">Additional Remarks:</label>
+                                            {{a.actionadditionalremarks || ''}}
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            </table>
+                            <hr>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            <div class="form-group">
+                                <label for="usr" class="bold-weight">Remarks:</label>
+                                <p>
+                                    {{remarks}}
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                
+            </div>
     </div>
 </template>
 <script>
@@ -349,6 +683,14 @@ let excludeBody = [
             'employeeList',
             'search_employee',
             'actionstatus',
+            'showMeetingDetails',
+            'actionadditionalremarks',
+            'actionindex',
+            'datetimeclose',
+            'meetingtypelist',
+            'agendaremarkspopup',
+            'actionremarkspopup'
+
         ];
 // let status = ['Pending', 'Approved', 'Rejected'];
 let regex = new RegExp("^(((([0-1][0-9])|(2[0-3])):?[0-5][0-9])|(24:?00))");
@@ -364,16 +706,36 @@ export default {
           location: '',
           starttime: moment(new Date()).format('hh:mm'),
           endtime: moment(new Date()).add(30, 'minutes').format('hh:mm'),
+          meetingtype: '',
+          meetingtypelist: [
+            'Weekly',
+            'Monthly',
+            'Quarterly',
+            'Semi-Annual',
+            'Marketing',
+            'Sales',
+            'Supply Chain',
+            'Product Management',
+            'Warehouse & Logistics',
+            'Finance',
+            'Admin',
+            'HR',
+            'Others'
+          ],
           agenda: [],
           agendaitem:'',
           agendapresenter:'',
           agendaremarks:'',
+          agendaremarkspopup: '',
 
           actionitems: [],
           actionitem:'',
           actionresponsible:'',
           actionduedate: '',
           actionremarks: '',
+          actionremarkspopup: '',
+          actionindex: '',
+          actionadditionalremarks:'',
 
           employeeList: [],
           attendeelist:[],
@@ -383,6 +745,8 @@ export default {
           meetingID: '',
           actionstatus: 0,
           status: 0,
+          showMeetingDetails: false,
+          datetimeclose: '',
         }
     },
     watch:{
@@ -398,9 +762,88 @@ export default {
         },
         filterActionStatus: function (value) {
             return value < 1? 'Pending': value == 1? 'Ongoing': 'Completed';
-        }
+        },
+
     },
     methods:{
+        async printForm(){
+            let elem = document.getElementById("printArea");
+            let domClone = elem.cloneNode(true);
+            
+            let $printSection = document.createElement("div");
+            $printSection.id = "printSection";
+            
+            // let $printSection = document.getElementById("printSection");
+
+            await $printSection.appendChild(domClone);
+            document.body.appendChild($printSection);
+
+            window.print();
+        },
+
+        acknowledgeAttendance(){
+            let params = {};
+            this.attendeelist.map(obj=>{
+                if(obj.empID == this.userinfo.empID)
+                obj.acknowledge = true;
+                return obj;
+            });
+
+            for (const key in this.$data) {
+                if (!excludeBody.includes(key)) {
+                    if(key == 'attendeelist' || key == 'check_tbl' || 
+                        key == 'agenda' || key == 'actionitems'
+                    ){
+                        params[key] = JSON.stringify(this.$data[key]);
+                    }else {
+                        params[key] = this.$data[key];
+                    }
+                    
+                }
+            }
+            this.showMeetingDetails = true;
+            params['fullname'] = this.computedfullname;
+            // params['empID_'] = this.selected.empID_;
+            params['reciever_emails'] = this.attendeelist.map(obj=>obj.email);
+            params['attendeelistId'] = this.attendeelistId.toString();
+            // params['status'] = (this.computedActionStatus).toLowerCase() == 'open'? 0: 1;
+            
+            axios.post('api/acknow-minute-meeting', params).then((response)=>{
+                    this.$parent.updateRow(params);
+                    // this.closeModal();
+            }).catch((err)=>{console.log(err);});
+        },
+        declineAttendance(){
+            this.attendeelist = this.attendeelist.filter(obj=>obj.empID != this.userinfo.empID);
+            // update the request
+            this.isDisable = true;
+            let params = {};
+            this.attendeelist.map(obj=>{
+                if(obj.empID == this.userinfo.empID)
+                obj.acknowledge = true;
+                return obj;
+            });
+
+            for (const key in this.$data) {
+                if (!excludeBody.includes(key)) {
+                    if(key == 'attendeelist' || key == 'check_tbl' || 
+                        key == 'agenda' || key == 'actionitems'
+                    ){
+                        params[key] = JSON.stringify(this.$data[key]);
+                    }else {
+                        params[key] = this.$data[key];
+                    }
+                    
+                }
+            }
+            params['fullname'] = this.computedfullname;
+            params['reciever_emails'] = this.attendeelist.map(obj=>obj.email);
+            params['attendeelistId'] = this.attendeelistId.toString();
+            axios.post('api/rem-attendance-meeting', params).then((response)=>{
+                this.$parent.deleteRow(this.meetingID);
+                this.closeModal();
+            }).catch((err)=>{ console.log(err); });
+        },
         selectActionDueDate(val){
             this.actionduedate = moment(val).format('MM/DD/YYYY');
         },
@@ -469,6 +912,11 @@ export default {
           if(!this.actionitem || !this.actionresponsible || !this.actionduedate || !this.actionremarks)
           return;
 
+          let actionclosedate = '';
+          if(Number(this.actionstatus) > 1)
+          actionclosedate = moment(new Date()).format('MM/DD/YYYY');
+
+
           let items = {
             actionitem: this.actionitem,
             actionresponsible: this.actionresponsible,
@@ -477,6 +925,7 @@ export default {
             actionstatus: this.actionstatus,
             actionaddedby: this.userinfo.fullname,
             actionaddedbyID: this.userinfo.empID,
+            actionitemclosedate: actionclosedate,
           };
           
           this.actionitems.push(items);
@@ -485,6 +934,16 @@ export default {
           this.actionduedate = '';
           this.actionremarks = '';
           this.actionstatus = 0;
+        },
+        changeSelectedActionObj(obj, index){
+            let actionclosedate = '';
+            if(Number(obj.actionstatus) > 1){
+                obj['actionitemclosedate'] = moment(new Date()).format('MM/DD/YYYY');
+            }else{
+                obj['actionitemclosedate'] = '';
+            }
+            
+            this.actionitems[index] = obj;
         },
         removeRow(index, entries = 'agenda')
         {
@@ -566,6 +1025,7 @@ export default {
                 params['reciever_emails'] = this.attendeelist.map(obj=>obj.email);
                 params['attendeelistId'] = this.attendeelistId.toString();
                 params['status'] = (this.computedActionStatus).toLowerCase() == 'open'? 0: 1;
+                
                 axios.post('api/update-minute-meeting', params).then((response)=>{
                     this.$parent.updateRow(response.data);
                     this.closeModal();
@@ -613,29 +1073,6 @@ export default {
             }).catch((err)=>{ console.log(err); });
         },
         appendTable(){
-                // this.$validator.validate('timein', this.timein);
-                // this.$validator.validate('timeout', this.timeout);
-
-                // this.$validator.validate('reason', this.reason);
-
-                // if(regex.test(this.timein) && regex.test(this.timeout) && this.reason !='')
-                // {
-                    // this.entries.push({
-                    //     supdate: this.supdate,
-                    //     timein: this.timein? moment(this.timein, ["HH:mm"]).format('hh:mm A') : '',
-                    //     timeout: this.timeout? moment(this.timeout, ["HH:mm"]).format('hh:mm A') : '',
-                    //     timein2: this.timein2? moment(this.timein2, ["HH:mm"]).format('hh:mm A') : '',
-                    //     timeout2: this.timeout2? moment(this.timeout2, ["HH:mm"]).format('hh:mm A') : '',
-                    //     reason: this.reason
-                    // });
-                    // this.reason = '';
-                    // this.supdate = moment(new Date()).format('YYYY/MM/DD');
-                    // this.timein =  '';
-                    // this.timeout = '';
-                    // this.timein2 = '';
-                    // this.timeout2 = '';
-
-                // }
 
         },
         // ACTIONS FOR Supplementary I.E APPROVE / REJECT / CANCEL
@@ -655,7 +1092,9 @@ export default {
         setDataForEdit(data = null){
             for(let i in this.$data)
             {
-                // if(i == '' )
+                if(i == 'meetingtypelist')
+                continue; 
+
                 if(i == 'agenda' || i == 'attendeelist' || i == 'actionitems'){
                     this.$data[i] = JSON.parse(data[i]);
                 }
@@ -673,9 +1112,10 @@ export default {
         },
         closeModal(){
             let obj = this.$data;
+            $('#printSection').remove();
             Object.keys(obj).forEach((key)=>{
                 if(key == 'witnesses' || key == 'meetingID' || key == 'meetingname' || 
-                   key == 'location' || key == 'remarks' ){
+                   key == 'location' || key == 'remarks'){
                     this.$data[key] = '';
                 }
                 if(key=='isDisable'){
@@ -720,10 +1160,86 @@ export default {
                         }
                     );
              });
-        }
+        },
+        // agenda Remarks popup
+        showPopOverAgendaRemarks(item, index){
+            this.actionindex = index;
+            this.agendaremarkspopup = item.agendaremarks || '';
+            $('#overlay-popup-agendaremarks').toggleClass('hide');
+        },
+        hidePopOverAgendaRemarks(){
+            $('#overlay-popup-agendaremarks').toggleClass('hide');
+        },
+        saveAgendaRemarks(){
+            this.agenda[this.actionindex]['agendaremarks'] = this.agendaremarkspopup;
+            $('#overlay-popup-agendaremarks').toggleClass('hide');
+        },
+        // pop up action remarks
+        showPopOverRemarks(item, index){
+            this.actionindex = index;
+            this.actionremarkspopup = item.actionremarks || '';
+            $('#overlay-popup-remarks').toggleClass('hide');
+        },
+        hidePopOverRemarks(){
+            $('#overlay-popup-remarks').toggleClass('hide');
+        },
+        saveRemarks(){
+            this.actionitems[this.actionindex]['actionremarks'] = this.actionremarkspopup;
+            $('#overlay-popup-remarks').toggleClass('hide');
+        },
+        
+        // addiontal remarks
+        showPopOver(item, index){
+            this.actionindex = index;
+            this.actionadditionalremarks = item.actionadditionalremarks || '';
+            $('#overlay-popup').toggleClass('hide');
+        },
+        hidePopOver(){
+            $('#overlay-popup').toggleClass('hide');
+        },
+        saveAdditionalRemarks(){
+            this.actionitems[this.actionindex]['actionadditionalremarks'] = this.actionadditionalremarks;
+            $('#overlay-popup').toggleClass('hide');
+        },
+        computedActionItemPrintAging(action = ''){
+            if(action.actionduedate == '')
+            return;
+
+            if((action.actionstatus == '2' || action.actionstatus == 2) && !action.actionitemclosedate)
+            return;
+
+            if((action.actionstatus == '2' || action.actionstatus == 2) && action.actionitemclosedate)
+            return parseInt(moment.duration(moment(new Date(action.actionitemclosedate)).diff(moment(new Date(action.actionduedate)))).asDays());
+
+            return parseInt(moment.duration(moment(new Date()).diff(moment(new Date(action.actionduedate)))).asDays());
+        },
 
     },
     computed:{
+        
+        computedDateStatDuration(){
+            if(!this.datetimeclose)
+            return '';
+
+            let from1 =  new Date(this.datefiled);
+            let to1 = new Date(this.datetimeclose);
+            var ms1 = moment(to1,"YYYY-MM-DD HH:mm:ss").diff(moment(from1,"YYYY-MM-DD HH:mm:ss"));
+            var d1 = moment.duration(ms1);
+
+            var s1 = Math.floor(d1.asHours()) + moment.utc(ms1).format(":mm:ss");
+            
+            s1 = s1.slice(0, (s1.indexOf(':'))).length <= 1 ? '0'+s1 : s1;
+            // slice the seconds
+            s1 = s1.slice(0, 5);
+            let duration1 =  s1 || '';
+            return duration1;
+        },
+        isAcknowledge(){
+            // show if attendees acknowledge
+            // hide if not creator
+            let findAttendee = this.attendeelist.find((a)=>a.empID == this.userinfo.empID && a.acknowledge == true);
+            return !this.meetingID || this.showMeetingDetails || findAttendee || this.selected.empID_ == this.userinfo.empID;
+        },
         attendeelistId(){
             return this.attendeelist.map(obj=>{
                 return obj.empID;
@@ -815,7 +1331,7 @@ export default {
                 witness_emails.push(w.email);
             })
 
-        }).catch(err=>alert('Supplementary Server Error'));
+        }).catch(err=>alert('Meeting Minutes Server Error'));
         this.MDBINPUT();
 
         if(this.$parent.disabledinput){

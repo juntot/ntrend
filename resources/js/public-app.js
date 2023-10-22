@@ -303,6 +303,7 @@ const app = new Vue({
 
             let mynotif={
                 fromnavapproval: response.data,
+                formnav: this.forms,
                 witness: this.witnessnav.length > 0? true: false,
             };
             return axios.post('api/notif_center', mynotif)
@@ -311,6 +312,7 @@ const app = new Vue({
         .then(res=>{
             // console.log('taeeeeeee...', res.data.approval_notif)
             this.formnavapproval = res.data.approval_notif;
+            this.forms = res.data.formnav;
             this.leaveCredits = res.data.leave_cred[0];
             this.formNotifs = res.data.form;
             this.postNotifs = res.data.post;
@@ -406,11 +408,14 @@ const app = new Vue({
             */
             let mynotif={
                 fromnavapproval: this.formnavapproval,
+                formnav: this.forms,
                 witness: this.witnessnav.length > 0? true: false,
             };
 
             axios.post('api/notif_center', mynotif)
             .then(res=>{
+                this.formnavapproval = res.data.approval_notif;
+                this.forms = res.data.formnav;
                 this.leaveCredits = res.data.leave_cred[0];
                 this.formNotifs = res.data.form;
                 this.postNotifs = res.data.post;

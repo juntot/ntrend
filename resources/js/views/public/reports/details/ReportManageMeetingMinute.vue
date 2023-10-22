@@ -139,6 +139,15 @@ button i.fa-plus-circle{
                     </div>
                 </div>
                 <div class="clearfix"></div>
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limit">
+                        <div class="form-field__control">
+                            <input type="text" class="form-field__input" :value="meetingtype" name="name" readonly="true">
+                            <label class="form-field__label">Meeting Type</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-md-8">
                         <div class="mdb-form-field form-group-limitx">
                             <div class="relative-pos">
@@ -289,6 +298,11 @@ let excludeBody = [
             'employeeList',
             'search_employee',
             'actionstatus',
+            'showMeetingDetails',
+            'actionadditionalremarks',
+            'actionindex',
+            'datetimeclose',
+            'meetingtypelist',
         ];
 // let status = ['Pending', 'Approved', 'Rejected'];
 let regex = new RegExp("^(((([0-1][0-9])|(2[0-3])):?[0-5][0-9])|(24:?00))");
@@ -305,6 +319,22 @@ export default {
           location: '',
           starttime: moment(new Date()).format('hh:mm'),
           endtime: moment(new Date()).add(30, 'minutes').format('hh:mm'),
+          meetingtype: '',
+          meetingtypelist: [
+            'Weekly',
+            'Monthly',
+            'Quarterly',
+            'Semi-Annual',
+            'Marketing',
+            'Sales',
+            'Supply Chain',
+            'Product Management',
+            'Warehouse & Logistics',
+            'Finance',
+            'Admin',
+            'HR',
+            'Others'
+          ],
           agenda: [],
           agendaitem:'',
           agendapresenter:'',
@@ -314,6 +344,7 @@ export default {
           actionitem:'',
           actionresponsible:'',
           actionduedate: '',
+          actionindex: '',
           actionremarks: '',
 
           employeeList: [],
@@ -324,6 +355,7 @@ export default {
           meetingID: '',
           actionstatus: 0,
           status: 0,
+          showMeetingDetails: false,
         }
     },
     watch:{
@@ -561,7 +593,8 @@ export default {
         setDataForEdit(data = null){
             for(let i in this.$data)
             {
-                // if(i == '' )
+                if(i == 'meetingtypelist')
+                continue; 
                 if(i == 'agenda' || i == 'attendeelist' || i == 'actionitems'){
                     this.$data[i] = JSON.parse(data[i]);
                 }

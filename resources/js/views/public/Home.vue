@@ -133,6 +133,10 @@
 										<label for="file-attachment" class="btn btn-info round">
 											photos/videos
 										</label>
+										<!-- <label class="btn btn-info round" data-toggle="modal" data-target="#myModalPoll" >
+											Poll
+										</label> -->
+										 
 										<input id="file-attachment" type="file" style="display: none;" @change.prevent="newFile">
 									
 										<!-- employee tags -->
@@ -486,12 +490,85 @@
 				</div>
 			<!-- END -->
 
+			<!-- POLL -->
+			<!-- Modal -->
+				<div class="modal fade" id="myModalPoll" role="dialog">
+					<div class="modal-dialog modal-md">
+					<div class="modal-content">
+						<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						 Create a Poll
+						</div>
+						<div class="modal-body">
+							
+							<div class="col-md-12">
+									<div class="mdb-form-field form-group-limitx">
+											<div class="form-field__control">
+													<input type="text" v-validate="'required'" class="form-field__input" name="poll-title">
+													<label class="form-field__label">Poll Question</label>
+													<div class="form-field__bar"></div>
+											</div>
+											<span class="errors">{{ errors.first('poll-title') }}</span>
+									</div>
+							</div>
+							<div class="col-md-12">
+									<div class="mdb-form-field">
+													<div class="form-field__control mdb-bgcolor">
+															<textarea class="form-field__textarea" id="" cols="4" rows="4" name="poll-description"></textarea>
+															<label class="form-field__label">Poll Description</label>
+															<div class="form-field__bar"></div>
+													</div>
+									</div>
+							</div>
+							<div class="clearfix"></div>
+							<div class="col-lg-12">
+                    <h5 class="form-subtitle"><em>Poll Choices</em></h5>
+							</div>
+							<div class="col-md-12">
+									<button class="btn btn-primary">Add Choices</button>
+							</div>
+							<div class="col-md-12">
+									<div class="mdb-form-field form-group-limitx">
+											<div class="form-field__control">
+													<input type="text" v-validate="'required'" class="form-field__input" name="poll-title">
+													<label class="form-field__label">Choice 1</label>
+													<div class="form-field__bar"></div>
+											</div>
+											<span class="errors">{{ errors.first('poll-title') }}</span>
+									</div>
+									<div class="mdb-form-field form-group-limitx">
+											<div class="form-field__control">
+													<input type="text" v-validate="'required'" class="form-field__input" name="poll-title">
+													<label class="form-field__label">Choice 1</label>
+													<div class="form-field__bar"></div>
+											</div>
+											<span class="errors">{{ errors.first('poll-title') }}</span>
+									</div>
+							</div>
+							<div class="clearfix"></div>
+							<div class="col-md-12">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" v-model="isallowmultipleselectpoll" value="true">Allow Multiple Selection?
+									</label>
+								</div>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+						<div class="modal-footer">
+								<button class="btn btn-primary">Save</button>
+							</div>
+					</div>
+					</div>
+				</div>
+			<!-- END -->
     </div>
 </template>
 
 <script>
 let defaultCompList = [];
 let fireworks;
+
 export default {
 
     data(){
@@ -553,6 +630,13 @@ export default {
 					// greetings
 					showGreeting: false,
 					birthdays: [],
+
+
+					// poll
+					isallowmultipleselectpoll: false,
+					pollquestion: '',
+					pollchoices:{},
+					polldata: [],
         };
 	},
 	methods:{
@@ -1063,7 +1147,31 @@ export default {
 					confetti.render();
 
 			// }
-		}
+		},
+
+		MDBINPUT(){
+				this.$nextTick(() => {
+						[].forEach.call(
+										document.querySelectorAll('.form-field__input, .form-field__textarea'),
+										(el) => {
+												el.onblur = () => {
+														setActive(el, false)
+												}
+												el.onfocus = () => {
+														setActive(el, true)
+												}
+												if(el.value !='')
+												{
+														// console.log(el);
+														if(!el.parentNode.classList.contains('form-field__control')){
+																el.parentNode.classList.add('form-field__control');
+														}
+														el.parentNode.parentNode.classList.add('form-field--is-filled');
+												}
+										}
+								);
+					});
+		},
 
 	},
 	filters:{
@@ -1171,14 +1279,26 @@ export default {
 		})
 		.catch((err)=>{ console.log(err); });
 
-
-
 		$('#myModal').on("hidden.bs.modal", this.closeModal);
 		$(document).on('shown.bs.modal','#myModal', this.openModal);
 
-		// tags
+			// tags
 		$('#myModalSmall').on("hidden.bs.modal", this.clearTags);
 
+		this.MDBINPUT();
+    }
+}
+
+
+const setActive = (el, active) => {
+    const formField = el.parentNode.parentNode
+    if (active) {
+        formField.classList.add('form-field--is-active')
+    } else {
+        formField.classList.remove('form-field--is-active')
+        el.value === '' ?
+        formField.classList.remove('form-field--is-filled') :
+        formField.classList.add('form-field--is-filled')
     }
 }
 </script>

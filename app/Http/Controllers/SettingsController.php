@@ -598,4 +598,18 @@ class SettingsController extends Controller
             
         }
     }
+
+
+    /*
+    * MY CALENDAR =================================================
+    */
+    public function getCalendarNotes(){
+        $data = DB::table('general_settings')->select('my_calendar_notes')->first();
+        return $data->my_calendar_notes;
+    }
+
+    public function addCalendarNotes(){
+        DB::table('general_settings')->updateOrInsert(['id'=>1], request()->all());
+        return request()->all();
+    }
 }

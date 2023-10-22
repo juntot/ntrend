@@ -6,6 +6,7 @@ use DB;
 
 trait DeliverySystemTrait
 {
+    
    // 
    public function consumeSAPEndpoint() {
     

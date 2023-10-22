@@ -213,7 +213,7 @@
                                     <label class="form-field__label">Branch</label>
                                     <div class="form-field__bar"></div>
                                 </div>
-                               <span class="errors">{{ errors.first('branch') }}</span>
+                               <span class="errors">{{ errors.first('branchname') }}</span>
                             </div>
                         </div>
                         <div class="clearfix"></div>
@@ -253,7 +253,7 @@
                             </div> -->
                             <div class="mdb-form-field form-group-limitx">
                                 <div class="form-field__control">
-                                    <select v-model="employee_status" id="branchname" name="branchname" v-validate="'required'" class="form-field__input" @change="getSelectedText">
+                                    <select v-model="employee_status" id="employee_status" name="employee_status" v-validate="'required'" class="form-field__input" @change="getSelectedText">
                                         <option value="Probationary" >Probationary</option>
                                         <option value="Regular" >Regular</option>
                                         <option value="Resigned" >Resigned</option>
@@ -677,16 +677,16 @@ export default {
 
 
 const setActive = (el, active) => {
-        const formField = el.parentNode.parentNode
-        if (active) {
-            formField.classList.add('form-field--is-active')
-        } else {
-            formField.classList.remove('form-field--is-active')
-            el.value === '' ?
-            formField.classList.remove('form-field--is-filled') :
-            formField.classList.add('form-field--is-filled')
-        }
+    const formField = el.parentNode.parentNode
+    if (active) {
+        formField.classList.add('form-field--is-active')
+    } else {
+        formField.classList.remove('form-field--is-active')
+        el.value === '' ?
+        formField.classList.remove('form-field--is-filled') :
+        formField.classList.add('form-field--is-filled')
     }
+}
 
 </script>
 

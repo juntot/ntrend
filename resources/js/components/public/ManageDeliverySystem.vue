@@ -42,7 +42,7 @@ ul .record-log-items{
 <template>
     <div>
        <form method="post">
-            <h3 class="text-center form-title"><span class="dblUnderlined">{{'A/R Invoice'}}</span></h3>
+            <h3 class="text-center form-title"><span class="dblUnderlined">{{'Delivery System'}}</span></h3>
             <!-- <div class="col-md-12">
                 <div class="mdb-form-field form-group-limitx">
                     <div class="form-field__control">

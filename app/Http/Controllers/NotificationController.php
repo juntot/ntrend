@@ -154,8 +154,42 @@ class NotificationController extends Controller
         }
         $formNotif['count_pending'] = $count;
 
+        // from nav pending counter requestor side ================================================================
+        $req = request('formnav');
+        $formnav_notif = [];
+        foreach ($req as $key => $value) {
+            $pending_count = [];
 
+            foreach ($value as $k => $v) {
+                
+                if($v['navtitle'] == 'MINUTES OF MEETING')
+                { 
+                    $db = DB::select('select attendeelist, attendeelistId from formmeetingminutes where status != 1');
+                    // return $db[0]->attendeelist;
+                    $v['count'] = 0;
+                    foreach ($db as $alist) {
+                        ($alist->attendeelist);
+                        
+                        // return json_encode($alist['attendeelist']);
+                        $list = json_decode($alist->attendeelist);
+                        foreach ($list as $listval) {
+                            if($listval->empID == UserSession::getSessionID() && $listval->acknowledge == false ){
+                                $v['count'] += 1 ;
+                            }
+                        }
+                    }
+                    
+                }
+                    $pending_count[] = $v;
+            }
+            
+            $formnav_notif[$key]= $pending_count;
+        }
 
+        
+
+       
+       
         // from nav approval pending counter ================================================================
         $req = request('fromnavapproval');
 
@@ -242,6 +276,7 @@ class NotificationController extends Controller
 
         return [
             'approval_notif' => $approval_notif,
+            'formnav' => $formnav_notif,
             'leave_cred' => $leaveCred,
             'post' => $postNotif,
             'form' => $formNotif,

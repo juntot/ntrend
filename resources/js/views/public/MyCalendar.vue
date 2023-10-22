@@ -7,7 +7,12 @@
 			{{formtitle}}
 		</div>
     <div class="col-lg-12 margin-15 padding-15">
+        
         <VuetifyCalendar :getEventDetails="showEventDetails" calendarHeight="890" :getNext="getNextRec" :getPrev="getPrevRec"/>
+        <span class="text-primary" style="white-space: pre-line">
+          <br>
+          Notes: {{ my_calendar_notes }}
+        </span>
         <!-- Modal -->
             <div id="user-dtr-records" class="modal fade" role="dialog" ref="vuemodal">
                 <div class="modal-dialog">
@@ -60,6 +65,7 @@ export default {
             },
             loader: false,
             holidayEvents: [],
+            my_calendar_notes: '',
         }
     },
     watch: { 
@@ -199,7 +205,10 @@ export default {
         // this.formtitle = ((this.$router.name)).toUpperCase();
         
      
-
+        axios.get('api/getcalendar-notes')
+            .then(res=>{
+                this.my_calendar_notes = res.data;
+        })
 
 
 

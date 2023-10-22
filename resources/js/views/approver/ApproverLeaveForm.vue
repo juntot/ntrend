@@ -119,7 +119,7 @@
                             <a href="#" class="btn btn-default" data-dismiss="modal" @click.prevent="hidePopOver">Close</a>
                         </div>
                     </div>
-                    </div>
+                </div>
             </div>
 
             <div class="modal fade" id="myModal4" style="display: none;">

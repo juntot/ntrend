@@ -111,30 +111,66 @@ export default {
 
             let rows = [];
             let header = [
-                'MEETING ID','MEETING NAME','NOTE TAKER ID', 'NOTE TAKER NAME', 'DEPARTMENT NAME', 'POSITION', 'DATE FILED', 'MEETING DATE',
-                'DURATION',  'LOCATION', 'START TIME', 'END TIME','ATTENDEES' , 'REMARKS', 'STATUS',
+                'MEETING ID','DATE CREATED','MEETING NAME','NOTE TAKER ID', 'NOTE TAKER NAME', 'DEPARTMENT NAME', 'POSITION', 'MEETING DATE',
+                'LOCATION', 'START TIME', 'END TIME','MEETING DURATION', 'MEETING TYPE',
+                'ATTENDEES(Acknowledged)', 'ATTENDEES(Declined)' , 'REMARKS','DATE CLOSE', 'STATUS DURATION', 'STATUS',
             ];
             rows.push(header);
             this.rows.forEach(obj => {
                 // let records = [];
-                obj.entries.forEach((entry, i)=>{
+                // obj.entries.forEach((entry, i)=>{
                     // if(i < 1){
+            let from =  new Date(moment().format('YYYY-MM-DD')+' '+ obj.starttime);
+            let to = new Date(moment().format('YYYY-MM-DD')+' '+ obj.endtime);
+            var ms = moment(to,"YYYY-MM-DD HH:mm:ss").diff(moment(from,"YYYY-MM-DD HH:mm:ss"));
+            var d = moment.duration(ms);
 
-                        
-                        let from =  new Date(moment().format('YYYY-MM-DD')+' '+ obj.starttime);
-                        let to = new Date(moment().format('YYYY-MM-DD')+' '+ obj.endtime);
-                        var ms = moment(to,"YYYY-MM-DD HH:mm:ss").diff(moment(from,"YYYY-MM-DD HH:mm:ss"));
-                        var duration = moment.duration(ms);
+            var s = Math.floor(d.asHours()) + moment.utc(ms).format(":mm:ss");
+            
+            s = s.slice(0, (s.indexOf(':'))).length <= 1 ? '0'+s: s;
+            // slice the seconds
+            s = s.slice(0, 5);
+            let duration =  s || '';
 
-                        let records = [
-                            obj.meetingID,
-                            obj.meetingname, obj.empID_, obj.fullname,obj.deptname, obj.posname, obj.datefiled,
-                            obj.meetingdate, duration, obj.location, moment(new Date(obj.starttime)).format('HH:mm a'),
-                            obj.moment(new Date(obj.endtime)).format('HH:mm a'), (JSON.parse(obj.attendeelist)).map(obj=>obj.fullname).toString(),
-                            obj.remarks, obj.status,
-                        ];
-                    rows.push(records);
-                });
+
+
+            // DURATION CLOSING STAT
+            let from1 =  new Date(obj.datefiled);
+            let to1 = new Date(obj.datetimeclose);
+            var ms1 = moment(to1,"YYYY-MM-DD HH:mm:ss").diff(moment(from1,"YYYY-MM-DD HH:mm:ss"));
+            var d1 = moment.duration(ms1);
+
+            var s1 = Math.floor(d1.asHours()) + moment.utc(ms1).format(":mm:ss");
+            
+            s1 = s1.slice(0, (s1.indexOf(':'))).length <= 1 ? '0'+s1 : s1;
+            // slice the seconds
+            s1 = s1.slice(0, 5);
+            let duration1 =  s1 || '';
+
+            let records = [
+                obj.meetingID, moment(obj.datefiled).format('MM/DD/YYYY'),
+                obj.meetingname, obj.empID_, obj.fullname,obj.deptname, obj.posname,
+                obj.meetingdate, obj.location, moment(new Date(moment().format('YYYY-MM-DD')+' '+ obj.starttime)).format('HH:mm a'),
+                moment(new Date(moment().format('YYYY-MM-DD')+' '+ obj.endtime)).format('HH:mm a'), duration, obj.meetingtype || '',
+                (JSON.parse(obj.attendeelist)).reduce((acc,obj)=>{
+                    if(obj.acknowledge)
+                    acc.push((obj.fullname).replaceAll(",", " "));
+                    return acc;
+                },[]
+                ).toString(),
+                (JSON.parse(obj.attendeelist)).reduce((acc,obj)=>
+                {
+                    if(!obj.acknowledge)
+                    acc.push((obj.fullname).replaceAll(",", " "));
+                    return acc;
+                },[]).toString(),
+                obj.remarks, 
+                obj.datetimeclose,
+                obj.datetimeclose ? duration1 : '',
+                obj.status < 1? 'Pending':'Closed',
+            ];
+            rows.push(records);
+                // });
 
             });
 
@@ -162,8 +198,19 @@ export default {
         
         let columnDefs = [
         {
-            title: "Meeting ID", data: 'meetingID'
+            title: "Meeting ID", data: 'meetingID', visible: false,
         },
+        {
+            title: "Date Created", data: 'datefiled', render: function(data){
+                return moment(data).format('MM/DD/YYYY');
+            }
+        },
+        // {
+        //     title: "Meeting Date", data: 'starttime', render: function(data){
+        //         return new Date(moment().format('YYYY-MM-DD')+' '+ data);
+        //     }
+        // },
+        
         {
             title: "Meeting Name", data: 'meetingname'
         },
@@ -220,13 +267,13 @@ export default {
             "sPaginationType": "simple_numbers",
             "dom": '<"top with-margin-bottom"f>rt<"mdl-grid"<"mdl-cell mdl-cell--4-col"i><"mdl-cell mdl-cell--8-col"p>><"clear">',
             "scrollX": true,
-            "order": [[ 0, "desc" ]],
+            "order": [[ 1, "desc" ]],
             "rowCallback": function(row, data, index) {
                 var cellValue = data["status"];
                     if (cellValue== 0 ) {
                        $(row).addClass("tr-pending");
                     }if (cellValue==1) {
-                       $(row).addClass("tr-approved");
+                       $(row).addClass("tr-verified");
                     }
                     if (cellValue==3) {
                        $(row).addClass("tr-rejected");

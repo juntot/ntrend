@@ -44,8 +44,9 @@ Route::get('/api/testmail', function(){
     // MailServices::sendDeliverySysMail($email, $from, $bcc, $subject, $message);
     return 'mail service';
 });
-Route::get('/api/mail', function(){
-    $email = 'ubec.creative@gmail.com';
+
+Route::get('/api-test/mail', function(){
+    $email = 'walter.son@northtrend.com';
     Mail::to($email)
          ->send(new \App\Mail\FormMail('body', 'subject'));
     return 'awsss';
@@ -54,6 +55,7 @@ Route::get('/api/mail', function(){
 Route::get('sms/test', 'CronController@testSMS');
 Route::get('cron/so', 'CronController@salesOrder');
 Route::get('cron/invtrans', 'CronController@autoCloseInventoryTrans');
+Route::get('cron/returnreq', 'CronController@autoCloseReturnRequest');
 
 Route::group(['middleware' => 'prevent-back-history'], function(){
 
@@ -325,6 +327,7 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::post('/api/update-minute-meeting', 'MeetingMinutesController@updateMeetingMinutes');
             Route::post('/api/acknow-minute-meeting', 'MeetingMinutesController@acknowledgeMeetingMinutes');
             Route::get('/api/del-minute-meeting/{ccId?}', 'MeetingMinutesController@delMeetingMinutes');
+            Route::post('/api/rem-attendance-meeting', 'MeetingMinutesController@removeAttendance');
             // Route::get('/api/getUrgentCheckbyemployee', 'MettingMinuteController@getUrgentCheckByEmployee');
             // Route::get('/api/getUrgentCheckApprover', 'MettingMinuteController@getUrgentCheckApprover'); // get approvers
 
@@ -683,6 +686,9 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::post('/api/del_event', 'CalendarController@delEvent');
             Route::post('/api/plot_calendar', 'CalendarController@plotCalendar');
 
+            Route::get('/api/getcalendar-notes', 'SettingsController@getCalendarNotes');
+            Route::post('/api/addcalendar-notes', 'SettingsController@addCalendarNotes');
+
 
 
             // ========================= WORK AROUND ==================================
@@ -738,6 +744,9 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
 
             // CRON INVENTORY TRANS
             Route::post('api/cron-invtrans-dayslimit', 'CronController@InvTransDaysLimit');
+
+            // CRON RETURN REQUEST
+            Route::post('api/cron-returnrequest-dayslimit', 'CronController@ReturnRequestDaysLimit');
 
             // cron notif settings
             Route::post('api/cron-sms-notif-num', 'CronController@addSMSnum');

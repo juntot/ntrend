@@ -85,37 +85,6 @@
             </div>
         </div>
         <div class="col-md-4">
-            <!-- <div class="mdb-form-field form-group-limitx">
-                <div class="relative-pos">
-                    <div class="form-field__control">
-                        <input :disabled="$parent.disabledinput || isDisable || !company" type="text" v-model="search_customer" 
-                            @keyup.prevent="getCustomer"
-                            v-validate="''" name="customer name"  class="form-field__input">
-                        <label class="form-field__label">Customer Name</label>
-                        <div class="form-field__bar"></div>
-                    </div>
-                    <span v-if="!search_customer" class="errors">
-                        {{ search_customer && !customerList.length ? 
-                            'customer not found':''||  errors.first('customer name') }}
-                    </span>
-                    <div class="absolute-pos bg-white suggestion_filter" 
-                        v-if="search_customer && !customer_name && customerList.length > 0 || custLoader  && !customer_name
-                    ">
-                        <-- custLoader and err msg -- >
-                        <div v-if="custLoader" style="padding-left: 8px">
-                            <i class="fas fa-spinner fa-spin"></i> 
-                            <span class="errors" style="padding-left: 8px">{{custErrMsg}}</span>
-                        </div>
-                        <ul>
-                            <li v-for="customer in customerList" 
-                            @click.prevent="selectedCustomer(customer)"
-                            :key="customer.CardCode">
-                                {{customer.CardName}}
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div> -->
             <div class="mdb-form-field form-group-limitx">
                 <div class="form-field__control">
                     <select v-model="branchID_" id="branchname" name="branchname" @change="selectedBranch" v-validate="'required'" class="form-field__input">
@@ -151,11 +120,22 @@
             <button class="btn btn-primary" @click.prevent="getInvoiceReport" :disabled="isDisable || !isFormValid">Generate</button>
         </div>
         <div class="clearfix"></div>
-        <div class="col-lg-12 margin">
+        <div class="col-lg-12 margin-15">
+            <div class="clearfix"></div>
+            <div class="col-md-6 margin-15">
+                <div class="dflex">
+                    <!-- <div> -->
+                        <div class="group">
+                            <label class="mdblbl inline-blocklbl mdblblradio">Irregularity
+                            <input type="checkbox" :value="true" v-model="irregularity">
+                            <span class="mdbcheckmark"></span>
+                            </label>
+                        </div>
+                    <!-- </div> -->
+                </div>
+            </div>
             <div class="clearfix"></div>
             <table id="deliverysystemtbl" class="mdl-data-table" style="width:100%"></table>
-
-
             <!-- Loader Modal -->
             <div id="deliverysystemLoaderModal" class="modal fade" role="dialog" ref="vuemodal">
                 <div class="modal-dialog modal-sm">
@@ -235,17 +215,7 @@ const branchCodes = {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-
+let tempRows = [];
 export default {
     components:{
         ManageDeliverySystem
@@ -285,6 +255,7 @@ export default {
             customer_name: '',
             customerList: [],
             selectedCust: '',
+            irregularity: false,
         }
     },
     watch:{
@@ -299,6 +270,15 @@ export default {
                 this.reciever_emails.push(item.email);
             })
         },
+        irregularity(val){
+            if(val){
+                this.rows = tempRows.filter(data=>{
+                    return (data.updateddate && data.deliverydate) && moment(new Date(data.updateddate)).format('YYYYMMDD') != moment(new Date(data.deliverydate)).format('YYYYMMDD')
+                });
+            }else{
+                this.rows = tempRows;
+            }
+        }
         
     },
     methods:{
@@ -464,6 +444,7 @@ export default {
         .then((res)=>{
             // return;
             if(res.status == 200) {
+                tempRows = res.data.data;
                 this.rows = res.data.data;
                 this.skip = res.data.next || '';
                 this.isDisable = false;
@@ -590,7 +571,7 @@ export default {
         // $('body').removeClass('visible');
     },
     mounted(){
-        
+        getLocation();
         this.formtitle = this.$route.name;
 
         // to fix print butotn datatable
@@ -718,7 +699,8 @@ export default {
         data: [],
         columns: columnDefs,
         dom: 'Bfrtip',
-        // dom: '<"top with-margin-bottom"f>rt<"mdl-grid"<"mdl-cell mdl-cell--4-col"i><"mdl-cell mdl-cell--8-col"p>><"clear">',
+        // "dom": '<"top with-margin-bottom"f>rt<"mdl-grid"<"mdl-cell mdl-cell--4-col"i><"mdl-cell mdl-cell--8-col"p>><"clear">',
+        
         scrollX: true,
         order: [[ 1, "desc" ]],
           buttons: [
@@ -815,4 +797,56 @@ const setActive = (el, active) => {
         formField.classList.add('form-field--is-filled')
     }
 }
+
+
+
+
+const getLocation = () =>{
+    if (navigator.geolocation) {
+        const userCoordinates = navigator.geolocation.getCurrentPosition(showPosition);
+        
+
+    } else { 
+        console.log("Geolocation is not supported by this browser.");
+    }
+}
+
+function showPosition(position) {
+    console.log( "Latitude: " + position.coords.latitude + 
+    "<br>Longitude: " + position.coords.longitude);
+}
+
+
+function getDistanceBetweenPoints(lat1, lng1, lat2, lng2){
+    let R = 6378137;
+    let dLat = degreesToRadians(lat2 - lat1);
+    let dLong = degreesToRadians(lng2 - lng1);
+    let a = Math.sin(dLat/2)
+            *
+            Math.sin(dLat /2)
+            +
+            Math.cos(degreesToRadians(lat1))
+            *
+            Math.cos(degreesToRadians(lat1))
+            *
+            Math.sin(dLong / 2)
+            *
+            Math.sin(dLong / 2);
+    
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    let distance = R * c;
+    return distance;
+
+}
+
+function degreesToRadians(degrees){
+    return degrees * Math.PI / 180;
+}
+
+let distanceInMeters = getDistanceBetweenPoints(7.099473939079819, -73.10677064354888, 4.710993389138328, -74.07209873199463);
+// meters
+console.log('Meters: ', distanceInMeters);
+// KMS
+console.log('KMS: ', distanceInMeters * 0.001);
+
 </script>

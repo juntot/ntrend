@@ -9,9 +9,9 @@
         <div class="col-lg-12 margin-15">
             <div class="col-lg-6 col-md-6  with-margin-bottom nopadding">
                 <div class="dflex">
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#myModal" style="margin-right: 15px;">ADD NEW</button>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#myModal" style="margin-right: 4px;">ADD NEW</button>
                     <div :class="openFilterStatus?'dropdown open z-1':'dropdown z-1'">
-                        <button class="btn btn-primary dropdown-toggle" type="button" @click.prevent="openFilterStatus = !openFilterStatus">
+                        <button style="margin-right: 4px;" class="btn btn-primary dropdown-toggle" type="button" @click.prevent="openFilterStatus = !openFilterStatus">
                             Filter Status
                         <!-- <span class="caret"></span> -->
                         </button>
@@ -36,8 +36,27 @@
                             </li>
                         </ul>
                     </div>
+                    <!-- filter meeting type -->
+                    <div :class="openFilterMeetingType?'dropdown open z-1':'dropdown z-1'">
+                        <button style="margin-right: 4px;" class="btn btn-primary dropdown-toggle" type="button" @click.prevent="openFilterMeetingType = !openFilterMeetingType">
+                            Meeting Type
+                        <!-- <span class="caret"></span> -->
+                        </button>
+                        
+                        <ul class="dropdown-menu statusfilter" style="padding: 10px">
+                            <button type="button" class="close" 
+                            
+                            @click="openFilterMeetingType = !openFilterMeetingType">×</button>
+                            <li style="padding: 4px 15px" v-for="(val, i) in meetingtypelist" :key="i">
+                                <label>
+                                    <input type="checkbox" v-model="meetingtype" :value="val" name="meetingtype" >
+                                    <span class="mdbcheckmark"></span>
+                                    {{val}}
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-                
             </div>
             <table id="meetingminutes" class="mdl-data-table" style="width:100%"></table>
 
@@ -66,6 +85,21 @@ import ManageMeetingMinute from '../../components/public/ManageMeetingMinute';
 let brand = ['NTMC', 'APBW', 'PHILCREST', 'TYREPLUS'];
 // let status = ['Pending', 'Approved', 'Rejected'];
 let defaultRows = [];
+let mettingtype_ = [
+    'Weekly',
+    'Monthly',
+    'Quarterly',
+    'Semi-Annual',
+    'Marketing',
+    'Sales',
+    'Supply Chain',
+    'Product Management',
+    'Warehouse & Logistics',
+    'Finance',
+    'Admin',
+    'HR',
+    'Others'
+];
 export default {
     components:{
         ManageMeetingMinute
@@ -73,6 +107,8 @@ export default {
     data(){
         return{
             openFilterStatus: false,
+            openFilterMeetingType: false,
+            openFilterDate: false,
             forapprover: '',
             formtitle: '',
             rows: [],
@@ -83,13 +119,25 @@ export default {
             reciever_emails: [],
             selected: {},
             status: [0, 1],
+            meetingtype:mettingtype_,
+            meetingtypelist: mettingtype_,
         }
     },
     watch:{
         status(val, old){
             let rows = [];
             rows = defaultRows.filter(data=>{
-                return val.includes(data.status);
+                return val.includes(data.status) && this.meetingtype.includes(data.meetingtype);
+            });
+
+            this.dtHandle.clear();
+            this.dtHandle.rows.add(rows);
+            this.dtHandle.draw();
+        },
+        meetingtype(val, old){
+            let rows = [];
+            rows = defaultRows.filter(data=>{
+                return this.status.includes(data.status) && val.includes(data.meetingtype);
             });
 
             this.dtHandle.clear();
@@ -99,7 +147,7 @@ export default {
         rows(val, old){
             let rows = [];
             rows = defaultRows.filter(data=>{
-                return this.status.includes(data.status);
+                return this.status.includes(data.status) && this.meetingtype.includes(data.meetingtype);
             });
 
             this.dtHandle.clear();
@@ -193,10 +241,12 @@ export default {
                 }
             });
             this.dtHandle=$('#meetingminutes').DataTable({
-            // aoColumnDefs: [{ "sType": "date-uk", "aTargets": [1] }],
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [1] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
+            language: { search: "",
+             searchPlaceholder: "Search records" },
             "sPaginationType": "simple_numbers",
             "dom": '<"top with-margin-bottom"f>rt<"mdl-grid"<"mdl-cell mdl-cell--4-col"i><"mdl-cell mdl-cell--8-col"p>><"clear">',
             "scrollX": true,
@@ -206,7 +256,7 @@ export default {
                     if (cellValue== 0 ) {
                        $(row).addClass("tr-pending");
                     }if (cellValue==1) {
-                       $(row).addClass("tr-approved");
+                       $(row).addClass("tr-verified");
                     }
                     if (cellValue==3) {
                        $(row).addClass("tr-rejected");
@@ -250,14 +300,20 @@ export default {
 
         let columnDefs = [
         {
-            title: "Meeting ID", data: 'meetingID'
+            title: "Meeting ID", data: 'meetingID', visible: false,
         },
         {
-            title: "Meeting Name", data: 'meetingname'
+            title: "Date Created", data: 'datefiled', render: function(data){
+                return moment(data).format('MM/DD/YYYY');
+            }
         },
         {
             title: "Note Taker", data: 'fullname'
         },
+        {
+            title: "Meeting Name", data: 'meetingname'
+        },
+        
         // {
         //     title: "Note Taken", data: 'datefiled', render: function(data){
         //         return moment(data).format('MM/DD/YYYY');
@@ -269,7 +325,9 @@ export default {
             }
         },
         {
-            title: "Duration", render: function(data, type, row){
+            title: "Meeting Type", data: 'meetingtype'
+            /*
+            render: function(data, type, row){
             let from =  new Date(moment().format('YYYY-MM-DD')+' '+ row.starttime);
             let to = new Date(moment().format('YYYY-MM-DD')+' '+ row.endtime);
             var ms = moment(to,"YYYY-MM-DD HH:mm:ss").diff(moment(from,"YYYY-MM-DD HH:mm:ss"));
@@ -281,8 +339,10 @@ export default {
             // slice the seconds
             s = s.slice(0, 5);
             return s || '';
+            
             // return moment(data).format('MM/DD/YYYY');
             }
+            */
         },
         // {
         //     title: "Start Time", data: 'starttime', render: function(data){

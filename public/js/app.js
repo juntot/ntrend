@@ -351,6 +351,25 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -373,9 +392,10 @@ __webpack_require__.r(__webpack_exports__);
       selectedEvent: {},
       selectedElement: null,
       selectedOpen: false,
-      events: [] // colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
+      events: [],
+      // colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
       // names: ['Meeting', 'Holiday', 'PTO', 'Travel', 'Event', 'Birthday', 'Conference', 'Party'],
-
+      my_calendar_notes: ''
     };
   },
   methods: {
@@ -564,6 +584,13 @@ __webpack_require__.r(__webpack_exports__);
     },
     rnd: function rnd(a, b) {
       return Math.floor((b - a + 1) * Math.random()) + a;
+    },
+    setCalendarNotes: function setCalendarNotes() {
+      axios.post('api/addcalendar-notes', {
+        my_calendar_notes: this.my_calendar_notes
+      }).then(function (res) {}).catch(function (er) {
+        return console.log(er);
+      });
     }
   },
   filters: {
@@ -597,7 +624,14 @@ __webpack_require__.r(__webpack_exports__);
   beforeDestroy: function beforeDestroy() {// bus.$off('addEvent', this.test)
   },
   destroyed: function destroyed() {},
-  mounted: function mounted() {// EVENT BUS
+  mounted: function mounted() {
+    var _this5 = this;
+
+    axios.get('api/getcalendar-notes').then(function (res) {
+      _this5.my_calendar_notes = res.data;
+    }).catch(function (er) {
+      return console.log(er);
+    }); // EVENT BUS
     // bus.$on('addEvent', this.addEvent);
   }
 });
@@ -12587,6 +12621,26 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 // import ManagePolicy from '../components/ManagePolicy';
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {// ManagePolicy
@@ -12599,6 +12653,7 @@ __webpack_require__.r(__webpack_exports__);
       selectedcomp: [],
       dayslimit: 0,
       dayslimit_invtrans: 0,
+      dayslimit_returnrequest: 0,
       isIstart: false,
       mobilenum: '',
       smsnotif: false
@@ -12656,6 +12711,11 @@ __webpack_require__.r(__webpack_exports__);
         dayslimit_invtrans: this.dayslimit_invtrans
       });
     },
+    updateDaysLimitReturnRequest: function updateDaysLimitReturnRequest() {
+      axios.post('api/cron-returnrequest-dayslimit', {
+        dayslimit_returnrequest: this.dayslimit_returnrequest
+      });
+    },
     updateComp: function updateComp() {
       axios.post('api/cron-so-updatecomp', {
         selectedcomp: this.selectedcomp.toString()
@@ -12703,6 +12763,7 @@ __webpack_require__.r(__webpack_exports__);
       _this3.selectedcomp = data.selectedcomp.length > 0 ? data.selectedcomp.split(",") : [];
       _this3.dayslimit = data.dayslimit;
       _this3.dayslimit_invtrans = data.dayslimit_invtrans;
+      _this3.dayslimit_returnrequest = data.dayslimit_returnrequest;
       _this3.isIstart = data.isStart;
       _this3.smsnotif = data.smsnotif;
 
@@ -17683,13 +17744,65 @@ var render = function() {
         )
       ]),
       _vm._v(" "),
+      _vm._m(0),
+      _vm._v(" "),
+      _c("div", { staticClass: "v-sheet theme--light col-lg-12 p-15" }, [
+        _vm._v(
+          "\n            Add Important Notes to My Calendar\n            "
+        ),
+        _c("textarea", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.my_calendar_notes,
+              expression: "my_calendar_notes"
+            }
+          ],
+          staticClass: "form-control",
+          attrs: { rows: "5", id: "comment" },
+          domProps: { value: _vm.my_calendar_notes },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.my_calendar_notes = $event.target.value
+            }
+          }
+        }),
+        _vm._v(" "),
+        _c("br"),
+        _c("br"),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-primary",
+            staticStyle: { float: "right" },
+            on: {
+              click: function($event) {
+                $event.preventDefault()
+                return _vm.setCalendarNotes($event)
+              }
+            }
+          },
+          [_vm._v("Save")]
+        ),
+        _vm._v(" "),
+        _c("div", { staticClass: "clearfix" })
+      ]),
+      _vm._v(" "),
+      _c("br"),
+      _c("br"),
+      _vm._v(" "),
       _c(
         "div",
         { staticClass: "modal fade", attrs: { id: "myModal", role: "dialog" } },
         [
           _c("div", { staticClass: "modal-dialog" }, [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(0),
+              _vm._m(1),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _c("div", { staticClass: "form-group col-md-6" }, [
@@ -17802,7 +17915,7 @@ var render = function() {
         [
           _c("div", { staticClass: "modal-dialog" }, [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(1),
+              _vm._m(2),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _c("div", { staticClass: "form-group col-md-6" }, [
@@ -17925,6 +18038,12 @@ var render = function() {
   )
 }
 var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "clearfix" }, [_c("br")])
+  },
   function() {
     var _vm = this
     var _h = _vm.$createElement
@@ -19363,7 +19482,7 @@ var render = function() {
             ]),
             _vm._v(" "),
             _c("span", { staticClass: "errors" }, [
-              _vm._v(_vm._s(_vm.errors.first("branch")))
+              _vm._v(_vm._s(_vm.errors.first("branchname")))
             ])
           ])
         ]),
@@ -19521,7 +19640,7 @@ var render = function() {
                     }
                   ],
                   staticClass: "form-field__input",
-                  attrs: { id: "branchname", name: "branchname" },
+                  attrs: { id: "employee_status", name: "employee_status" },
                   on: {
                     change: [
                       function($event) {
@@ -27252,12 +27371,64 @@ var render = function() {
         ])
       ]),
       _vm._v(" "),
+      _c("div", { staticClass: "clearfix" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "dflex baseline" }, [
+        _c("div", { staticClass: "col-md-6" }, [
+          _vm._v("\n            Return Request\n          ")
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-md-6" }, [
+          _c("div", { staticClass: "mdb-form-field form-group-limitx" }, [
+            _c("div", { staticClass: "form-field__control" }, [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.dayslimit_returnrequest,
+                    expression: "dayslimit_returnrequest"
+                  }
+                ],
+                staticClass: "form-field__input",
+                attrs: { type: "text", name: "comp_name" },
+                domProps: { value: _vm.dayslimit_returnrequest },
+                on: {
+                  change: _vm.updateDaysLimitReturnRequest,
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.dayslimit_returnrequest = $event.target.value
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("label", { staticClass: "form-field__label" }, [
+                _vm._v("Auto close days limit")
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "form-field__bar" })
+            ]),
+            _vm._v(" "),
+            _c("span", { staticClass: "errors" }, [
+              _vm._v(_vm._s(_vm.errors.first("comp_name")))
+            ])
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _vm._m(1),
+      _vm._v(" "),
+      _c("br"),
+      _c("br"),
+      _vm._v(" "),
       _c("div", { staticClass: "clearfix" })
     ]),
     _vm._v(" "),
     _c("br"),
     _vm._v(" "),
-    _vm._m(1),
+    _vm._m(2),
     _vm._v(" "),
     _c("div", { staticClass: "clearfix" }),
     _vm._v(" "),
@@ -27364,6 +27535,22 @@ var staticRenderFns = [
       "div",
       { staticClass: "col-lg-12 header-title margin-15 p-15 bgc-white" },
       [_c("h4", [_vm._v("Auto Close SAP Documents")])]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "small",
+      { staticStyle: { color: "#3d4b96", "font-size": "14px" } },
+      [
+        _c("i", [
+          _vm._v(
+            "Note: Setting zero value for days limit will disable the autoclose per request"
+          )
+        ])
+      ]
     )
   },
   function() {
@@ -89521,7 +89708,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   mode: 'history',
-  base: '/ntrends/',
+  // base: '/ntrends/',
   routes: [// graph
   {
     path: '/',
