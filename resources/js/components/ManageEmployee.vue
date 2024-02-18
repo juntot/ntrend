@@ -213,7 +213,7 @@
                                     <label class="form-field__label">Branch</label>
                                     <div class="form-field__bar"></div>
                                 </div>
-                               <span class="errors">{{ errors.first('branch') }}</span>
+                               <span class="errors">{{ errors.first('branchname') }}</span>
                             </div>
                         </div>
                         <div class="clearfix"></div>
@@ -243,9 +243,24 @@
                         </div>
                         <div class="clearfix"></div>
                         <div class="col-md-12">
-                            <div class="mdb-form-field form-group-limitx">
+                            <!-- <div class="mdb-form-field form-group-limitx">
                                 <div class="form-field__control">
                                     <input type="text" v-model="employee_status"  v-validate="" name="employee_status"  class="form-field__input">
+                                    <label class="form-field__label">Employee Status</label>
+                                    <div class="form-field__bar"></div>
+                                </div>
+                               <span class="errors">{{ errors.first('employee_status') }}</span>
+                            </div> -->
+                            <div class="mdb-form-field form-group-limitx">
+                                <div class="form-field__control">
+                                    <select v-model="employee_status" id="employee_status" name="employee_status" v-validate="'required'" class="form-field__input" @change="getSelectedText">
+                                        <option value="Probationary" >Probationary</option>
+                                        <option value="Regular" >Regular</option>
+                                        <option value="Resigned" >Resigned</option>
+                                        <option value="Contractual" >Contractual</option>
+                                        <option value="Project Base" >Project Base</option>
+                                        <option value="On Job Training" >On Job Training</option>
+                                    </select>
                                     <label class="form-field__label">Employee Status</label>
                                     <div class="form-field__bar"></div>
                                 </div>
@@ -494,6 +509,10 @@ export default {
                     // console.log(data);
                 }
 
+                if(i == 'SL' || i == 'VL' || i == 'BL' || i == 'DL'){
+                    this.$data[i] = data[i] || 0;
+                }
+
 
                 this.selected.branchname = data.branchname;
                 this.selected.deptname = data.deptname;
@@ -658,16 +677,16 @@ export default {
 
 
 const setActive = (el, active) => {
-        const formField = el.parentNode.parentNode
-        if (active) {
-            formField.classList.add('form-field--is-active')
-        } else {
-            formField.classList.remove('form-field--is-active')
-            el.value === '' ?
-            formField.classList.remove('form-field--is-filled') :
-            formField.classList.add('form-field--is-filled')
-        }
+    const formField = el.parentNode.parentNode
+    if (active) {
+        formField.classList.add('form-field--is-active')
+    } else {
+        formField.classList.remove('form-field--is-active')
+        el.value === '' ?
+        formField.classList.remove('form-field--is-filled') :
+        formField.classList.add('form-field--is-filled')
     }
+}
 
 </script>
 

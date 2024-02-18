@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\UserSession;
+use App\Services\FormApproverService;
 use DB;
 
 class PRSController extends Controller
@@ -65,7 +66,9 @@ class PRSController extends Controller
     // GET PRF FORM EMPLOYEE APPROVERS
     public function getPRFApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.PRF = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.PRF = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.PRF = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('PRS');
         return $data;
     }
 

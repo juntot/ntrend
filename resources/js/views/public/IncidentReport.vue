@@ -1,3 +1,17 @@
+<style>
+.td-approve {
+  color: #2979ff !important;
+}
+.td-reject {
+  color: #ab003c !important;
+}
+.td-close {
+  color: #00a732 !important;
+}
+.td-endorse {
+  color: #651fff !important;
+}
+</style>
 <template>
     <div>
         <div id="loader2" v-if="loader">
@@ -34,12 +48,12 @@
 </template>
 <script>
 import ManageIncidentReport from '../../components/public/ManageIncidentReport';
-let incidenttype = [
-        'Inventory Discrepancy', 'Habitual Tardiness', 'Habitual Absences', 'TYREPLUSAbsence w/o official leave', 'Insubordination',
-        'Non-compliance to policies/procedures', 'Delivery Discrepancy', 'Theft', 'Falsification/Tampering of Documents', 'Loss/Damage of Company Property',
-        'Non remittance/short of collections', 'Others'
-    ];
-let status = ['Pending', 'Approved', 'Rejected'];
+// let incidenttype = [
+//         'Inventory Discrepancy', 'Habitual Tardiness', 'Habitual Absences', 'TYREPLUSAbsence w/o official leave', 'Insubordination',
+//         'Non-compliance to policies/procedures', 'Delivery Discrepancy', 'Theft', 'Falsification/Tampering of Documents', 'Loss/Damage of Company Property',
+//         'Non remittance/short of collections', 'Others'
+//     ];
+// let status = ['Pending', 'Approved', 'Rejected'];
 
 export default {
     components:{
@@ -62,12 +76,12 @@ export default {
         rows(val, old){
             let row = val;
 
-            row.forEach((item, index)=>{
-                if(!isNaN(item.incidenttype) && !isNaN(item.status)){
-                    row[index]['incidenttype'] = incidenttype[item.incidenttype - 1];
-                    row[index]['status'] = status[item.status];
-                }
-            });
+            // row.forEach((item, index)=>{
+            //     if(!isNaN(item.incidenttype) && !isNaN(item.status)){
+            //         row[index]['incidenttype'] = incidenttype[item.incidenttype - 1];
+            //         row[index]['status'] = status[item.status];
+            //     }
+            // });
             this.dtHandle.clear();
             this.dtHandle.rows.add(row);
             this.dtHandle.draw();
@@ -81,6 +95,7 @@ export default {
     methods:{
         addRow(val)
         {
+            
             this.rows.unshift(val);
         },
         deleteRow(val)
@@ -97,6 +112,7 @@ export default {
         },
         updateRow(val)
         {
+            
             let row = this.$data.rows;
             row.forEach((item, index)=>{
                 if(item.incidentID == val.incidentID)
@@ -124,7 +140,8 @@ export default {
     mounted(){
 
         // this.forapprover = ((this.$route.path).slice(1)).toLowerCase().split('-')[];
-        this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
+        // this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
+        this.formtitle = this.$route.name;
 
         axios.get('api/getIncidentReportbyemployee').then((response)=>{
             this.loader = false;
@@ -139,7 +156,8 @@ export default {
                         var month = parseInt(dateA[0], 10);
                         var year = parseInt(dateA[2], 10);
                         var date = new Date(year, month - 1, day)
-                        x = date.getTime();
+                        // x = date.getTime();
+                        x = moment(a).valueOf();
                     }
                     catch (err) {
                         x = new Date().getTime();
@@ -157,7 +175,7 @@ export default {
                 }
             });
             this.dtHandle=$('#incidentReport').DataTable({
-            // aoColumnDefs: [{ "sType": "date-uk", "aTargets": [0] }],
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [1] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
@@ -167,14 +185,20 @@ export default {
             "order": [[ 0, "desc" ]],
             "rowCallback": function(row, data, index) {
                 var cellValue = data["status"];
-                    if (cellValue=="Pending") {
-                       $(row).addClass("tr-pending");
+                    if (cellValue==1 && !data['endorse2']) { // approved
+                       $(row).addClass("td-approve");
                     }
-                    if (cellValue=="Approved") {
-                       $(row).addClass("tr-approved");
+                    if (cellValue==2 || (cellValue == 1 && data['endorse1'])) { // rejected
+                       $(row).addClass("td-endorse");
                     }
-                    if (cellValue=="Rejected") {
-                       $(row).addClass("tr-rejected");
+                    // if (cellValue==2) { // rejected
+                    //    $(row).addClass("td-endorse");
+                    // }
+                    if (cellValue==3) { // executed
+                       $(row).addClass("td-close");
+                    }
+                    if (cellValue==4) { // executed
+                       $(row).addClass("td-reject");
                     }
 
                 }
@@ -187,8 +211,7 @@ export default {
             $("#incidentReport tbody").on('click', 'tr', function() {
                 var tr = $(this).closest('tr');
                 var row = table.row( tr );
-                if(row.data().status.toLowerCase() == 'approved' ||
-                   row.data().status.toLowerCase() == 'rejected')
+                if(row.data().status >= 1 )
                 {
                     self.disabledinput = true;
                     // return;
@@ -215,19 +238,35 @@ export default {
 
         let columnDefs = [
         {
-            title: "INCIDENT ID", data: 'incidentID', visible: false,
+            title: "Incident #", data: 'incidentID', visible: true,
         },
-        // {
-        //     title: "Employee ID", data: 'empID_'
-        // },
         {
             title: "Date Filed", data: 'datefiled'
-        },{
+        },
+        {
+            title: "Person Involved", data: 'search_employee'
+        },
+        {
             title: "Nature of incident", data: 'incidenttype'
-        },{
-            title: "Details of incident", data: 'details', className: "row-limit"
-        },{
-            title: "Status", data: 'status'
+        },
+        // {
+        //     title: "Details of incident", data: 'details', className: "row-limit"
+        // },
+        {
+            title: "Status", data: 'status',
+            render: function(data){
+                /**
+                 * 0 pending
+                 * 1 endorse 1
+                 * 2 endorse 2
+                 * 3 close
+                 * 4 rejected
+                 */
+                return data == 0 ? 'Pending':
+                       data == 1 || data == 2 ? 'Further Investigation':
+                    //    data == 2 ? '2nd Endorsed': 
+                       data == 3 ? 'Closed': 'Rejected';
+            }
         }];
         // MODAL
         $('#myModal').on("hidden.bs.modal", this.closeModal);

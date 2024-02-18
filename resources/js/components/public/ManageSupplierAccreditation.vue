@@ -506,7 +506,7 @@
                 </div>
                 <div class="clearfix"></div>
                 <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addSupplierAccreditation" :disabled="isDisable || !isFormValid" v-if="submitBtn">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addSupplierAccreditation" :disabled="disabledIfNoApprover || isDisable || !isFormValid" v-if="submitBtn">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateSupplierAccreditation" :disabled="isDisable || !isFormValid" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteSupplierAccreditation" :disabled="isDisable" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionSupplierAccreditation(1)" v-if="approveRejecBtn">
@@ -678,7 +678,9 @@ export default {
 
     },
     computed:{
-
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         getDiff(){
             this.datestart =  moment(this.datestart).format('YYYY-MM-DD');
             this.dateend = moment(this.dateend).format('YYYY-MM-DD');

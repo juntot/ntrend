@@ -108,7 +108,7 @@ class NotificationController extends Controller
 
         // leave cred ================================================================================
         $leaveCred = DB::select('select SL, VL, BL, DL from employee where empID = :empid', [UserSession::getSessionID()]);
-
+        
 
         // post notif =================================================================================
         $active_user = UserSession::getEmpKey();
@@ -154,8 +154,42 @@ class NotificationController extends Controller
         }
         $formNotif['count_pending'] = $count;
 
+        // from nav pending counter requestor side ================================================================
+        $req = request('formnav');
+        $formnav_notif = [];
+        foreach ($req as $key => $value) {
+            $pending_count = [];
 
+            foreach ($value as $k => $v) {
+                
+                if($v['navtitle'] == 'MINUTES OF MEETING')
+                { 
+                    $db = DB::select('select attendeelist, attendeelistId from formmeetingminutes where status != 1');
+                    // return $db[0]->attendeelist;
+                    $v['count'] = 0;
+                    foreach ($db as $alist) {
+                        ($alist->attendeelist);
+                        
+                        // return json_encode($alist['attendeelist']);
+                        $list = json_decode($alist->attendeelist);
+                        foreach ($list as $listval) {
+                            if($listval->empID == UserSession::getSessionID() && $listval->acknowledge == false ){
+                                $v['count'] += 1 ;
+                            }
+                        }
+                    }
+                    
+                }
+                    $pending_count[] = $v;
+            }
+            
+            $formnav_notif[$key]= $pending_count;
+        }
 
+        
+
+       
+       
         // from nav approval pending counter ================================================================
         $req = request('fromnavapproval');
 
@@ -174,20 +208,32 @@ class NotificationController extends Controller
                     // $db_approval = DB::select("select count(leaveID) from '.$formcode.' where empID_ = :empID and ", [UserSession::getSessionID()]);
                     $data = '';
                     if($formcode == 'formsupplementary'){
+                        // 0 pending, 1 verified by witness, 2 appprover, 3 rejected
                         $data = DB::select('select count(eleave.empID_) as count
                                 from '.$formcode.' eleave left join eformapproverbyemp eform
                                     on eleave.empID_ = eform.empID_
+                                inner join employee emp
+                                    on emp.empID = eleave.empID_
                                 where eform.approverID_ = :approverID and
-                                eleave.recstat != 1 
+                                eleave.recstat = 0 
                                 and eform.'.$formcol.' = 1
                                 and eleave.status = 1', [UserSession::getSessionID()]);
-                    }else{
+                    }else if($formcode == 'formtransmittal'){
+                        $data = DB::select('select count(eleave.empID_) as count
+                                from '.$formcode.' eleave 
+                                where eleave.approvedby = :approverID and
+                                eleave.recstat = 0 
+                                and eleave.status = 0', [UserSession::getSessionID()]);
+                    }
+                    else{
                         $data = DB::select('select count(eleave.empID_) as count
                                 from '.$formcode.' eleave left join eformapproverbyemp eform
                                     on eleave.empID_ = eform.empID_
+                                inner join employee emp
+                                    on emp.empID = eleave.empID_
                                 where eform.approverID_ = :approverID 
                                 and eform.'.$formcol.' = 1
-                                and eleave.recstat != 1 
+                                and eleave.recstat = 0 
                                 and eleave.status = 0', [UserSession::getSessionID()]);
                     }
 
@@ -217,7 +263,7 @@ class NotificationController extends Controller
                 AND
                     (form.witnesses not like ? or form.witnesses is null)
                 AND
-                    form.recstat != 1
+                    form.recstat = 0
                 AND
                     form.status <= 1'
             ,[
@@ -230,6 +276,7 @@ class NotificationController extends Controller
 
         return [
             'approval_notif' => $approval_notif,
+            'formnav' => $formnav_notif,
             'leave_cred' => $leaveCred,
             'post' => $postNotif,
             'form' => $formNotif,

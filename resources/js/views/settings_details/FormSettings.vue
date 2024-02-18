@@ -43,13 +43,16 @@
                     </div>
 
                     <div class="dropdown padding-lr-15" style="margin-top: 15px; margin-bottom: 15px;">
-                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{{selected_status | status_filters}}
+                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">{{selected_status_name | status_filters}}
                         &nbsp;&nbsp;<div class="caret"></div></button>
                         <ul class="dropdown-menu scroll-menu">
-                            <li><a href="#" @click.prevent="selected_status = 'Approved'" >Approved</a></li>
+                            <li v-for="stat in statusList" :key="stat.id">
+                                <a href="#" @click.prevent="selected_status = stat.status, selected_status_name = stat.name" >{{stat.name}}</a>
+                            </li>
+                            <!-- <li><a href="#" @click.prevent="selected_status = 'Approved'" >Approved</a></li>
                             <li><a href="#" @click.prevent="selected_status = 'Rejected'">Rejected</a></li>
                             <li><a href="#" @click.prevent="selected_status = 'Pending'">Pending</a></li>
-                            <li><a href="#" @click.prevent="selected_status = 'Disabled'">Disabled</a></li>
+                            <li><a href="#" @click.prevent="selected_status = 'Disabled'">Disabled</a></li> -->
                         </ul>
                     </div>
                     <div class="padding-lr-15">
@@ -64,33 +67,12 @@
         <div class="bgc-white col-lg-12">
             <br><br>
             <div class="col-md-6 nopadding">
-                <button class="btn btn-primary" @click.prevent="enableRange" :disabled="this.selected_status != 'Disabled' || disableBtn">Enable</button>
-                <button class="btn btn-danger" @click.prevent="disableRange" :disabled="this.selected_status == 'Disabled' || disableBtn">Disable</button>
+                <button class="btn btn-primary" @click.prevent="enableRange" :disabled="this.selected_status != 99 || disableBtn">Enable</button>
+                <button class="btn btn-danger" @click.prevent="disableRange" :disabled="this.selected_status == 99 || disableBtn">Disable</button>
 
             </div>
             <table id="manage-forms" class="mdl-data-table" style="width: 100%"></table>
         </div>
-        <!-- <div>
-            <div class="dflex-normal">
-                <div class="dropdown">
-                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select Form Type
-                    &nbsp;&nbsp;<div class="caret"></div></button>
-                    <ul class="dropdown-menu">
-                        <li v-for="list in form_list" :key="list.formID"><a href="#">{{list.formtitle}}</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <div class="dropdown">
-                        <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Select Status
-                        &nbsp;&nbsp;<div class="caret"></div></button>
-                        <ul class="dropdown-menu">
-                            <li v-for="list in form_list" :key="list.formID"><a href="#">{{list.formtitle}}</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="clearfix"></div> -->
     </div>
 </template>
 <script>
@@ -98,6 +80,7 @@
 export default {
     data(){
         return{
+            
             dateStart: moment().format('YYYY-MM-DD'),
             dateEnd: moment().format('YYYY-MM-DD'),
             form_list: [],
@@ -106,6 +89,7 @@ export default {
                 formtitle:'',
             },
             selected_status: '',
+            selected_status_name: '',
             // selected_form_obj:{},
 
             dtHandle: null,
@@ -142,14 +126,62 @@ export default {
     },
     computed:{
         disableBtn(){
-            return !this.selected_status.length > 0 || !this.selected_type.formtitle.length>0;
+            return this.selected_status < 0 || this.selected_status.length == 0 || !this.selected_type.formtitle.length>0;
+        },
+        statusList(){
+            
+            if(this.selected_type.td == 'formoverride'){
+                this.selected_status_name = '';
+                return [
+                    {status: 0, name: 'Pending'},
+                    {status: 2, name: 'Approved'},
+                    {status: 3, name: 'Rejected'},
+                    {status: 99, name: 'Disabled'},
+                ];    
+            }
+            // else if(this.selected_type.td == "formworkrequest"){
+            //     this.selected_status_name = '';
+            //     this.selected_status_name = '';
+            //     return [
+            //         {status: 0, name: 'Pending'},
+            //         {status: 1, name: 'Approved'},
+            //         {status: 2, name: 'Rejected'},
+            //         {status: 99, name: 'Disabled'},
+            //     ];
+            // }
+            else if(this.selected_type.td == "formsupplementary"){
+                this.selected_status_name = '';
+                return [
+                    {status: 0, name: 'Pending'},
+                    {status: 2, name: 'Approved'},
+                    {status: 3, name: 'Rejected'},
+                    {status: 99, name: 'Disabled'},
+                ];
+            }
+            else if(this.selected_type.td == "formtransmittal"){
+                this.selected_status_name = '';
+                return [
+                    {status: 0, name: 'Pending'},
+                    {status: 2, name: 'Approved'},
+                    {status: 3, name: 'Rejected'},
+                    {status: 99, name: 'Disabled'},
+                ];
+            }
+            else{
+            return [
+                    {status: 0, name: 'Pending'},
+                    {status: 1, name: 'Approved'},
+                    {status: 2, name: 'Rejected'},
+                    {status: 99, name: 'Disabled'},
+                ];
+            }
         }
     },
     methods:{
         disableRange(){
-            if(this.selected_status != 'Disabled'){
+            if(this.selected_status != 99){
                 let td = this.selected_type.td;
-                let type= status.indexOf(this.selected_status);
+                let type= this.selected_status;
                 axios.post('api/disable-form-records',{
                     datefrom: this.dateStart,
                     dateto: this.dateEnd,
@@ -162,9 +194,9 @@ export default {
 
         },
         enableRange(){
-            if(this.selected_status == 'Disabled'){
+            if(this.selected_status == 99){
                 let td = this.selected_type.td;
-                let type= status.indexOf(this.selected_status);
+                let type= this.selected_status;
                 axios.post('api/enable-form-records',{
                     datefrom: this.dateStart,
                     dateto: this.dateEnd,
@@ -191,8 +223,8 @@ export default {
             let params = {};
             // let status = ['Pending', 'Approved', 'Rejected'];
             let td = this.selected_type.td;
-            if(this.selected_status != 'Disabled'){
-                type= status.indexOf(this.selected_status);
+            if(this.selected_status != 99){
+                type= this.selected_status;
                 params = {
                     datefrom: this.dateStart, dateto: this.dateEnd,
                     td: td, status: type,
@@ -308,7 +340,8 @@ let columnDefs = [{
         },{
             title: "Status", data: 'status',
              render: function(data, type, full, meta) {
-                 return data == 1? 'Approved': data == 2? 'Rejected': 'Pending'
+                //  return data == 1? 'Approved': data == 2? 'Rejected': 'Pending'
+                return data;
              }
         }, {
             title: "Date Filed", data: 'datefiled'

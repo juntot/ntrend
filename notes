@@ -1,0 +1,59 @@
+delete permanent for resigned employees will delete all attachment as well and all forms
+supplmentary, leave, overtime
+
+DELIMITER //
+create PROCEDURE sp_DeletePermanentUser(IN userId varchar(12))
+BEGIN
+-- eforms
+DELETE FROM eformuser WHERE empID_= userId;
+DELETE FROM eform_reportbyuser WHERE empID_= userId;
+DELETE FROM eformapprover WHERE empID_= userId;
+DELETE FROM eformapproverbyemp WHERE empID_= userId;
+
+-- forms
+DELETE FROM payslips WHERE empID_= userId;
+DELETE FROM formleave WHERE empID_= userId;
+DELETE FROM formundertime WHERE empID_= userId;
+DELETE FROM formsalarydiscrepancy WHERE empID_= userId;
+-- sup details
+DELETE FROM formsupdetails WHERE supID_ IN (
+   SELECT supID FROM formsupplementary WHERE empID_= userId
+);
+DELETE FROM formsupplementary WHERE empID_= userId;
+
+-- formoffsetdetails
+DELETE FROM formoffsetdetails WHERE offsetID_ IN (
+   SELECT offsetID FROM formoffset WHERE empID_= userId
+);
+DELETE FROM formoffset WHERE empID_= userId;
+
+
+DELETE FROM formincidentreport WHERE empID_= userId or personsinvolve = userId;
+DELETE FROM formcallingcard WHERE empID_= userId;
+DELETE FROM formlaptoprequest WHERE empID_= userId;
+DELETE FROM formworkrequest WHERE empID_= userId;
+DELETE FROM formfinancialadvantage WHERE empID_= userId;
+
+-- formcanvasdetails
+DELETE FROM formcanvasdetails WHERE canvasID_ IN (
+   SELECT canvasID FROM formcanvas WHERE empID_= userId
+);
+DELETE FROM formcanvas WHERE empID_= userId;
+
+-- PRF & PRS missing
+
+DELETE FROM formmiis WHERE empID_= userId;
+DELETE FROM formtravel WHERE empID_= userId;
+DELETE FROM formurgentcheck WHERE empID_= userId;
+DELETE FROM formaccreditation WHERE empID_= userId;
+DELETE FROM formoverride WHERE empID_= userId;
+DELETE FROM formovertime WHERE empID_= userId;
+DELETE FROM formtransmittal WHERE empID_= userId;
+
+-- users
+DELETE FROM employee WHERE empID= userId;
+DELETE FROM users WHERE empID= userId;
+
+
+END //
+DELIMITER ;

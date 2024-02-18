@@ -7,10 +7,11 @@
         <div id="loader2" v-if="loader">
             <div class="loader-bar"></div>
         </div>
-        <div class="col-lg-12 header-title">
+        <div class="col-lg-12 header-title bgc-white">
             <h4>MANAGE WITNESS SUPPLEMENTARY</h4>
         </div>
-        <div class="col-lg-12 canvas-chart margin-15">
+        <div class="col-lg-12 canvas-chart margin-15 bgc-white">
+            <br><br>
             <table id="form-group-tbl" class="mdl-data-table" style="width:100%"></table>
 
             <!-- modal update details -->

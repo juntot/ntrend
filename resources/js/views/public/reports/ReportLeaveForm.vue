@@ -38,7 +38,7 @@ import ReportManageLeaveForm from './details/ReportManageLeaveForm';
 // let leavetype = ['Sick Leave', 'Birthday Leave', 'Leave w/o Pay', 'Bereavement Leave', 'Vacation Leave', 'Others'];
 let leavetype = [
     'Sick Leave', 'Birthday Leave', 'Leave w/out Pay', 'Bereavement Leave', 'Vacation Leave',
-    'Descritionary Leave', 'Solo Parent Leave', 'Paternity Leave', 'Others'
+    'Descritionary Leave', 'Maternity Leave', 'Paternity Leave', 'Others'
     ];
 let status = ['Pending', 'Approved', 'Rejected'];
 
@@ -125,12 +125,17 @@ export default {
             let wb = XLSX.utils.book_new();
 
             let rows = [];
-            let header = ['EMPLOYEE ID', 'EMPLOYEE NAME', 'COMPANY', 'DEPARTMENT NAME', 'POSITION', 'DATE FILED', 'DATE START', 'DATE END', 'TOTAL DAYS', 'HALF DAY', 'TYPE OF LEAVE', 'REASON', 'APPROVER', 'APPROVED DATE', 'REMARKS', 'STATUS'];
+            let header = ['EMPLOYEE ID', 'EMPLOYEE NAME', 'COMPANY', 'DEPARTMENT NAME', 'POSITION', 'DATE FILED', 'DATE START', 'DATE END', 
+            'TOTAL DAYS',
+            //  'HALF DAY', 
+             'TYPE OF LEAVE', 'REASON', 'APPROVER', 'APPROVED DATE', 'REMARKS', 'STATUS'];
             rows.push(header);
             this.rows.forEach(obj => {
                 let records = [
                             obj.empID_, obj.fullname, obj.compname, obj.deptname, obj.posname, obj.datefiled,
-                            obj.datestart, obj.dateend, obj.totaldays, obj.halfday, obj.leavetype,
+                            obj.datestart, obj.dateend, 
+                            obj.totaldays >= 1? Math.round(obj.totaldays): obj.totaldays
+                            , obj.leavetype,
                             obj.reason, obj.approvedby, obj.approveddate,
                             obj.remarks, obj.status
                         ];
@@ -173,10 +178,12 @@ export default {
             title: "Date End", data: 'dateend'
         },
         {
-            title: "Total Days", data: 'totaldays',
-            render:(data, type, row )=>{
-                return row['halfday'] > 0 ? data + 0.5 : 1;
-            },
+            title: "Total Days", 
+            data: 'totaldays',
+            render: function(data){
+                return Number(data).valueOf();
+            }
+            
         },
         {
             title: "Half day", data: 'halfday',

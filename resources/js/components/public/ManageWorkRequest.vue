@@ -1,13 +1,13 @@
 <template>
     <div>
-
+        <h4 class="text-right" style="color: #3f51b5">{{workID ? 'Ticket# '+workID: ''}}</h4>
         <form method="post">
             <h3 class="text-center form-title"><span class="dblUnderlined">WORK REQUEST FORM</span></h3>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limit">
                         <div class="form-field__control">
-                            <input type="text" class="form-field__input" :value="datefiled" name="Date requested" readonly="true">
-                            <label class="form-field__label">Date requested</label>
+                            <input type="text" class="form-field__input" :value="datefiled_datetime" name="Date requested" readonly="true">
+                            <label class="form-field__label">Date & Time requested</label>
                             <div class="form-field__bar"></div>
                         </div>
                     </div>
@@ -40,7 +40,8 @@
                 <div class="col-md-4">
                     <div class="mdb-form-field">
                         <div class="form-field__control">
-                            <input type="text" class="form-field__input" :value="computedfullname +' '+userinfo.mname" name="Name" :readonly="true">
+                            <!-- <input type="text" class="form-field__input" :value="computedfullname +' '+userinfo.mname" name="Name" :readonly="true"> -->
+                             <input type="text" class="form-field__input" :value="computedfullname" name="Name" :readonly="true">
                             <label class="form-field__label">Full Name</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -176,7 +177,7 @@
                             <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="3" name="radio" >
                             <span class="checkmark"></span>
                             </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">System Autorization
+                            <label class="mdblbl inline-blocklbl mdblblradio">System Authorization
                             <input :disabled="$parent.disabledinput" type="checkbox" value="System Autorization" v-model="request_type">
                             <span class="mdbcheckmark"></span>
                             </label>
@@ -266,8 +267,8 @@
                             <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="11" name="radio" >
                             <span class="checkmark"></span>
                             </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">Setup Telephone
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Setup Telephone" v-model="request_type">
+                            <label class="mdblbl inline-blocklbl mdblblradio">Layout Design
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Layout Design" v-model="request_type">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
@@ -460,7 +461,7 @@
                 <div class="modal-footer">
 
 
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addWorkRequest" :disabled="isDisable || !isFormValid || !request_type.length > 0" v-if="!workID && $parent.$data.forapprover != 'approval'">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addWorkRequest" :disabled="disabledIfNoApprover || isDisable || !isFormValid || !request_type.length > 0" v-if="!workID && $parent.$data.forapprover != 'approval'">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateWorkRequest" :disabled="isDisable || !isFormValid" v-if="workID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteWorkRequest" :disabled="isDisable" v-if="workID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionWorkRequest(1)" v-if="workID && $parent.$data.forapprover == 'approval' && selected.status == 0">
@@ -479,26 +480,28 @@
     </div>
 </template>
 <script>
-// let worktype = ['System Access (SAP, HRIS etc.)',
-//                 'Borrow item',
-//                 'System Autorization',
-//                 'RDP Access',
-//                 'Password Reset',
-//                 'Internet Access',
-//                 'Email Setup',
-//                 'Install Apps(Spark, Skype, etc.)',
-//                 'Setup Workstation',
-//                 'Setup Printer'
-//                 ,'Setup Telephone',
-//                 'Cleaning / Maintenance',
-//                 'Repair',
-//                 'Format',
-//                 'System Report',
-//                 'System Layout',
-//                 'GPS Report',
-//                 'Conversation History',
-//                 'CCTV Report',
-//                 'File & Data Recovery'];
+// let worktypeFilter = ['system access',
+//                 'borrow item',
+//                 'system autorization',
+//                 'rdp access',
+//                 'password reset',
+//                 'internet access',
+//                 'email setup',
+//                 'install apps (spark, skype etc.)',
+//                 'setup workstation',
+//                 'setup printer',
+//                 'layout design',
+//                 'cleaning / maintenance',
+//                 'repair',
+//                 'format',
+//                 'system report',
+//                 'system layout',
+//                 'gps report',
+//                 'conversation history',
+//                 'cctv report',
+//                 'file & data recovery',
+//                 'assistance',
+//                 ];
 
 let status = ['Pending', 'Approved', 'Rejected'];
 export default {
@@ -508,7 +511,8 @@ export default {
         status: 0,
         empID_: '',
         work_attachment: '',
-        datefiled: moment(new Date()).format('MM/DD/YYYY'),
+        datefiled_datetime: moment(new Date()).format('MM/DD/YYYY HH:mm:ss'),
+        datefiled: moment(new Date()).format('MM/DD/YYYY HH:mm:ss'),
 		dateneed: moment(moment(new Date()).add(1, 'days')).format('MM/DD/YYYY'),
         date_from: moment(new Date()).format('MM/DD/YYYY'),
         date_to: moment(new Date()).format('MM/DD/YYYY'),
@@ -520,7 +524,7 @@ export default {
         remarks: '',
         urgency: 'Medium',
         request_type: [],
-
+        
 		}
     },
     watch:{
@@ -690,7 +694,9 @@ export default {
                 if(i == 'request_type' && typeof data[i] == 'string')
                 this.$data[i] = (data[i]).split(",");
 
-
+                if(i == 'datefiled_datetime')
+                this.$data[i] = moment(data[i]).format('DD/MM/YYYY HH:mm:ss');
+                
                 // if(i == 'worktype')
                 // this.$data[i] = (worktype.indexOf(data[i]) + 1);
 
@@ -724,6 +730,9 @@ export default {
         }
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         isFormValid(){
             return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },

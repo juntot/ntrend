@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class LoanController extends Controller
@@ -42,7 +43,7 @@ public function updateLoan(){
 // DELETE
 public function deleteLoan($loanID  = null){
     DB::table('formloan')->where('loanID', '=', $loanID)
-    ->update(['recstat' => 1]);
+    ->update(['recstat' => 404]);
     // ->delete();
 }
 
@@ -52,7 +53,7 @@ public function getLoanByEmployee(){
     $data = DB::select('select form.*,
     DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
     CONCAT(emp.fname," ", emp.lname) as approvedby from formloan form left join employee emp on
-    form.approvedby = emp.empID where form.recstat !=1 and form.empID_ = :empid', [UserSession::getSessionID() ]);
+    form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID() ]);
 
     return $data;
 }
@@ -61,7 +62,9 @@ public function getLoanByEmployee(){
 // GET Loan FORM EMPLOYEE APPROVERS
 public function getLoanApprover(){
     // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Company0Loan = 1');
-    $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Company0Loan = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+    // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Company0Loan = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+    $data = FormApproverService::getFormApproverByUser('Company0Loan');
     return $data;
 }
 
@@ -83,7 +86,7 @@ public function approvalLoanRequest(){
                                 on pos.posID = emp.posID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
-                            where eform.approverID_ = :approverID and eformloan.recstat != 1', [UserSession::getSessionID()]);
+                            where eform.approverID_ = :approverID and eformloan.recstat = 0', [UserSession::getSessionID()]);
     return $data;
 }
 

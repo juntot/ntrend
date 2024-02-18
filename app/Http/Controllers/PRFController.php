@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class PRFController extends Controller
@@ -21,9 +22,9 @@ class PRFController extends Controller
         ]);
 
 
-        $data = DB::table('formPRF')->insertGetId(request()->except(['isDisable', 'prfID', 'entries', 'itemdesc', 'uom', 'qty', 'allocatedbudget', 'reason', 'remarks', 'accountableto', 'approvedby','reciever_emails']));
+        $data = DB::table('formprf')->insertGetId(request()->except(['isDisable', 'prfID', 'entries', 'itemdesc', 'uom', 'qty', 'allocatedbudget', 'reason', 'remarks', 'accountableto', 'approvedby','reciever_emails']));
         // GET LAST INDEX
-        // $data = DB::select('select prfID from formPRF order by prfID desc limit 1');
+        // $data = DB::select('select prfID from formprf order by prfID desc limit 1');
 
             // FROM SUP DETAILS DATA
             $prfrecord = request()->only(['entries']);
@@ -38,7 +39,7 @@ class PRFController extends Controller
             // 12 to 24hr echo date("H:i", strtotime("1:30 PM"));
             // 24 to 12 echo date("g:i a", strtotime("13:30"));
 
-            DB::table('formPRFdetails')->insert($prfdetailsparams);
+            DB::table('formprfdetails')->insert($prfdetailsparams);
             // request()->merge(['status' => 0, 'prfID' => $data[0]->prfID]);
             // return request()->except(['isDisable']);
             $response = array_merge($response, ['status' => 0, 'prfID' => $data]);
@@ -59,7 +60,7 @@ class PRFController extends Controller
         ]);
 
 
-        DB::table('formPRF')
+        DB::table('formprf')
             ->where('prfID', request('prfID'))
             ->update(request()->except(['isDisable', 'prfID', 'entries', 'itemdesc', 'uom', 'qty',
                 'allocatedbudget', 'reason', 'remarks', 'accountableto', 'approvedby',
@@ -77,8 +78,8 @@ class PRFController extends Controller
         }
 
         //DELETE AND THEN ADD
-        DB::table('formPRFdetails')->where('prfID_', '=', request('prfID'))->delete();
-        DB::table('formPRFdetails')->insert($prfdetailsparams);
+        DB::table('formprfdetails')->where('prfID_', '=', request('prfID'))->delete();
+        DB::table('formprfdetails')->insert($prfdetailsparams);
         // request()->merge(['empID_' => UserSession::getSessionID(), 'status' => 0]);
         // return request()->except(['isDisable']);
         return $request;
@@ -86,20 +87,20 @@ class PRFController extends Controller
 
     // DELETE
     public function deletePRF($prfID  = null){
-        DB::table('formPRF')->where('prfID', '=', $prfID)
-        ->update(['recstat' => 1]);
+        DB::table('formprf')->where('prfID', '=', $prfID)
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
     // GET
     public function getPRFByEmployee(){
         // SESSION ID
-        // $data = DB::select('select * from formPRF where empID_ = :empid', [UserSession::getSessionID()]);
+        // $data = DB::select('select * from formprf where empID_ = :empid', [UserSession::getSessionID()]);
         $data = DB::select('select form.*,
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
-        CONCAT(emp.fname," ", emp.lname) as approvedby from formPRF form left join employee emp on
+        CONCAT(emp.fname," ", emp.lname) as approvedby from formprf form left join employee emp on
         form.approvedby = emp.empID where
-        form.recstat != 1  and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.recstat = 0  and form.empID_ = :empid', [UserSession::getSessionID()]);
 
         // check if data has vale
         if(count($data) > 0)
@@ -109,7 +110,7 @@ class PRFController extends Controller
            {
                 $prfID = $data[$keys]->prfID;
                 // never add supdetailsID to avoid error in update
-                $supdetails = DB::select('select prfID_, itemdesc, uom, qty, allocatedbudget, reason, accountableto from formPRFdetails where prfID_ = :prfID', [$prfID]);
+                $supdetails = DB::select('select prfID_, itemdesc, uom, qty, allocatedbudget, reason, accountableto from formprfdetails where prfID_ = :prfID', [$prfID]);
                 $data[$keys]->entries = $supdetails;
            }
 
@@ -122,20 +123,22 @@ class PRFController extends Controller
     // GET PRF FORM EMPLOYEE APPROVERS
     public function getPRFApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.PRF = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.PRF = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.PRF = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        
+        $data = FormApproverService::getFormApproverByUser('PRF');
         return $data;
     }
 
     // GET FORMS FOR APPROVAL
     public function approvalPRFRequest(){
-        // $data = DB::select('select * from formPRF where (status = 0 and empID_ != :empID) OR approvedby = :empid',
+        // $data = DB::select('select * from formprf where (status = 0 and empID_ != :empID) OR approvedby = :empid',
         // [UserSession::getSessionID(), UserSession::getSessionID()]);
-        // $data = DB::select('select eprf.* from formPRF eprf left join eformapproverbyemp eform on eprf.empID_ = eform.empID_ where eform.approverID_ = :approverID', [UserSession::getSessionID()]);
+        // $data = DB::select('select eprf.* from formprf eprf left join eformapproverbyemp eform on eprf.empID_ = eform.empID_ where eform.approverID_ = :approverID', [UserSession::getSessionID()]);
         $data = DB::select('select eprf.*,
                             DATE_FORMAT(eprf.datefiled, "%m/%d/%Y") as datefiled,
                             CONCAT(emp.fname," ",emp.lname) as fullname, emp.email,
                             branch.branchname, pos.posname, dept.deptname
-                            from formPRF eprf left join eformapproverbyemp eform
+                            from formprf eprf left join eformapproverbyemp eform
                                 on eprf.empID_ = eform.empID_
                             right join employee emp
                                 on emp.empID = eprf.empID_
@@ -145,7 +148,7 @@ class PRFController extends Controller
                                 on branch.branchID = emp.branchID_
                             inner join department dept
                                 on dept.deptID = emp.deptID_
-                            where eform.approverID_ = :approverID and eprf.recstat != 1', [UserSession::getSessionID()]);
+                            where eform.approverID_ = :approverID and eprf.recstat = 0', [UserSession::getSessionID()]);
 
          // check if data has vale
          if(count($data) > 0)
@@ -155,7 +158,7 @@ class PRFController extends Controller
             {
                  $prfID = $data[$keys]->prfID;
                  // never add supdetailsID to avoid error in update
-                 $supdetails = DB::select('select prfID_, itemdesc, uom, qty, allocatedbudget, reason, accountableto from formPRFdetails where prfID_ = :prfID', [$prfID]);
+                 $supdetails = DB::select('select prfID_, itemdesc, uom, qty, allocatedbudget, reason, accountableto from formprfdetails where prfID_ = :prfID', [$prfID]);
                  $data[$keys]->entries = $supdetails;
             }
 
@@ -165,7 +168,7 @@ class PRFController extends Controller
 
     // IE APPROVE / REJECTED
     public function actionFormPRF(){
-        DB::table('formPRF')
+        DB::table('formprf')
         ->where('prfID', request('prfID'))
         ->update([
             'status' => request('status'), 'approvedby'=> request('approvedby'),

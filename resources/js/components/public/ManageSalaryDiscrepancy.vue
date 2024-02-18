@@ -96,12 +96,12 @@
                         LIST OF APPROVERS: 
                     </p>
                     <div class="clearfix"></div>
-                    <span class="approverlist alert-info" v-for="approver in $parent.approvers">{{approver.approvers}}</span>
+                    <span class="approverlist alert-info" v-for="(approver, key) in $parent.approvers" :key="key">{{approver.approvers}}</span>
                     <br><br>
                 </div>
                 <div class="clearfix"></div>
                 <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addSalaryDiscrepancy" :disabled="isDisable || !isFormValid" v-if="submitBtn">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addSalaryDiscrepancy" :disabled="disabledIfNoApprover || isDisable || !isFormValid" v-if="submitBtn">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateSalaryDiscrepancy" :disabled="isDisable || !isFormValid" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteSalaryDiscrepancy" :disabled="isDisable" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionSalaryDiscrepancy(1)" v-if="approveRejecBtn">
@@ -239,6 +239,9 @@ export default {
         }
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         isFormValid(){
             return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },

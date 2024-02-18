@@ -20,7 +20,6 @@ Vue.use(VueRouter);
 // moment().tz("Asia/Manila").format();
 moment.tz.setDefault("Asia/Manila");
 
-
 const app = new Vue({
     store: store,
     el: '#root',
@@ -236,15 +235,17 @@ const app = new Vue({
     filters:{
         leaveCreditFilter: (value) => {
             if (!value) return '00'
-            value = '0'+value;
+            value = '0'+Number(value).valueOf();
+            // value = '0'+value;
             // return this.leaveCredits;
             // value = this.leaveCredits[value] || this.userinfo[value]
             // value = '0'+value;
-            return value.slice(-2);
+            // return value.slice(-2);
+            return value.slice(1);
         },
         moment: function (date) {
     		return moment(date).fromNow();
-  		}
+  		},
     },
     async created(){
         
@@ -302,6 +303,7 @@ const app = new Vue({
 
             let mynotif={
                 fromnavapproval: response.data,
+                formnav: this.forms,
                 witness: this.witnessnav.length > 0? true: false,
             };
             return axios.post('api/notif_center', mynotif)
@@ -310,6 +312,7 @@ const app = new Vue({
         .then(res=>{
             // console.log('taeeeeeee...', res.data.approval_notif)
             this.formnavapproval = res.data.approval_notif;
+            this.forms = res.data.formnav;
             this.leaveCredits = res.data.leave_cred[0];
             this.formNotifs = res.data.form;
             this.postNotifs = res.data.post;
@@ -405,11 +408,14 @@ const app = new Vue({
             */
             let mynotif={
                 fromnavapproval: this.formnavapproval,
+                formnav: this.forms,
                 witness: this.witnessnav.length > 0? true: false,
             };
 
             axios.post('api/notif_center', mynotif)
             .then(res=>{
+                this.formnavapproval = res.data.approval_notif;
+                this.forms = res.data.formnav;
                 this.leaveCredits = res.data.leave_cred[0];
                 this.formNotifs = res.data.form;
                 this.postNotifs = res.data.post;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class CallingCardController extends Controller
@@ -49,7 +50,7 @@ class CallingCardController extends Controller
     // DELETE
     public function deleteCallingCard($ccID  = null){
         DB::table('formcallingcard')->where('ccID', '=', $ccID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
     // GET
@@ -65,7 +66,7 @@ class CallingCardController extends Controller
             cc.tyreplus, cc.approveddate, cc.remarks, cc.status from formcallingcard cc
             INNER JOIN employee emp
             on cc.empID_ = emp.empID
-            where cc.recstat != 1 and
+            where cc.recstat = 0 and
             cc.empID_ = :empid', [UserSession::getSessionID()]);
 
         return $data;
@@ -76,7 +77,9 @@ class CallingCardController extends Controller
     // GET LEAVE FORM EMPLOYEE APPROVERS
     public function getCallingCardApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Calling0Card0Request = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Calling0Card0Request = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Calling0Card0Request = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Calling0Card0Request');
         return $data;
     }
 
@@ -100,7 +103,7 @@ class CallingCardController extends Controller
                                 on pos.posID = emp.posID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
-                            where eform.approverID_ = :approverID and eccard.recstat != 1', [UserSession::getSessionID()]);
+                            where eform.approverID_ = :approverID and eccard.recstat = 0', [UserSession::getSessionID()]);
         return $data;
     }
 

@@ -95,7 +95,7 @@ export default {
         resetPassword(data){
             axios.post('api/resetpass',{empID: data.empID})
             .then(res=>{
-
+                alert('password reset..');
             })
             .catch(err=>console.log(err));
         },

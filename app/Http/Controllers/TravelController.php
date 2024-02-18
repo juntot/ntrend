@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class TravelController extends Controller
@@ -61,7 +62,7 @@ class TravelController extends Controller
     // DELETE
     public function deleteTravel($travelID  = null){
         DB::table('formtravel')->where('travelID', '=', $travelID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -73,7 +74,7 @@ class TravelController extends Controller
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         DATE_FORMAT(form.departuredate, "%m/%d/%Y") as departuredate,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formtravel form left join employee emp on
-        form.approvedby = emp.empID where form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
 
         return $data;
     }
@@ -82,9 +83,11 @@ class TravelController extends Controller
     // GET TRAVEL FORM EMPLOYEE APPROVERS
     public function getTravelApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Travel0Form = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform
-                    right join employee emp on eform.approverID_ = emp.empID where eform.Travel0Form = 1 and eform.empID_ = :empiD',
-                [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform
+        //             right join employee emp on eform.approverID_ = emp.empID where eform.Travel0Form = 1 and eform.empID_ = :empiD',
+        //         [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Travel0Form');
         return $data;
     }
 
@@ -107,7 +110,7 @@ class TravelController extends Controller
                                 on pos.posID = emp.posID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
-                            where eform.approverID_ = :approverID and etravel.recstat != 1', [UserSession::getSessionID()]);
+                            where eform.approverID_ = :approverID and etravel.recstat = 0', [UserSession::getSessionID()]);
         return $data;
     }
 

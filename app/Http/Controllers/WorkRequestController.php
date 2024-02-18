@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use Carbon\Carbon;
 use DB;
 
@@ -19,8 +20,8 @@ class WorkRequestController extends Controller
         request()->merge(['empID_' => UserSession::getSessionID()]);
 
         //merge datefile formatted date
+
         request()->merge([
-            // 'datefiled' => UserSession::formatDate(request()->datefiled),
             'datefiled' => date("Y-m-d"),
             'datefiled_datetime' => date("Y-m-d H:i:s"),
             'dateneed' => UserSession::formatDate(request()->dateneed),
@@ -30,6 +31,8 @@ class WorkRequestController extends Controller
 
 
         $data = DB::table('formworkrequest')->insertGetId(request()->except(['isDisable', 'workID', 'approvedby', 'status','reciever_emails', 'attachment']));
+            
+           /*
             // $data = DB::select('select workID from formworkrequest order by workID desc limit 1');
             // GET LAST INDEX
             // request()->merge(['status' => 0, 'workID' => $data[0]->workID]);
@@ -37,6 +40,8 @@ class WorkRequestController extends Controller
 
             // save attchment
             //folder by ID preparation for multiple files in single workID folder
+            */
+
             $attachment = UserSession::IMG_Attachment('workrequest/'.$carbon_format.'/'.$data);
             if(count($attachment)){
                 $attachment = $attachment[0];
@@ -47,9 +52,10 @@ class WorkRequestController extends Controller
             else{
                 $attachment = '';
             }
-
+            /*
             // $attachment = $attachment[0][0];
-
+            */
+            
             DB::table('formworkrequest')
             ->where('workID', $data)
             ->update(['work_attachment' => $attachment]);
@@ -60,8 +66,9 @@ class WorkRequestController extends Controller
 
         
         // mail notification
-        return MailServices::getApproverEmail('workID', 360, 'formworkrequest', 'Work0Request');
-        MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'WORK REQUEST');
+        // return FormApproverService::getApproverEmail('workID', 360, 'formworkrequest', 'Work0Request');
+        
+        MailServices::sendNotify(request('reciever_emails'), request('empID_'), 'WORK REQUEST', 'Work Request Form');
         MailServices::formNotify(request('reciever_emails'), request('empID_'), 'work request request', $data, 'workreq');
         return $response;
 
@@ -113,7 +120,7 @@ class WorkRequestController extends Controller
     // DELETE
     public function deleteWorkRequest($workID  = null){
         DB::table('formworkrequest')->where('workID', '=', $workID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -131,7 +138,7 @@ class WorkRequestController extends Controller
             from formworkrequest form
             left join employee emp on
                 form.approvedby = emp.empID
-            where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+            where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
         return $data;
     }
 
@@ -139,7 +146,9 @@ class WorkRequestController extends Controller
     // GET LEAVE FORM EMPLOYEE APPROVERS
     public function getWorkRequestApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Work0Request = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Work0Request = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Work0Request = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Work0Request');
         return $data;
     }
 
@@ -177,7 +186,7 @@ class WorkRequestController extends Controller
                                 on emp.branchID_ = branch.branchID
                             where eform.approverID_ = :approverID 
                             and eform.Work0Request = 1
-                            and ework.recstat != 1', [UserSession::getSessionID()]);
+                            and ework.recstat = 0', [UserSession::getSessionID()]);
 
         return $data;
     }
@@ -192,10 +201,12 @@ class WorkRequestController extends Controller
             DB::table('formworkrequest')
             ->where('workID', request('workID'))
             ->update([
-                'status' => request('status'), 'approvedby'=> request('approvedby'),
-                'approveddate'=> date("Y-m-d H:i:s"), 'remarks' => request('remarks')
+                'status' => request('status'), 
+                'approvedby'=> request('approvedby'),
+                'approveddate'=> date("Y-m-d H:i:s"), 
+                'remarks' => request('remarks')
                 ]);
-            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'WORK REQUEST', 'APPROVED');
+            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'WORK REQUEST', 'APPROVED', 'Work Request Form');
             MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'work request request', 'approved', request('workID'), 'workreq');
         }
         elseif(request('status') == 2){
@@ -206,11 +217,11 @@ class WorkRequestController extends Controller
                 'approveddate'=> date("Y-m-d H:i:s"), 'remarks' => request('remarks')
                 ]);
 
-            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'WORK REQUEST', 'REJECTED');
+            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'WORK REQUEST', 'REJECTED', 'Work Request Form');
             MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'work request request', 'rejected', request('workID'), 'workreq');
         }
         elseif(request('status') == 0){
-            return request()->all();
+            // return request()->all();
             DB::table('formworkrequest')
             ->where('workID', request('workID'))
             ->update([
@@ -220,7 +231,7 @@ class WorkRequestController extends Controller
             ]);
             
             
-            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'WORK REQUEST', 'CANCELLED');
+            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'WORK REQUEST', 'CANCELLED', 'Work Request Form');
             MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'work request request', 'cancelled', request('workID'), 'workreq');
         }
         elseif(request('status') == 3){
@@ -232,7 +243,7 @@ class WorkRequestController extends Controller
 
             ]);
 
-            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'WORK REQUEST', 'EXECUTED');
+            MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'WORK REQUEST', 'EXECUTED', 'Work Request Form');
             MailServices::formNotifyReviewed(request('email'), request('approvedby'), 'work request request', 'executed', request('workID'), 'workreq');
         }
         elseif(request('status') == 5){
@@ -246,7 +257,7 @@ class WorkRequestController extends Controller
             ]);
             
             
-            MailServices::send_email_Notify(request('reciever_emails'), request('approvedby'), 'WORK REQUEST', ' <br><br>move back to pending his/her ');
+            MailServices::send_email_Notify(request('reciever_emails'), request('approvedby'), 'WORK REQUEST', ' <br><br>move back to pending his/her ', 'Work Request Form');
             MailServices::form_post_Notify(request('reciever_emails'), request('approvedby'), 'work request request', request('workID'), 'workreq', 'move back to pending his/her submitted');
 
             request()->merge(['status' => 0]);
@@ -259,7 +270,7 @@ class WorkRequestController extends Controller
                 'confirm_datetime'=> date("Y-m-d H:i:s"), 'remarks' => request('remarks'),
             ]);
 
-            MailServices::send_email_Notify(request('reciever_emails'), request('empID_'), 'WORK REQUEST', ' <br><br>confirmed his/her ');
+            MailServices::send_email_Notify(request('reciever_emails'), request('empID_'), 'WORK REQUEST', ' <br><br>confirmed his/her ', 'Work Request Form');
             MailServices::form_post_Notify(request('reciever_emails'), request('empID_'), 'work request request', request('workID'), 'workreq', 'confirmed his/her submitted');
             
             

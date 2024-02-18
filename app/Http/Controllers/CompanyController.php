@@ -24,7 +24,7 @@ class CompanyController extends Controller
 
 
     public function getCompany(){
-    	$data = DB::select('select compID, compname from companytbl where status = 1');
+    	$data = DB::select('select compID, compname from companytbl where status = 1 order by compname');
     	return $data;
     }
 

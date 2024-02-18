@@ -21,7 +21,7 @@ class JobPositionController extends Controller
    }
 
    public function getPosition(){
-        $data = DB::select('select * from positiontbl where status=1');
+        $data = DB::select('select * from positiontbl where status=1 order by posname');
         return $data;
    }
 

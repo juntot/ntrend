@@ -244,7 +244,10 @@ export default {
         //     title: "Employee ID", data: 'empID_'
         // },
         {
-            title: "Date Filed", data: 'datefiled'
+            title: "Date & Time Filed", data: 'datefiled_datetime',
+            render: function(data) {
+                return moment(data).format('DD/MM/YYYY HH:mm:ss');
+            }
         }, {
             title: "Date Needed", data: 'dateneed'
         },{

@@ -21,9 +21,9 @@ class UserSession{
             ]);
     }
 
-    public static function formatDate($str_date)
+    public static function formatDate($str_date, $format = "Y-m-d")
     {
-        return date("Y-m-d", strtotime($str_date));
+        return date($format, strtotime($str_date));
     }
 
     public static function delAttachment($path){
@@ -82,7 +82,6 @@ class UserSession{
                     \Storage::delete('public/'.$folder.'/'.$filename);
                     $path = $image->storeAs('public/'.$folder, $filename);
 
-
                     // $file_path[] = ['pdf_loc' => $path, 'empID_' => pathinfo($filename, PATHINFO_FILENAME)];
                 }else{
                     $path = $image->storeAs('public/'.$folder, $filename);
@@ -127,14 +126,45 @@ class UserSession{
 
 
 
+    public static function IMG_Attachment($path = '', $helperLocation = ''){
+        $files = request()->file('attachment');
+        $file_path = [];
+        $old_path = $path;
+    
+        if(request()->hasFile('attachment') && $files)
+        {   
+            if(!$helperLocation)
+            \File::deleteDirectory('storage/app/public/'.$old_path);
+
+            $count = 0;
+            foreach($files as $image)
+            {
+                // helperLocation contains old location of images - use for array of images and look for exact location of specific each attachment
+                if($helperLocation)
+                \Storage::delete($helperLocation[$count]);
+                
+                $path = $image->store('public/'.$old_path);
+                $file_path[$count] = $path ;
+                
+                $count++;
+
+            }
+        }
+        return $file_path;
+    }
+
+
+/*
     public static function IMG_Attachment($path = ''){
         $files = request()->file('attachment');
         $file_path = [];
+        $old_path = $path;
         // return $files;
 
         if(request()->hasFile('attachment') && $files)
         {
-            \File::deleteDirectory('storage/app/public/'.$path);
+            \File::deleteDirectory('storage/app/public/'.$old_path);
+            $count = 0;
             foreach($files as $image)
             {
 
@@ -151,13 +181,22 @@ class UserSession{
 
                 // }
 
-                $path = $image->store('public/'.$path);
-                $file_path[] = $path;
+                
+                $path = $image->store('public/'.$old_path);
+                $file_path[$count] = $path ;
+                
+                $count++;
 
             }
         }
         return $file_path;
     }
+*/
+
+
+
+
+
 
 
 

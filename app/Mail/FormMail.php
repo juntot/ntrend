@@ -19,11 +19,12 @@ class FormMail extends Mailable
     public $name;
     public $formType;
     PUBLIC $emailBody;
-    public function __construct($emailBody = null)
+    public function __construct($emailBody = null, $subject = '')
     {
         //
         // $this->name = $from;
         // $this->formType = $formType;
+        $this->subject = $subject ? $subject : 'Exceltrend Portal';
         $this->emailBody = $emailBody;
 
     }
@@ -35,8 +36,8 @@ class FormMail extends Mailable
      */
     public function build()
     {
-        return $this->from('no-reply@northtrend.com', 'Exceltrend Portal')
-                    ->subject('Exceltrend Portal')
+        return $this->from('e-Portal@northtrend.com',)
+                    ->subject($this->subject)
                     ->view('emails.formNotif');
     }
 }

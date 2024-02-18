@@ -92,6 +92,18 @@
                         </div>
                 </div>
                 <div class="clearfix"></div> -->
+                <div class="clearfix"></div>
+                <div class="col-lg-12">
+                    <h5 class="form-subtitle"></h5>
+                    <div class="mdb-form-field">
+                            <div class="form-field__control mdb-bgcolor">
+                                <textarea :readonly="true" class="form-field__textarea" v-validate="'required'" id="" cols="4" rows="4" v-model="detailedreason" name="detailedreason"></textarea>
+                                <label class="form-field__label">Detailed Reason</label>
+                                <div class="form-field__bar"></div>
+                            </div>
+                            <span class="errors">{{ errors.first('detailedreason') }}</span>
+                    </div>
+                </div>
                 <div class="col-lg-12">
                     <h5 class="form-subtitle"><em>Requested By</em></h5>
                 </div>
@@ -227,6 +239,7 @@ export default {
             witnesses: '',
             approvedby: '',
             remarks: '',
+            detailedreason: '',
 		}
     },
     watch:{

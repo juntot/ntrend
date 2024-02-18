@@ -45,8 +45,6 @@ class FormController extends Controller
         DB::select('update eformuser set '.$navform.' = '.$status.' where empID_ IN (
             select empID from employee where deptID_ = (select deptID from department where deptname = "'.$deptval.'" limit 1)
         )');
-
-
     }
 
 
@@ -111,17 +109,26 @@ class FormController extends Controller
     // APPROVERS GENERAL
     public function getFormApprovers()
     {
-        $data = DB::select('select form.empID_, emp.fname, emp.lname, form.* from eformapprover form inner join employee emp on form.empID_ = emp.empID and emp.status = 1');
+        $data = DB::select('select form.empID_, emp.fname, emp.lname, form.* 
+        from eformapprover form 
+        inner join employee emp 
+            on form.empID_ = emp.empID 
+        and emp.status = 1');
         return $data;
     }
 
     // APPROVERS BY EMPLOYEE
     public function getFormApproversByEmployee($empID = '')
     {
+        
         if($empID){
-            $data = DB::select('select form.*, form.approverID_ AS empID_, emp.fname, emp.lname from eformapproverbyemp form inner join employee emp on form.approverID_ = emp.empID where form.empID_ = :empID and emp.status = 1', [$empID]);
-
-
+            $data = DB::select('select form.*, form.approverID_ AS empID_, emp.fname, emp.lname 
+            from eformapproverbyemp form 
+            inner join employee emp 
+                on form.approverID_ = emp.empID 
+            where form.empID_ = :empID 
+            and emp.status = 1', [$empID]);
+            
         }else{
             // $appvByEmployee = DB::select('select form.empID_, emp.fname, emp.lname, form.* from efromapproverbyemp form inner join employee emp on form.empID_ = emp.empID where emp.empID != :empID', [$empID]);
             // DB::select('select form.empID_, emp.fname, emp.lname, form.* from eformapprover form inner join employee emp on form.empID_ = emp.empID');
@@ -147,7 +154,11 @@ class FormController extends Controller
                 $data[$key]->Supplier0Accreditation = 0;
                 $data[$key]->PRS = 0;
                 $data[$key]->Overtime0Request = 0;
+
+                // remove transmittal in datatable 
+                unset($data[$key]->Transmittal);
             }
+            
         }
 
 
@@ -207,7 +218,7 @@ class FormController extends Controller
     public function updateFormApproverByEmployee($empid = null, $approverid = null ,$formname = null ,$status = null){
         // return ()
        $isExist = DB::select("select empID_, approverID_ from eformapproverbyemp where empID_ = '$empid' and approverID_ = '$approverid'");
-
+        
        if(count($isExist)>0)
        {
             DB::table('eformapproverbyemp')
