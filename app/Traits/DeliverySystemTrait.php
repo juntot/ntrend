@@ -90,7 +90,7 @@ trait DeliverySystemTrait
             "html_body" => $message
         );    
 
-        if(count($cc))
+        if($cc && count($cc))
         $data["cc"] = $cc;
 
 

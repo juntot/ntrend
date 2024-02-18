@@ -25,7 +25,8 @@
   		<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
 		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.material.min.css"> -->
 
-		<link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+		<!-- <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet"> -->
+		<link href="{{URL::asset('resources/assets/css/materialdesignicons.min.css')}}" rel="stylesheet">
 		<!-- <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet"> -->
 		<link rel="stylesheet" href="{{URL::to('/public/css/vuetify.css')}}">
 
@@ -535,8 +536,8 @@
 		</div> <!--ROOT-->
             <script src="{{URL::asset('resources/assets/js/jquery/jquery3.3.1.min.js')}}"></script>
 
-			<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
-			<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+			<link href="{{ URL::asset('resources/assets/js/summernote/summernote.min.css') }}" rel="stylesheet">
+			<script src="{{ URL::asset('resources/assets/js/summernote/summernote.min.js') }}"></script>
 
 
 			<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.js"></script> -->

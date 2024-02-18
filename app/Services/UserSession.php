@@ -26,6 +26,10 @@ class UserSession{
         return date($format, strtotime($str_date));
     }
 
+    public static function delDirectory($path){
+        \File::deleteDirectory('storage/app/'.$path);
+    }
+
     public static function delAttachment($path){
         if(\Storage::disk('local')->exists($path))
             \Storage::delete($path);
@@ -93,27 +97,35 @@ class UserSession{
     }
 
 
-    public static function fileAttachments($folder = ''){
+    public static function fileAttachments($folder = '', $rand = false){
         $files = request()->file('attachment');
         $file_path = [];
-        // return $files;
+        
         if(request()->has('attachment') && $files)
         {
+            
             foreach($files as $image)
             {
-                $filename = $image->getClientOriginalName();
-                // $ext = $image->getClientOriginalExtension();
 
-
-                if(\Storage::disk('local')->exists('public/'.$folder.'/'.$filename)){
-                    \Storage::delete('public/'.$folder.'/'.$filename);
-                    $path = $image->storeAs('public/'.$folder, $filename);
-
-                    // $file_path[] = ['pdf_loc' => $path, 'empID_' => pathinfo($filename, PATHINFO_FILENAME)];
-                }else{
-                    $path = $image->storeAs('public/'.$folder, $filename);
-                    $file_path[] = ['pdf_loc' => $path, 'empID_' => pathinfo($filename, PATHINFO_FILENAME)];
+                if($rand){
+                    $path = $image->store('public/'.$folder);
+                    $file_path[] = ['file_loc' => $path];
                 }
+                else{
+                    $filename = $image->getClientOriginalName();
+                    // $ext = $image->getClientOriginalExtension();
+                    
+                    if(\Storage::disk('local')->exists('public/'.$folder.'/'.$filename)){
+                        \Storage::delete('public/'.$folder.'/'.$filename);
+                        $path = $image->storeAs('public/'.$folder, $filename);
+
+                        // $file_path[] = ['pdf_loc' => $path, 'empID_' => pathinfo($filename, PATHINFO_FILENAME)];
+                    }else{
+                        $path = $image->storeAs('public/'.$folder, $filename);
+                        $file_path[] = ['pdf_loc' => $path, 'empID_' => pathinfo($filename, PATHINFO_FILENAME)];
+                    }
+                }
+                
             }
         }
         return $file_path;

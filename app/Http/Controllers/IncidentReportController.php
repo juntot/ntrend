@@ -11,6 +11,23 @@ use DB;
 
 class IncidentReportController extends Controller
 {
+    // attachment
+    public function incidentReportAttachment(){
+        $loc = UserSession::fileAttachments('IR/'.Carbon::now()->isoFormat('YYYY-MM-DD'), true);
+        if(count($loc))
+        return $loc[0]['file_loc'];
+    }
+
+    // remove directory
+    public function delDirectory(){
+        // if($path){
+            $path = 'public/IR/'.Carbon::now()->subDays(61)->toDateString();
+            // return $path;
+            UserSession::delDirectory($path);
+        // }
+        
+    }
+
     // ADD
     public function addIncidentReport(){
         date_default_timezone_set("Asia/Hong_Kong");
@@ -156,48 +173,63 @@ class IncidentReportController extends Controller
         // [UserSession::getSessionID(), UserSession::getSessionID()]);
         // $data = DB::select('select eIReport.* from formincidentreport eIReport left join eformapproverbyemp eform on eIReport.empID_ = eform.empID_ where eform.approverID_ = :approverID', [UserSession::getSessionID()]);
 
-        $data = DB::select('select distinct(eIReport.incidentID), eIReport.*,
-                            DATE_FORMAT(eIReport.datefiled, "%m/%d/%Y") as datefiled,
-                            CONCAT(emp.fname," ",emp.lname) as fullname, emp.email,
-                            branch.branchname, pos.posname,
-                            (
-                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
-                                where subemp.empID = eIReport.approvedby
-                            ) as approvedby,
-                            (
-                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
-                                where subemp.empID = eIReport.personsinvolve
-                            ) as search_employee,
-                            (
-                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
-                                where subemp.empID = eIReport.empID_
-                            ) as reportedby,
-                            (
-                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
-                                where subemp.empID = eIReport.endorse1
-                            ) as search_endorse_employee,
-                            (
-                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
-                                where subemp.empID = eIReport.endorse2
-                            ) as search_endorse_employee2
+        $sql = 'select distinct(eIReport.incidentID), eIReport.*,
+                DATE_FORMAT(eIReport.datefiled, "%m/%d/%Y") as datefiled,
+                CONCAT(emp.fname," ",emp.lname) as fullname, emp.email,
+                branch.branchname, pos.posname,
+                (
+                    select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                    where subemp.empID = eIReport.approvedby
+                ) as approvedby,
+                (
+                    select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                    where subemp.empID = eIReport.personsinvolve
+                ) as search_employee,
+                (
+                    select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                    where subemp.empID = eIReport.empID_
+                ) as reportedby,
+                (
+                    select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                    where subemp.empID = eIReport.endorse1
+                ) as search_endorse_employee,
+                (
+                    select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                    where subemp.empID = eIReport.endorse2
+                ) as search_endorse_employee2
 
-                            from formincidentreport eIReport left join eformapproverbyemp eform
-                                on eIReport.empID_ = eform.empID_
-                            right join employee emp
-                                on emp.empID = eIReport.empID_
-                            inner join positiontbl pos
-                                on pos.posID = emp.posID_
-                            inner join branchtbl branch
-                                on branch.branchID = emp.branchID_
-                            where eform.approverID_ = :approverID
-                            OR eIReport.endorse1 = :endorse1ID 
-                            OR eIReport.endorse2 = :endorse2ID 
+                from formincidentreport eIReport left join eformapproverbyemp eform
+                    on eIReport.empID_ = eform.empID_
+                right join employee emp
+                    on emp.empID = eIReport.empID_
+                inner join positiontbl pos
+                    on pos.posID = emp.posID_
+                inner join branchtbl branch
+                    on branch.branchID = emp.branchID_';
 
-                            and eIReport.recstat = 0', [
-                                UserSession::getSessionID(),
-                                UserSession::getSessionID(),
-                                UserSession::getSessionID()
-                            ]);
+        $params = [];
+        if(UserSession::getEmpKey()[0]->deptID_ == 2){
+            $sql = $sql.' where eform.Incident0Report = 1
+            and eIReport.recstat = 0';
+            $params = [];
+        }else{
+            $sql = $sql.' where (eform.approverID_ = :approverID
+                OR eIReport.endorse1 = :endorse1ID 
+                OR eIReport.endorse2 = :endorse2ID)
+                and eform.Incident0Report = 1
+                and eIReport.recstat = 0';
+
+            $params = [
+                UserSession::getSessionID(),
+                UserSession::getSessionID(),
+                UserSession::getSessionID()
+            ];
+        }
+        
+
+        // return $sql;
+        $data = DB::select($sql, $params);
+        // dept ID 2 = HR department
 
         return $data;
     }
@@ -227,10 +259,11 @@ class IncidentReportController extends Controller
         ]);
 
         // return request()->all();
+// return request('endorse2_email').' endorse1: '.request('endorse1_email'). ''. 'Endorse to you an Incident Report Request for Further Investigation '. 'Incident Report Request';
 
         DB::table('formincidentreport')
         ->where('incidentID', request('incidentID'))
-        ->update(request()->all());
+        ->update(request()->except('empID_'));
 
          // MAIL NOTIFICATION
          if(request('status') == 1)
@@ -242,20 +275,22 @@ class IncidentReportController extends Controller
          elseif(request('status') == 2){
             //  2nd endorsement
             //  MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'INCIDENT REPORT REQUEST', 'REJECTED');
-            MailServices::send_email_Notify(request('endorse2_email'), request('endorse1'), '', 'Endorse to you an Incident Report Request for Further Investigation ', 'Incident Report Request');
+            
+            MailServices::send_email_Notify(request('endorse2_email'), UserSession::getSessionID(), '', 'Endorse to you an Incident Report Request for Further Investigation ', 'Incident Report Request');
          }
          elseif(request('status') == 3){
             //  close
             //  endorse
             //  MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'INCIDENT REPORT REQUEST', 'REJECTED');
             $requestorEmail = [ MailServices::getEmailsByEmpId(request('empID_')), request('personsinvolve_email')];
-            MailServices::send_email_Notify($requestorEmail, request('approvedby'), '', 'Mark Close an Incident Report Request ', 'Incident Report Request');
+
+            MailServices::send_email_Notify($requestorEmail, UserSession::getSessionID(), '', 'Mark Close an Incident Report Request ', 'Incident Report Request');
          }
          else{
             //  rejected 4 status
             //  MailServices::sendNotifyReviewed(request('email'), request('approvedby'), 'INCIDENT REPORT REQUEST', 'CANCELLED');
             $requestorEmail = [ MailServices::getEmailsByEmpId(request('empID_')), request('personsinvolve_email')];
-            MailServices::send_email_Notify($requestorEmail, request('approvedby'), '', 'Rejected an Incident Report Request ', 'Incident Report Request');
+            MailServices::send_email_Notify($requestorEmail, UserSession::getSessionID(), '', 'Rejected an Incident Report Request ', 'Incident Report Request');
          }
         return request()->all();
     }

@@ -149,10 +149,13 @@ class DeliverySystemController extends Controller
                 ['DocNum_' => request('DocNum_')],
                 request()->except(['path', 'method', 'CardCode', 'DocTotal', 'company', 'branchcode'])
             );
-            $this->sendSMSNotif();
+            // $this->sendSMSNotif();
             $this->deliverySystemMailer('no-reply@northtrend.com', 'Customer Survey', '');
-            // $this->deliverySystemMailer('no-reply@northtrend.com', 'chareday.occena@northtrend.com', 'Customer Survey');
+            
+            // $this->deliverySystemMailer('no-reply@northtrend.com', 'chareday.occena@northtrend.com', 'Customer Survey');    
         }
+        return response()->json(request()->except(['path', 'method', 'branchcode']), 200);
+
         // return response()->json(request()->only(['DocNum_','isSuccess']),$sapstatus);
         // update local DB
         // DB::table('formdeliverysys')
@@ -161,7 +164,7 @@ class DeliverySystemController extends Controller
         //     request()->except(['path', 'method', 'CardCode', 'DocTotal', 'company'])
         // );
         
-        return response()->json(request()->except(['path', 'method', 'branchcode']), 200);
+        
         
 
         
@@ -271,6 +274,7 @@ North Trend Marketing Corp | AP Blue Whale Corp. <br>
 Solid Trend Trade Sales Inc. | Philcrest Marketing Corp.</div>';
 
         // MailServices::sendDeliverySysMail($to, $from, $bcc, $subject, $message);
+        
         return $this->smtp2goEmailAPI([$to], $subject, $message , $cc);
     }
 

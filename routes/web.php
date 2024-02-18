@@ -208,6 +208,8 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/api/deleteIncidentReport/{workid?}', 'IncidentReportController@deleteIncidentReport');
             Route::get('/api/getIncidentReportbyemployee', 'IncidentReportController@getIncidentReportByEmployee');
             Route::get('/api/getIncidentReportApprover', 'IncidentReportController@getIncidentReportApprover'); // get approvers
+            Route::post('/api/IncidentReportattachment', 'IncidentReportController@incidentReportAttachment'); // get approvers
+            Route::get('/cron/remdirectory', 'IncidentReportController@delDirectory');
 
             // COMPANY LOAN FORM
             Route::post('/api/addLoan', 'LoanController@addLoan');
@@ -238,6 +240,7 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/api/deleteworkrequest/{workid?}', 'WorkRequestController@deleteWorkRequest');
             Route::get('/api/getworkrequestbyemployee', 'WorkRequestController@getWorkRequestByEmployee');
             Route::get('/api/getWorkRequestApprover', 'WorkRequestController@getWorkRequestApprover'); // get approvers
+            Route::get('/api/getListITPersonnel', 'WorkRequestController@getListITPersonnel');
 
             // FINANCIAL ADVANTAGE FORM
             Route::post('/api/addFinancialAdvantage', 'FinancialAdvantageController@addFinancialAdvantage');
@@ -751,6 +754,9 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             // cron notif settings
             Route::post('api/cron-sms-notif-num', 'CronController@addSMSnum');
             Route::post('api/cron-sms-notif', 'CronController@allowSMSnotif');
+
+
+            
     });
 
 });

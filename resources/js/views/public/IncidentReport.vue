@@ -131,6 +131,32 @@ export default {
         closeModal(){
             this.disabledinput = false;
             this.selected = {};
+        },
+        renderDisciplinaryAction(row){
+            let finalActionTaken = 'N/A';
+            if(row.status == 3){
+                if(row.disciplinaryaction2 && row.disciplinaryaction2 != 'N/A'){
+                    finalActionTaken = row.disciplinaryaction2;   
+                }
+                else if(row.actionTaken2 && row.actionTaken2 != 'N/A'){
+                    finalActionTaken = row.actionTaken2;
+                }
+                else if(row.disciplinaryaction1 && row.disciplinaryaction1 != 'N/A'){
+                    finalActionTaken = row.disciplinaryaction1;
+                }
+                else if(row.actionTaken1 && row.actionTaken1 != 'N/A'){
+                    finalActionTaken = row.actionTaken2;
+                }else if(row.disciplinaryaction && row.disciplinaryaction != 'N/A'){
+                    finalActionTaken = row.disciplinaryaction;
+                }else{
+                    finalActionTaken = row.actionTaken;
+                }
+                
+            }
+            if(row.status == 4)
+            finalActionTaken = 'Rejected';
+
+            return finalActionTaken;
         }
     },
     created(){
@@ -235,25 +261,31 @@ export default {
         })
         .catch((err)=>{});
 
-
+        
         let columnDefs = [
         {
-            title: "Incident #", data: 'incidentID', visible: true,
+            title: "Incident #", className:"td-ellipses row-limit-sm",  data: 'incidentID', visible: true,
         },
         {
-            title: "Date Filed", data: 'datefiled'
+            title: "Date Filed", className:"td-ellipses row-limit-sm",  data: 'datefiled'
         },
         {
-            title: "Person Involved", data: 'search_employee'
+            title: "Person Involved", className:"td-ellipses row-limit-sm",  data: 'search_employee'
         },
         {
-            title: "Nature of incident", data: 'incidenttype'
+            title: "Disciplinary Action", className:"td-ellipses row-limit-sm",  render: (data, type, row)=>{
+                return this.renderDisciplinaryAction(row);
+                
+            }
+        },
+        {
+            title: "Nature of incident", className:"td-ellipses row-limit-sm",  data: 'incidenttype'
         },
         // {
-        //     title: "Details of incident", data: 'details', className: "row-limit"
+        //     title: "Details of incident", className:"td-ellipses row-limit-sm",  data: 'details', className: "row-limit"
         // },
         {
-            title: "Status", data: 'status',
+            title: "Status", className:"td-ellipses row-limit-sm",  data: 'status',
             render: function(data){
                 /**
                  * 0 pending

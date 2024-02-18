@@ -222,6 +222,7 @@ export default {
     },
     data(){
         return{
+            
             forapprover: '',
             formtitle: '',
             rows: [],
@@ -256,6 +257,7 @@ export default {
             customerList: [],
             selectedCust: '',
             irregularity: false,
+            site_execution: '',
         }
     },
     watch:{
@@ -273,7 +275,7 @@ export default {
         irregularity(val){
             if(val){
                 this.rows = tempRows.filter(data=>{
-                    return (data.updateddate && data.deliverydate) && moment(new Date(data.updateddate)).format('YYYYMMDD') != moment(new Date(data.deliverydate)).format('YYYYMMDD')
+                    return (data.updateddate && data.U_COMMITMENT) && moment(new Date(data.U_COMMITMENT)).format('YYYYMMDD') != moment(new Date(data.deliverydate)).format('YYYYMMDD')
                 });
             }else{
                 this.rows = tempRows;
@@ -324,6 +326,7 @@ export default {
         handleBlur(e){
             e.preventDefault();
         },
+
         selectCompany(val){
             this.dtHandle.clear();
             this.dtHandle.draw();
@@ -351,8 +354,6 @@ export default {
                 }else{
                     this.errMsg = 'An error occured when connecting please contact your IT-Department';    
                 }
-                
-
 
             })
             .catch((e)=>{
@@ -371,7 +372,7 @@ export default {
             this.custLoader = true;
             const searchStr = ((this.search_customer).trim()).toUpperCase();
             axios.post(`api/consume-api`, {
-                query:'BusinessPartners?$select=CardCode,GroupCode,CardName',
+                query:'BusinessPartners?$select=CardCode,GroupCode,CardName,U_GPSAddress',
                 params: `&$filter=(startswith(CardName,\'${searchStr}\')) or startswith(CardCode, \'${searchStr}\')`,
                 order: '&$orderby=CardName&$top=1000',
                 method: 'GET'
@@ -506,6 +507,18 @@ export default {
             
             data['SalesPersonName'] = await resSalesPerson.data.data.value[0]['SalesEmployeeName'];  
 
+            const custCoordinates = await axios.post(`api/consume-api`, {
+                query:'BusinessPartners?$select=CardCode,U_GPSAddress',
+                params: `&$filter=CardCode eq '${data.CardCode}'`,
+                method: 'GET'
+            });
+
+            let gpsCoor = custCoordinates.data.data.value[0]['U_GPSAddress'];
+            gpsCoor = gpsCoor && gpsCoor.length > 0 ? gpsCoor.split(", ") : '';
+
+            data['custCoordinates'] = gpsCoor.length > 1? gpsCoor : '';
+            data['custCoordinatesAddrName'] = gpsCoor.length > 1 ? await this.getGEOAddress(gpsCoor[0], gpsCoor[1]): '';
+
             let resWareHouse = '';
             for (const [index, item] of data.DocumentLines.entries()) {
                  resWareHouse = await axios.post(`api/get-sap-details`, {
@@ -524,6 +537,7 @@ export default {
         }
         this.loaderNestedSapRequest = false;
         this.loaderNestedSapRequestError = false;
+        data['site_execution'] = this.site_execution || '';
         this.selected = await data;
         bus.$emit('setupdate',  data);
          
@@ -537,8 +551,33 @@ export default {
         this.loaderNestedSapRequest = false;
         this.loaderNestedSapRequestError = false;
     },
+    async getGEOAddress(lat, lng){
+        if(!lat || !lng)
+        return;
+
+        // return $.get({ url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&sensor=false&key=AIzaSyAvJeiIwxKvgUd5cpvMK6qQCZUzvE67ArE`, success(data) {
+        //     return data.results[0].formatted_address;
+
+        // }});
+        const addr = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&sensor=false&key=AIzaSyAvJeiIwxKvgUd5cpvMK6qQCZUzvE67ArE`);
+        return addr.data.results[0].formatted_address;
+    },
+    getLocation(){
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (position)=>{
+                    let x = this.getGEOAddress(position.coords.latitude, position.coords.longitude);
+                    x.then(rs=>this.site_execution = rs);
+                });
+            } else { 
+                console.log("Geolocation is not supported by this browser.");
+            }
+        }
 
     },
+    // showPosition(position) {
+    //     console.log( "Latitude: " + position.coords.latitude + 
+    //     "<br>Longitude: " + position.coords.longitude);
+    // },
     computed:{
         isFormValid(){
             return !Object.keys(this.fields).some(key => this.fields[key].invalid);
@@ -571,7 +610,7 @@ export default {
         // $('body').removeClass('visible');
     },
     mounted(){
-        getLocation();
+        this.getLocation();
         this.formtitle = this.$route.name;
 
         // to fix print butotn datatable
@@ -634,6 +673,12 @@ export default {
             title: "Delivery Date", data: 'DocDate', render: function(data){
                 return moment(new Date(data)).format('MM/DD/YYYY');
             }
+        },
+        {
+            title: "Commitment Date", data: 'U_COMMITMENT', render: function(data){
+                return moment(new Date(data)).format('MM/DD/YYYY');
+            },
+            visible: false,
         },
         {
             title: "Delivered/Pickup Date", data: 'deliverydate', render: function(data){
@@ -801,20 +846,20 @@ const setActive = (el, active) => {
 
 
 
-const getLocation = () =>{
-    if (navigator.geolocation) {
-        const userCoordinates = navigator.geolocation.getCurrentPosition(showPosition);
+// const getLocation = () =>{
+//     if (navigator.geolocation) {
+//         const userCoordinates = navigator.geolocation.getCurrentPosition(showPosition);
         
 
-    } else { 
-        console.log("Geolocation is not supported by this browser.");
-    }
-}
+//     } else { 
+//         console.log("Geolocation is not supported by this browser.");
+//     }
+// }
 
-function showPosition(position) {
-    console.log( "Latitude: " + position.coords.latitude + 
-    "<br>Longitude: " + position.coords.longitude);
-}
+// function showPosition(position) {
+//     console.log( "Latitude: " + position.coords.latitude + 
+//     "<br>Longitude: " + position.coords.longitude);
+// }
 
 
 function getDistanceBetweenPoints(lat1, lng1, lat2, lng2){
@@ -845,8 +890,8 @@ function degreesToRadians(degrees){
 
 let distanceInMeters = getDistanceBetweenPoints(7.099473939079819, -73.10677064354888, 4.710993389138328, -74.07209873199463);
 // meters
-console.log('Meters: ', distanceInMeters);
+// console.log('Meters: ', distanceInMeters);
 // KMS
-console.log('KMS: ', distanceInMeters * 0.001);
+// console.log('KMS: ', distanceInMeters * 0.001);
 
 </script>

@@ -12,11 +12,20 @@
                         </div>
                     </div>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-4">
                     <div class="mdb-form-field form-group-limit">
                         <div class="form-field__control">
                             <input type="text" class="form-field__input" :value="computedfullname" name="requestor" readonly="true">
                             <label class="form-field__label">Requestor</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                    </div>
+            </div>
+            <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limit">
+                        <div class="form-field__control">
+                            <input type="text" class="form-field__input" :value="faID" name="faID" readonly="true">
+                            <label class="form-field__label">FA#</label>
                             <div class="form-field__bar"></div>
                         </div>
                     </div>

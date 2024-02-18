@@ -12,7 +12,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-8">
+                <div class="col-md-4">
                             <div class="form-group-limit">
                                         <Datepicker :disabled="true" :value="date_overtime" wrapper-class="mdb-form-field" input-class="form-field__input datePicker" :typeable="false" :format="'MM/dd/yyyy'">
                                         <label slot="afterDateInput" class="form-field__label">Date Overtime</label>
@@ -20,6 +20,15 @@
                                         <span slot="afterDateInput" class="errors">{{ errors.first('mname') }}</span>
                                         </Datepicker>
                             </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limit">
+                        <div class="form-field__control">
+                            <input :disabled="$parent.disabledinput" type="text" class="form-field__input" :value="overtimeID" name="datefiled" readonly="true" >
+                            <label class="form-field__label">Overtime #</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limit">

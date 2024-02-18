@@ -10,6 +10,31 @@ textarea::-webkit-scrollbar{
     font-style: italic;
     float: right;
 }
+span#file-label{
+    cursor: pointer;
+}
+ul.attachments-list{
+    padding-left:0px !important;
+}
+ul.attachments-list li:first-child{
+    margin-left: 0px;
+}
+ul.attachments-list li{
+    display: inline-block;
+    padding: 10px;
+    margin-left: 20px;
+    background: aliceblue;
+    border-radius: 8px;
+}
+
+.IR-rem-attachment{
+    position: absolute; 
+    top: -7px; 
+    font-size: 21px;  
+    color: #c20e0e; 
+    cursor: pointer;
+}
+
 </style>
 <template>
     <div>
@@ -95,7 +120,7 @@ textarea::-webkit-scrollbar{
             <div class="col-md-3">
                 <div class="mdb-form-field form-group-limit">
                     <div class="form-field__control">
-                        <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="text" class="form-field__input" v-model="designation" v-validate="'required'" name="designation">
+                        <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="text" class="form-field__input" v-model="designation" v-validate="'required'" name="designation" :readonly="true">
                         <label class="form-field__label">Designation</label>
                         <div class="form-field__bar"></div>
                     </div>
@@ -105,7 +130,7 @@ textarea::-webkit-scrollbar{
             <div class="col-md-3">
                 <div class="mdb-form-field form-group-limit">
                     <div class="form-field__control">
-                        <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="text" class="form-field__input" v-model="branch" v-validate="'required'" name="branch">
+                        <input :disabled="$parent.disabledinput || (userinfo.empID !== selected.empID_ && selected.empID_)" type="text" class="form-field__input" v-model="branch" v-validate="'required'" name="branch" :readonly="true">
                         <label class="form-field__label">Branch</label>
                         <div class="form-field__bar"></div>
                     </div>
@@ -240,20 +265,31 @@ textarea::-webkit-scrollbar{
                 </div>
             </div>
             <div class="clearfix"></div>
+            <!-- creator attachment -->
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <!-- <img id="work-attachments" :src="'public/images/priemer_jacket.jpg'" alt="Avatar"> -->
+                <label for="prog__attachment_creator" v-if="(!$parent.disabledinput && userinfo.empID == selected.empID_ && creator_attach.length < 3) || !incidentID && creator_attach.length < 3">
+                    <span class="profile-cam-icon" style="position: relative;"><i class="fas fa-camera"></i></span>
+                        <span style="position: relative; left: 10px; bottom: 3px;">
+                            <span id="file-label">Attach File</span>
+                            <!-- <a id="file-label1" :href="'storage/app/'+progmechanic_attachment" target="_blank" v-show="progmechanic_attachment">attachment - {{'Program Mechanics'}}</a> -->
+                    </span>
+                </label>
+                <ul class="nostyle-list attachments-list"  style="padding-left: 20px;">
+                    <li v-for="(item, key) in creator_attach" :key="key" class="relative-pos">
+                        <a class="fas fa-link" :href="'storage/app/'+item" target="_blank"> Attachment: {{key + 1}}</a>
+                        <i v-if="(!$parent.disabledinput && userinfo.empID == selected.empID_) || !incidentID" class="fas fa-times-circle IR-rem-attachment" @click.prevent="remAttachment(key, 'creator attachment')"></i>
+                    </li>
+                </ul>
+                <input id="prog__attachment_creator" class="program-attachment" type="file" @change="attachFile" style="display:none;">
+            </div>
+            <div class="clearfix"></div>
             <div class="col-lg-12">
                 <h5 class="form-subtitle"><em>Explanation from {{search_employee || 'person involve'}}</em></h5>
             </div>
             <div class="col-md-12">
                 <div class="mdb-form-field">
                     <div class="form-field__control mdb-bgcolor">
-                        <!-- <div v-show="showBlockMessageExplanationSection" style="white-space: pre-line; padding: 15px;">
-                            {{ explanation }}
-                        </div> -->
-                        <!-- <div v-show="!showBlockMessageExplanationSection">
-                            <textarea :disabled="$parent.disabledinput || userinfo.empID != selected.personsinvolve || !selected.personsinvolve" class="form-field__textarea"  cols="4" rows="4" v-model="explanation" name="additional-info"></textarea>
-                            <label class="form-field__label">Add explanation here</label>
-                            <div class="form-field__bar"></div>
-                        </div> -->
                         <div>
                             <textarea :disabled="$parent.disabledinput || userinfo.empID != selected.personsinvolve || !selected.personsinvolve" class="form-field__textarea"  cols="4" rows="4" v-model="explanation" name="additional-info"></textarea>
                             <span v-show="showBlockMessageExplanationSection" class="show_more_btn" @click="showMore">show more</span>
@@ -264,6 +300,26 @@ textarea::-webkit-scrollbar{
                     <h6><span class="errors">{{ errors.first('additional-info') }}</span></h6>
                 </div>
             </div>
+            <div class="clearfix"></div>
+            <!-- attachment for person involve -->
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <!-- <img id="work-attachments" :src="'public/images/priemer_jacket.jpg'" alt="Avatar"> -->
+                <label for="prog__attachment_person_involve" v-if="!$parent.disabledinput && userinfo.empID == selected.personsinvolve && selected.personsinvolve && personinvolve_attach.length < 3">
+                    <span class="profile-cam-icon" style="position: relative;"><i class="fas fa-camera"></i></span>
+                        <span style="position: relative; left: 10px; bottom: 3px;">
+                            <span id="file-label">Attach File</span>
+                            <!-- <a id="file-label1" :href="'storage/app/'+progmechanic_attachment" target="_blank" v-show="progmechanic_attachment">attachment - {{'Program Mechanics'}}</a> -->
+                    </span>
+                </label>
+                <ul class="nostyle-list attachments-list"  style="padding-left: 20px;">
+                    <li v-for="(item, key) in personinvolve_attach" :key="key" class="relative-pos">
+                        <a class="fas fa-link" :href="'storage/app/'+item" target="_blank"> Attachment: {{key + 1}}</a>
+                        <i v-if="!$parent.disabledinput && userinfo.empID == selected.personsinvolve" class="fas fa-times-circle IR-rem-attachment" @click.prevent="remAttachment(key, 'personinvolve')"></i>
+                    </li>
+                </ul>
+                <input id="prog__attachment_person_involve" class="program-attachment" type="file" @change="attachFile" style="display:none;">
+            </div>
+            <div class="clearfix"></div>
             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                 <div class="mdb-form-field form-group-limit">
                     <div class="form-field__control">
@@ -274,6 +330,7 @@ textarea::-webkit-scrollbar{
                 </div>
             </div>
             
+            
             <div class="clearfix"></div>
             <div class="col-lg-12">
                 <h5 class="form-subtitle"><em>FOR APPROVERS</em></h5>
@@ -283,7 +340,7 @@ textarea::-webkit-scrollbar{
                 <h5 class="form-subtitlex"><em><sup class="tr-executed">Initial Action Taken</sup></em></h5>
             </div>
             <div class="col-md-12">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="mdblblradio">
                         <span class="checklbl">Coaching</span>
                         <input type="radio" value="Coaching" v-model="actionTaken" name="action taken"
@@ -297,7 +354,7 @@ textarea::-webkit-scrollbar{
                         <span class="checkmark"></span>
                     </label>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="mdblblradio">
                         <span class="checklbl">Further Investigation</span>
                         <input type="radio" value="Further Investigation" v-model="actionTaken" name="action taken"
@@ -310,6 +367,20 @@ textarea::-webkit-scrollbar{
                         :disabled="$parent.$data.forapprover != 'approval' || (selected.approvedby && userinfo.empID != selected.approvedby)">
                         <span class="checkmark"></span>
                     </label>
+                </div>
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <select id="posname" v-model="disciplinaryaction" name="disciplinary action" v-validate="'required'" class="form-field__input" 
+                            :disabled="actionTaken != 'For Due Process' ||  (selected.approvedby && userinfo.empID != selected.approvedby)" >
+                                <option :value="'N/A'">N/A</option>
+                                <option :value="item" v-for="(item, key) in disciplinaryactionOptions" :key="key">{{ item }}</option>
+                            </select>
+                            <label class="form-field__label">Disciplinary Action</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('disciplinary action') }}</span>
+                    </div>
                 </div>
             </div>
             <div class="clearfix"></div>
@@ -394,29 +465,56 @@ textarea::-webkit-scrollbar{
                         <h5 class="form-subtitlex"><em><sup class="tr-executed">Initial Action Taken</sup></em></h5>
                     </div>
                     <div class="col-md-12">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="mdblblradio">
                                 <span class="checklbl">Coaching</span>
-                                <input :disabled="$parent.$data.forapprover != 'approval'" type="radio" value="Coaching" v-model="actionTaken1" name="action taken1">
+                                <input 
+                                :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse1)) 
+                                && (selected.endorse1 && !selected.endorse2 && userinfo.posID != 16)"
+                                type="radio" value="Coaching" v-model="actionTaken1" name="action taken1">
                                 <span class="checkmark"></span>
                             </label>
                             <label class="mdblblradio">
                                 <span class="checklbl">Coaching and Immediate Deduction</span>
-                                <input :disabled="$parent.$data.forapprover != 'approval'" type="radio" value="Coaching and Immediate Deduction" v-model="actionTaken1" name="action taken1">
+                                <input 
+                                :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse1)) 
+                                && (selected.endorse1 && !selected.endorse2 && userinfo.posID != 16)"
+                                type="radio" value="Coaching and Immediate Deduction" v-model="actionTaken1" name="action taken1">
                                 <span class="checkmark"></span>
                             </label>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="mdblblradio">
                                 <span class="checklbl">Further Investigation</span>
-                                <input :disabled="$parent.$data.forapprover != 'approval'" type="radio" value="Further Investigation" v-model="actionTaken1" name="action taken1">
+                                <input 
+                                :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse1)) || userinfo.posID == 16 "
+                                type="radio" value="Further Investigation" v-model="actionTaken1" name="action taken1">
                                 <span class="checkmark"></span>
                             </label>
                             <label class="mdblblradio">
                                 <span class="checklbl">For Due Process</span>
-                                <input :disabled="$parent.$data.forapprover != 'approval'" type="radio" value="For Due Process" v-model="actionTaken1" name="action taken1">
+                                <input 
+                                :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse1)) 
+                                && (selected.endorse1 && !selected.endorse2 && userinfo.posID != 16)"
+                                type="radio" value="For Due Process" v-model="actionTaken1" name="action taken1">
                                 <span class="checkmark"></span>
                             </label>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mdb-form-field form-group-limitx">
+                                <div class="form-field__control">
+                                    <select id="posname" v-model="disciplinaryaction1" name="disciplinary action1" v-validate="'required'" class="form-field__input" 
+                                    :disabled="actionTaken1 != 'For Due Process' || (userinfo.empID != selected.endorse1)
+                                    && userinfo.posID != 16
+                                    " >
+                                        <option :value="'N/A'">N/A</option>
+                                        <option :value="item" v-for="(item, key) in disciplinaryactionOptions" :key="key">{{ item }}</option>
+                                    </select>
+                                    <label class="form-field__label">Disciplinary Action</label>
+                                    <div class="form-field__bar"></div>
+                                </div>
+                                <span class="errors">{{ errors.first('disciplinary action1') }}</span>
+                            </div>
                         </div>
                     </div>
                     <div class="clearfix"></div>
@@ -424,7 +522,9 @@ textarea::-webkit-scrollbar{
                             <div class="mdb-form-field form-group-limit">
                                 <div class="relative-pos">
                                     <div class="form-field__control">
-                                        <input :disabled="$parent.$data.forapprover != 'approval'" type="text" v-model="search_endorse_employee2"  v-validate="'required'" name="2nd Endorsement"  class="form-field__input"
+                                        <input 
+                                        :disabled="$parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse1)" 
+                                        type="text" v-model="search_endorse_employee2"  v-validate="'required'" name="2nd Endorsement"  class="form-field__input"
                                         @keyup.prevent="searchEmployeeEndorse2"
                                         >
                                         <label class="form-field__label">2nd Endorsement:</label>
@@ -453,7 +553,9 @@ textarea::-webkit-scrollbar{
                     <div class="col-lg-12" v-show="actionTaken1 == 'Coaching and Immediate Deduction'">
                         <div class="mdb-form-field form-group-limit">
                             <div class="form-field__control">
-                                <input :disabled="$parent.$data.forapprover != 'approval'"  type="text" class="form-field__input" v-model="deduction_amt1" v-validate="'required'" name="deduct amount">
+                                <input 
+                                :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse1)) && userinfo.posID != 16"  
+                                type="text" class="form-field__input" v-model="deduction_amt1" v-validate="'required'" name="deduct amount">
                                 <label class="form-field__label">Deduction Amount</label>
                                 <div class="form-field__bar"></div>
                             </div>
@@ -469,7 +571,9 @@ textarea::-webkit-scrollbar{
                                             {{endorse1_remarks}}
                                         </div> -->
                                         <div>
-                                            <textarea :disabled="$parent.$data.forapprover != 'approval'" class="form-field__textarea"  cols="4" rows="4" v-model="endorse1_remarks" name="additional-info"></textarea>
+                                            <textarea 
+                                            :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse1)) && userinfo.posID != 16" 
+                                            class="form-field__textarea"  cols="4" rows="4" v-model="endorse1_remarks" name="additional-info"></textarea>
                                             <span v-show="showBlockMessageEndorserRemarks" class="show_more_btn" @click="showMore">show more</span>
                                             <label class="form-field__label">{{actionTaken1}} Remarks</label>
                                             <div class="form-field__bar"></div>
@@ -501,36 +605,65 @@ textarea::-webkit-scrollbar{
                     <h5 class="form-subtitlex"><em><sup class="tr-executed">Initial Action Taken</sup></em></h5>
                 </div>
                 <div class="col-md-12">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="mdblblradio">
                             <span class="checklbl">Coaching</span>
-                            <input :disabled="$parent.$data.forapprover != 'approval'" type="radio" value="Coaching" v-model="actionTaken2" name="action taken2">
+                            <input 
+                            :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse2))
+                            && (selected.endorse2 && userinfo.posID != 16)" 
+                            type="radio" value="Coaching" v-model="actionTaken2" name="action taken2">
                             <span class="checkmark"></span>
                         </label>
                         <label class="mdblblradio">
                             <span class="checklbl">Coaching and Immediate Deduction</span>
-                            <input :disabled="$parent.$data.forapprover != 'approval'" type="radio" value="Coaching and Immediate Deduction" v-model="actionTaken2" name="action taken2">
+                            <input 
+                            :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse2))
+                            && (selected.endorse2 && userinfo.posID != 16)" 
+                            type="radio" value="Coaching and Immediate Deduction" v-model="actionTaken2" name="action taken2">
                             <span class="checkmark"></span>
                         </label>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="mdblblradio">
                             <span class="checklbl">Further Investigation</span>
-                            <input :disabled="$parent.$data.forapprover != 'approval'" type="radio" value="Further Investigation" v-model="actionTaken2" name="action taken2">
+                            <input 
+                            :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse2))
+                            && (selected.endorse2 && userinfo.posID != 16)" 
+                            type="radio" value="Further Investigation" v-model="actionTaken2" name="action taken2">
                             <span class="checkmark"></span>
                         </label>
                         <label class="mdblblradio">
                             <span class="checklbl">For Due Process</span>
-                            <input :disabled="$parent.$data.forapprover != 'approval'" type="radio" value="For Due Process" v-model="actionTaken2" name="action taken2">
+                            <input 
+                            :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse2))
+                            && (selected.endorse2 && userinfo.posID != 16)" 
+                            type="radio" value="For Due Process" v-model="actionTaken2" name="action taken2">
                             <span class="checkmark"></span>
                         </label>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mdb-form-field form-group-limitx">
+                            <div class="form-field__control">
+                                <select id="posname" v-model="disciplinaryaction2" name="disciplinary action2" v-validate="'required'" class="form-field__input" 
+                                :disabled="actionTaken2 != 'For Due Process' || (userinfo.empID != selected.endorse2)
+                                && (selected.endorse2 && userinfo.posID != 16)" >
+                                    <option :value="'N/A'">N/A</option>
+                                    <option :value="item" v-for="(item, key) in disciplinaryactionOptions" :key="key">{{ item }}</option>
+                                </select>
+                                <label class="form-field__label">Disciplinary Action</label>
+                                <div class="form-field__bar"></div>
+                            </div>
+                            <span class="errors">{{ errors.first('disciplinary action2') }}</span>
+                        </div>
                     </div>
                 </div>
                 <div class="clearfix"></div>
                 <div class="col-lg-12" v-show="actionTaken2 == 'Coaching and Immediate Deduction'">
                     <div class="mdb-form-field form-group-limit">
                         <div class="form-field__control">
-                            <input :disabled="$parent.$data.forapprover != 'approval'"  type="text" class="form-field__input" v-model="deduction_amt2" v-validate="'required'" name="deduct amount">
+                            <input 
+                            :disabled="$parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse2)" 
+                             type="text" class="form-field__input" v-model="deduction_amt2" v-validate="'required'" name="deduct amount">
                             <label class="form-field__label">Deduction Amount</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -546,7 +679,10 @@ textarea::-webkit-scrollbar{
                                         {{endorse2_remarks}}
                                     </div> -->
                                     <div>
-                                        <textarea :disabled="$parent.$data.forapprover != 'approval'" class="form-field__textarea"  cols="4" rows="4" v-model="endorse2_remarks" name="additional-info"></textarea>
+                                        <textarea 
+                                        :disabled="($parent.$data.forapprover != 'approval' || (userinfo.empID != selected.endorse2)) &&
+                                        (selected.endorse2 && userinfo.posID != 16)" 
+                                        class="form-field__textarea"  cols="4" rows="4" v-model="endorse2_remarks" name="additional-info"></textarea>
                                         <span v-show="showBlockMessageEndorserRemarks" class="show_more_btn" @click="showMore">show more</span>
                                         <label class="form-field__label">{{actionTaken2}} Remarks</label>
                                         <div class="form-field__bar"></div>
@@ -574,12 +710,17 @@ textarea::-webkit-scrollbar{
                     </p>
                     <div class="clearfix"></div>
                     <span class="approverlist alert-info" v-for="(approver, key) in $parent.approvers" :key="key">{{approver.approvers}}</span>
+                    <span class="approverlist alert-info">HR Department</span>
                     <br><br>
+            </div>
+            <div class="clearfix"></div>
+            <div class="col-lg-12">
+                <span class="errors">Note: All attachements will be automatically deleted after 60days</span>
             </div>
             <div class="clearfix"></div>
             <div class="modal-footer">
                     <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addIncidentReport" :disabled="
-                     disabledIfNoApprover || isDisable || !isFormValid" v-if="!incidentID && $parent.$data.forapprover != 'approval'">
+                     disabledIfNoApprover || isDisable || !isFormValid || !submitBtn" v-if="!incidentID && $parent.$data.forapprover != 'approval'">
                     <!-- update -->
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateIncidentReport" 
                     :disabled="isDisable || !isFormValid" 
@@ -600,39 +741,39 @@ textarea::-webkit-scrollbar{
                     (actionTaken == 'Coaching and Immediate Deduction' && !deduction_amt)
                     " 
                     @click.prevent="requestActionIncidentReport(1)" 
-                    v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && status == 0 ">
+                    v-if="(incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && status == 0) || (incidentID && $parent.$data.forapprover == 'approval' && userinfo.posID == 16 && status == 0) ">
                     
                     <!-- reject main approver -->
                     <input type="submit" class="btn btn-primary" value="Reject" 
                         @click.prevent="requestActionIncidentReport(4)" 
-                        v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && status == 0 
+                        v-if="(incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && status == 0) || (incidentID && $parent.$data.forapprover == 'approval' && userinfo.posID == 16 && status == 0) 
                     ">
 
-                    <!-- first level endorse -->
-                    <input type="submit" class="btn btn-primary" value="Approve" 
+                    <!-- second level endorse -->
+                    <input type="submit" class="btn btn-primary" value="Approve." 
                     :disabled="!actionTaken1 || 
                     (actionTaken1 == 'Further Investigation' && !endorse2) || 
                     (actionTaken1 == 'Coaching and Immediate Deduction' && !deduction_amt1)
                     " 
                     @click.prevent="requestActionIncidentReport(1)" 
-                    v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse1 && status == 1 ">
+                    v-if="(incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse1 && status == 1) || (incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.posID == 16 && status == 1)">
                     
-                    <!-- reject 1st endorser-->
+                    <!-- reject 2nd endorser-->
                     <input type="submit" class="btn btn-primary" value="Reject" 
                         @click.prevent="requestActionIncidentReport(4)" 
-                        v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse1 && status == 1 ">
+                        v-if="(incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse1 && status == 1) || (incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.posID == 16 && status == 1)">
 
                     <!-- end level and final endorser -->
-                    <input type="submit" class="btn btn-primary" value="Approve" 
-                    :disabled="!actionTaken2 ||
-                    (actionTaken2 == 'Coaching and Immediate Deduction' && !deduction_amt2)" 
+                    <input type="submit" class="btn btn-primary" value="Approve.." 
+                    :disabled="(!actionTaken2 ||
+                    (actionTaken2 == 'Coaching and Immediate Deduction' && !deduction_amt2)) && userinfo.posID != 16 && status > 1" 
                     @click.prevent="requestActionIncidentReport(3)" 
-                    v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse2 && status == 2 ">
+                    v-if="(incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse2 && status == 2 ) || (incidentID && $parent.$data.forapprover == 'approval' && userinfo.posID == 16 && status > 1)">
                     
                     <!-- reject final endorser-->
                     <input type="submit" class="btn btn-primary" value="Reject" 
                         @click.prevent="requestActionIncidentReport(4)" 
-                        v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse2 && status >= 2 ">
+                        v-if="(incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse2 && status >= 2 ) || (incidentID && $parent.$data.forapprover == 'approval' && userinfo.posID == 16 && status > 1)">
                     
                     
                     <!-- <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionIncidentReport(0)" v-if="incidentID && $parent.$data.forapprover == 'approval' && $parent.$data.isCancel"> -->
@@ -658,6 +799,9 @@ const excludeBody = [
     'search_endorse_employee2',
     'reportedby',
     'datefiled',
+    'disciplinaryactionOptions',
+    // 'creator_attach',
+    // 'personinvolve_attach',
 ];
 export default {
     props: ['userinfo', 'selected'],
@@ -678,13 +822,30 @@ export default {
             personsinvolve_email: '',
             designation: '',
             branch: '',
-			incidenttype: 'Inventory Discrepancy', // nature of inciddent
+			incidenttype: 'others', // nature of inciddent
             details: '',
             explanation: '',
             refs: '',
+            
+            creator_attach: [],
+            personinvolve_attach: [],
 
             approvedby: '',
             actionTaken: '',
+            disciplinaryaction: 'N/A',
+            disciplinaryactionOptions: [
+                'Verbal Warning',
+                'Written Warning',
+                'Probation',
+                'Suspension',
+                'Demotion',
+                'Financial Penalties',
+                'Training or Counseling',
+                'Performance Improvement',
+                'Plan (PIP)',
+                'Transfer',
+                'Termination',
+            ],
             remarks: '',
 
             // endorse 1
@@ -694,7 +855,7 @@ export default {
             actionTaken1: '',
             deduction_amt1: '',
             endorse1_remarks: '',
-
+            disciplinaryaction1: 'N/A',
             // endorse 2
             search_endorse_employee2: '',
             endorse2: '',
@@ -702,6 +863,7 @@ export default {
             actionTaken2: '',
             deduction_amt2: '',
             endorse2_remarks: '',
+            disciplinaryaction2: 'N/A',
 
 			// reqstat: 0, //0 pending, 1//approve //2 declined
 			status: 0, //0 open, 1//close
@@ -711,6 +873,18 @@ export default {
     watch:{
         userinfo(val, old){
             this.MDBINPUT();
+        },
+        actionTaken(val, old){
+            if(val != 'For Due Process')
+            this.disciplinaryaction = 'N/A';
+        },
+        actionTaken1(val, old){
+            if(val != 'For Due Process')
+            this.disciplinaryaction1 = 'N/A';
+        },
+        actionTaken2(val, old){
+            if(val != 'For Due Process')
+            this.disciplinaryaction2 = 'N/A';
         }
     },
     methods:{
@@ -829,6 +1003,7 @@ export default {
             
         },
         addIncidentReport(){
+            // this.updateIncidentReport();
             if(this.isFormValid)
             {
                 this.isDisable = true;
@@ -837,15 +1012,26 @@ export default {
                     if (!excludeBody.includes(key)) {
                         params[key] = this.$data[key];
                     }
+                    
                 }
+                params['creator_attach'] = params.creator_attach.toString();
+                params['personinvolve_attach'] = params.personinvolve_attach.toString();
                 params['reciever_emails'] = this.$parent.reciever_emails;
                 axios.post('api/addIncidentReport', params).then((response)=>{
-                    this.$parent.addRow({...response.data, datefiled: moment(response.data.datefiled).format('MM/DD/YYYY'),  reportedby: this.computedfullname, search_employee: this.search_employee});
+                    this.$parent.addRow({
+                        ...response.data, 
+                        datefiled: moment(response.data.datefiled).format('MM/DD/YYYY'),  
+                        reportedby: this.computedfullname, 
+                        search_employee: this.search_employee,
+                        creator_attach: params.creator_attach.split(','),
+                        personinvolve_attach: params.personinvolve_attach.split(',')
+                    });
                     this.closeModal();
                 }).catch((err)=>{console.log(err);});
             }
         },
         updateIncidentReport(){
+            
             if(this.isFormValid)
             {
 
@@ -858,12 +1044,57 @@ export default {
                     }
                 }
                 
+                params['creator_attach'] = params.creator_attach.toString();
+                params['personinvolve_attach'] = params.personinvolve_attach.toString();
                 params['incidentID'] = this.selected.incidentID;
                 axios.post('api/updateIncidentReport', params).then((response)=>{
                     this.$parent.updateRow({...response.data, datefiled: this.datefiled, reportedby:this.computedfullname, search_employee: this.search_employee});
                     this.closeModal();
                 }).catch((err)=>{console.log(err);});
             }
+        },
+        attachFile(e){
+            let isCreator = e.target.id == 'prog__attachment_creator'? true: false;
+            
+            if(e.target.value != ''){
+			    let file    = e.target.files[0]; //sames as here
+
+				if (file) {
+
+                     const config = {
+                        onUploadProgress: function(progressEvent) {
+                        var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+                        // console.log(percentCompleted)
+                        }
+                    }
+                    
+                    const formData = new FormData();
+                    formData.append('attachment[]', file );
+                    axios.post('api/IncidentReportattachment', formData, config)
+                    .then(res=>{
+                        if(isCreator){
+                            this.creator_attach.push(res.data);
+                        }else{
+                            
+                            this.personinvolve_attach.push(res.data);
+                        }
+                        
+
+                    })
+                    .catch(er=>console.log(er))
+				}
+			}else{
+
+				return null;
+			}
+        },
+        remAttachment(index, type = 'personinvolve'){
+            if(type == 'personinvolve'){
+                this.personinvolve_attach.splice(index, 1);
+            }else{
+                this.creator_attach.splice(index, 1);
+            }
+            
         },
         deleteIncidentReport(){
             this.isDisable = true;
@@ -888,6 +1119,7 @@ export default {
 
             params['status'] = status;
             params['actionTaken'] =  this.actionTaken;
+            params['disciplinaryaction'] =  this.disciplinaryaction;
             params['remarks'] = this.remarks;
 
             params['actionTaken1'] =  this.actionTaken1;
@@ -900,6 +1132,7 @@ export default {
             params['endorse2_email'] = this.endorse2_email;
             params['deduction_amt'] =  this.deduction_amt;
             params['deduction_amt2'] =  this.deduction_amt2;
+            params['empID_'] = this.selected.empID_;
             /**
              * 0 pending
              * 1 endorse 1
@@ -911,6 +1144,7 @@ export default {
             // if approve and action taken is not to be endorsed close the status
             if(status === 1 && this.status == 0 && this.actionTaken != 'Further Investigation'){
                 params['status'] = 3;
+                params['empID_'] = this.selected.empID_;
                 // params['deduction_amt'] =  '';
                 params['deduction_amt2'] =  '';
             }
@@ -925,6 +1159,13 @@ export default {
                 params['deduction_amt2'] =  '';
 
             }
+            // if approve and action taken is not endorse2
+            if(status === 1 && this.status == 1 && this.actionTaken1 != 'Further Investigation'){
+                params['status'] = 3;
+                params['empID_'] = this.selected.empID_;
+            }
+
+
             // last approver emi
             // if approve and action taken is endorse2
             if(status === 1 && this.status == 1 && this.actionTaken1 == 'Further Investigation'){
@@ -938,7 +1179,7 @@ export default {
             
             params['endorse2_remarks'] = this.endorse2_remarks;
 
-            // console.log(params);s
+            // console.log(status,this.status,this.actionTaken, params);
             // return;
             // change approve by to username;
             axios.post('api/actionformIncidentReport', params).then((response)=>{
@@ -954,12 +1195,17 @@ export default {
                 this.closeModal();
             }).catch((err)=>{ console.log(err); });
         },
-
+        
         setDataForEdit(data = null){
             for(let i in this.$data)
             {
-                if(i != 'isDisable' && i!= 'employeeList')
+                if(i != 'isDisable' && i!= 'employeeList' && i != 'disciplinaryactionOptions' && 
+                   i != 'creator_attach' && i != 'personinvolve_attach'
+                )
                 this.$data[i] = data[i];
+
+                if((i == 'creator_attach' || i == 'personinvolve_attach') && data[i])
+                this.$data[i] = (data[i]+'').split(',');
             
             }
             
@@ -975,7 +1221,7 @@ export default {
             let obj = this.$data;
             Object.keys(obj).forEach((key)=>{
                 if(key != 'datefiled' && key != 'dateoccured' && key != 'incidenttime'
-                && key != 'incidenttype'){
+                && key != 'incidenttype' && key != 'disciplinaryactionOptions'){
                     this.$data[key] =  '';
                 }
                 if(key == 'datefiled' && key == 'dateoccured' && key == 'incidenttime') {
@@ -986,6 +1232,11 @@ export default {
                 if(key == 'isDisable'){
                     this.$data[key] = false;
                 }
+                if(key == 'disciplinaryaction' || key == 'disciplinaryaction1' || key == 'disciplinaryaction2'){
+                    this.$data[key] = 'N/A';
+                }
+                if(key == 'creator_attach' || key == 'personinvolve_attach')
+                this.$data[key] = [];
                 
             });
             
@@ -1057,7 +1308,7 @@ export default {
         },
         submitBtn()
         {
-            return !this.supID && this.$parent.$data.forapprover != 'approval';
+            return this.personsinvolve;
         },
         updateDeleteBtn(){
             return this.supID && this.$parent.$data.forapprover != 'approval' && !this.$parent.disabledinput 

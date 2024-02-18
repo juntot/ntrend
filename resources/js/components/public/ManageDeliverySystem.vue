@@ -106,14 +106,14 @@ ul .record-log-items{
             <div class="clearfix"></div>
             <div class="col-lg-12">
                 <h5 class="tr-approved">Delivery Type</h5>
-                <div class="col-sm-12">    
+                <div class="col-md-2">    
                     <label class="mdblblradio">
                         <span class="checklbl" >Delivery</span>
                         <input :disabled="$parent.disabledinput" type="radio" v-model="deliverytype" value="delivery" name="radio">
                         <span class="checkmark"></span>
                     </label>
                 </div>
-                <div class="col-sm-12">
+                <div class="col-md-10">
                     <label class="mdblblradio">
                         <span class="checklbl">Pickup</span>
                         <input :disabled="$parent.disabledinput" type="radio" v-model="deliverytype" value="pickup" name="radio">
@@ -122,7 +122,40 @@ ul .record-log-items{
                 </div>
             </div>
             <div class="clearfix"></div>
-            <div class="col-md-3">
+            <br>
+            <div class="clearfix"></div>
+            <div class="col-md-12">
+                <div class="mdb-form-field form-group-limitx">
+                    <div class="form-field__control">
+                        <input :disabled="$parent.disabledinput" type="text" class="form-field__input" :value="selected.custCoordinatesAddrName" name="customer address" readonly="true">
+                        <label class="form-field__label">Customer Address</label>
+                        <div class="form-field__bar"></div>
+                    </div>
+                    <span class="errors">{{ errors.first('customer address') }}</span>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="mdb-form-field form-group-limitx">
+                    <div class="form-field__control">
+                        <input :disabled="$parent.disabledinput" type="text" class="form-field__input" :value="selected.site_execution" name="site execution" readonly="true">
+                        <label class="form-field__label">Site Execution</label>
+                        <div class="form-field__bar"></div>
+                    </div>
+                    <span class="errors">{{ errors.first('site execution') }}</span>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="col-md-4">
+                <div class="mdb-form-field form-group-limitx">
+                    <div class="form-field__control">
+                        <input :disabled="$parent.disabledinput" type="text" class="form-field__input" :value="selected.U_COMMITMENT | dateLogs" v-validate="'required'" name="commitment date">
+                        <label class="form-field__label">Commitment Date</label>
+                        <div class="form-field__bar"></div>
+                    </div>
+                    <span class="errors">{{ errors.first('commitment date') }}</span>
+                </div>
+            </div>
+            <div class="col-md-4">
                 <Datepicker :value="deliverydate" v-validate="'required'" @selected="selectDeliveryDate" wrapper-class="mdb-form-field form-group-limitx" input-class="form-field__input datePicker" :typeable="false" :format="'MM/dd/yyyy'">
                     <label slot="afterDateInput" class="form-field__label">Delivered/Pickup (Date)</label>
                     <div slot="afterDateInput" class="form-field__bar"></div>
@@ -139,16 +172,8 @@ ul .record-log-items{
                     <span class="errors">{{ errors.first('receivedby') }}</span>
                 </div>
             </div>
-            <div class="col-md-3">
-                <!-- <div class="mdb-form-field form-group-limitx">
-                    <div class="form-field__control">
-                        <input :disabled="$parent.disabledinput" type="text" class="form-field__input" v-model="driver" v-validate="'required'" name="driver">
-                        <label class="form-field__label">Driver</label>
-                        <div class="form-field__bar"></div>
-                    </div>
-                    <span class="errors">{{ errors.first('driver') }}</span>
-                </div> -->
-
+            <div class="clearfix"></div>
+            <div class="col-md-4">
                      <div class="mdb-form-field form-group-limitx">
                         <div class="relative-pos">
                             <div class="form-field__control">
@@ -182,8 +207,7 @@ ul .record-log-items{
                         </div>
                     </div>
             </div>
-            
-            <div class="col-md-2">
+            <div class="col-md-4">
                 <div class="mdb-form-field form-group-limitx">
                     <div class="form-field__control">
                         <input :disabled="$parent.disabledinput || deliverytype == 'pickup'" type="text" class="form-field__input" v-model="vehiclenum" name="vehicle_no">
@@ -291,6 +315,8 @@ ul .record-log-items{
                         <strong>Driver:</strong> {{ val.driver }}
                         <br>
                         <strong>Vehicle Num:</strong> {{ val.vehiclenum }}
+                        <br>
+                        <strong>Site Execution:</strong> {{ val.siteExecutionAddrName || '' }}
                     </li>
                 </ul>
             </div>
@@ -330,6 +356,7 @@ export default {
     props: ['userinfo', 'selected'],
     data() {
 		return {
+        addressName: '',
         empID_: '',
         datefiled: moment(new Date()).format('MM/DD/YYYY'),
         deliverydate: moment(new Date()).format('YYYY-MM-DD'),
@@ -438,7 +465,9 @@ export default {
             }
             
         },
-        updateCard(){
+        async updateCard(){
+            await this.getLocation(this.processUpdate);
+            return;
             // if(this.deliverydate == moment(new Date()).subtract(1, 'years').format('YYYY-MM-DD'))
             // return this.errActualDateDelivered = 'Invalid Date';
             if(this.deliverytype == 'delivery' && this.vehiclenum == ''){
@@ -576,6 +605,132 @@ export default {
             });
             $("#deliverysystemModal").modal("hide");
         },
+        getDistanceBetweenPoints(lat1, lng1, lat2, lng2){
+            let R = 6378137;
+            let dLat = this.degreesToRadians(lat2 - lat1);
+            let dLong = this.degreesToRadians(lng2 - lng1);
+            let a = Math.sin(dLat/2)
+                    *
+                    Math.sin(dLat /2)
+                    +
+                    Math.cos(this.degreesToRadians(lat1))
+                    *
+                    Math.cos(this.degreesToRadians(lat1))
+                    *
+                    Math.sin(dLong / 2)
+                    *
+                    Math.sin(dLong / 2);
+            
+            let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            let distance = R * c;
+            return distance;
+
+        },
+        
+        degreesToRadians(degrees){
+            return degrees * Math.PI / 180;
+        },
+
+        async getGEOAddress(lat, lng){
+            if(!lat || !lng)
+            return;
+
+            // return $.get({ url: `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&sensor=false&key=AIzaSyAvJeiIwxKvgUd5cpvMK6qQCZUzvE67ArE`, success(data) {
+            //     return data.results[0].formatted_address;
+
+            // }});
+            const addr = await axios.get(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&sensor=false&key=AIzaSyAvJeiIwxKvgUd5cpvMK6qQCZUzvE67ArE`);
+            return addr.data.results[0].formatted_address;
+        },
+        getLocation(callback){
+                if (navigator.geolocation) {
+                    
+                     navigator.geolocation.getCurrentPosition(async (position)=>{
+                        let distanceInMeters = this.getDistanceBetweenPoints(
+                            position.coords.latitude, position.coords.longitude,
+                            this.selected.custCoordinates[0], this.selected.custCoordinates[1]) * 0.001; //Calc Distance in KMS
+                        
+                        let siteExecution = await this.getGEOAddress(position.coords.latitude, position.coords.longitude);
+                        return callback({lat: position.coords.latitude, lng: position.coords.longitude, distance: distanceInMeters, 
+                                         siteExecutionAddrName: siteExecution || '' });
+                    
+                    });
+                } else { 
+                    alert("Geolocation is not supported by this browser.");
+                    return false;
+                }
+        },
+        processUpdate(data){
+            // console.log('process', data);
+            // if(data.distance > 1 ) //greater than 1km
+            // return alert("You are too far from customer location. Maximum distance is 1km");            
+            
+            // historylogs
+
+            // if(this.deliverydate == moment(new Date()).subtract(1, 'years').format('YYYY-MM-DD'))
+            // return this.errActualDateDelivered = 'Invalid Date';
+            if(this.deliverytype == 'delivery' && this.vehiclenum == ''){
+                this.error_vehiclenum = 'This field is required.';
+                return;
+            } 
+
+            if(this.deliverytype == 'delivery' && this.driver == ''){
+                this.error_driver = 'This field is required.';
+                return;
+            }
+            
+            if(this.isFormValid)
+            {
+                
+                this.isDisable = true;
+               
+                const dataRec = {
+                    deliverydate: this.deliverydate,
+                    receivedby: this.receivedby,
+                    updatedby_: this.userinfo.empID,
+                    updatebyFullName: this.computedfullname,
+                    driver: this.driver,
+                    vehiclenum: this.vehiclenum,
+                    updateddate: moment().format('YYYY-MM-DD HH:mm:ss'),
+                    company: this.selected.company,
+                    remarks: this.remarks,
+                    }   
+                this.historylogs.push({
+                    ...dataRec, 
+                    siteExecutionAddrName: data.siteExecutionAddrName,
+                    siteExecCoordinates: data.lat+', '+data.lng,
+                    distance: data.distance 
+                });
+                    
+                let params = {
+                    path: `Invoices(${this.selected.DocEntry})`,
+                    method: 'PATCH',
+                    DocNum_: this.selected.DocNum,
+                    updatebyFullName: this.computedfullname,
+                    CardCode: this.selected.CardCode,
+                    DocTotal: this.selected.DocTotal,
+                    SalesPersonName: this.selected.SalesPersonName,
+                    DocumentsOwnerName: this.selected.DocumentsOwnerName,
+                    historylogs: JSON.stringify(this.historylogs),
+                    branchcode: this.selected.branchcode,
+                    deliverytype: this.deliverytype,
+                    ...dataRec
+                };
+                // return;
+                
+                axios.post('api/update-delivery', params).then((response)=>{
+                    // console.log(response.data);
+                    // this.$parent.updateRow(response.data);
+                    this.$parent.updateRow(response.data);
+                    this.closeModal();
+                }).catch((err)=>{
+                    // console.log(response.data);
+                    this.$parent.updateRow(err.response.data);
+                    this.closeModal();
+                });
+            }
+        }
+
     },
     computed:{
         disabledIfNoApprover(){

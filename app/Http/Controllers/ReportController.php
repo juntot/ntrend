@@ -366,6 +366,7 @@ class ReportController extends Controller
                 }
                 $data = DB::select('select eIReport.*,
                             DATE_FORMAT(eIReport.datefiled, "%m/%d/%Y") as datefiled,
+                            eIReport.datefiled as raw_datefiled,
                             CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname, dept.deptname,
                             (
                                 select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
@@ -968,7 +969,7 @@ class ReportController extends Controller
                             inner join companytbl comp
                                 on comp.compID = emp.compID_
                             WHERE
-                                (overtime.datefiled BETWEEN :dateFrom AND :dateTo)
+                                (overtime.date_overtime BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND

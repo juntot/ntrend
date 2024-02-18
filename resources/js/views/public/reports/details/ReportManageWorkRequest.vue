@@ -121,6 +121,15 @@
                         <span class="checkmark"></span>
                     </label>
                 </div>
+                <div class="col-md-6">
+                    <div class="mdb-form-field">
+                        <div class="form-field__control">
+                             <input type="text" class="form-field__input" :value="preferredIT" name="Preferred IT" >
+                            <label class="form-field__label">Preferred IT</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="clearfix"></div>
                 <div v-show="worktype==1">
                     <div class="col-md-4">
@@ -312,8 +321,8 @@
                             <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="15" name="radio" >
                             <span class="checkmark"></span>
                             </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">System Report
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Report" v-model="request_type">
+                            <label class="mdblbl inline-blocklbl mdblblradio">System Report & Layout
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Report & Layout" v-model="request_type">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
@@ -323,8 +332,8 @@
                             <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="16" name="radio" >
                             <span class="checkmark"></span>
                             </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">System Layout
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Layout" v-model="request_type">
+                            <label class="mdblbl inline-blocklbl mdblblradio">System Development
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Development" v-model="request_type">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
@@ -520,7 +529,7 @@ export default {
         remarks: '',
         urgency: 'Highest',
         request_type: [],
-
+        preferredIT: '',
 		}
     },
     watch:{

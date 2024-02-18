@@ -504,7 +504,7 @@
 							<div class="col-md-12">
 									<div class="mdb-form-field form-group-limitx">
 											<div class="form-field__control">
-													<input type="text" v-validate="'required'" class="form-field__input" name="poll-title">
+													<input type="text" v-validate="''" class="form-field__input" name="poll-title">
 													<label class="form-field__label">Poll Question</label>
 													<div class="form-field__bar"></div>
 											</div>
@@ -530,7 +530,7 @@
 							<div class="col-md-12">
 									<div class="mdb-form-field form-group-limitx">
 											<div class="form-field__control">
-													<input type="text" v-validate="'required'" class="form-field__input" name="poll-title">
+													<input type="text" v-validate="''" class="form-field__input" name="poll-title">
 													<label class="form-field__label">Choice 1</label>
 													<div class="form-field__bar"></div>
 											</div>
@@ -538,7 +538,7 @@
 									</div>
 									<div class="mdb-form-field form-group-limitx">
 											<div class="form-field__control">
-													<input type="text" v-validate="'required'" class="form-field__input" name="poll-title">
+													<input type="text" v-validate="''" class="form-field__input" name="poll-title">
 													<label class="form-field__label">Choice 1</label>
 													<div class="form-field__bar"></div>
 											</div>

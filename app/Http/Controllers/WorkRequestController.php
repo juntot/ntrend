@@ -30,7 +30,7 @@ class WorkRequestController extends Controller
         ]);
 
 
-        $data = DB::table('formworkrequest')->insertGetId(request()->except(['isDisable', 'workID', 'approvedby', 'status','reciever_emails', 'attachment']));
+        $data = DB::table('formworkrequest')->insertGetId(request()->except(['isDisable', 'workID', 'approvedby', 'status','reciever_emails', 'attachment','preferredITList']));
             
            /*
             // $data = DB::select('select workID from formworkrequest order by workID desc limit 1');
@@ -112,7 +112,7 @@ class WorkRequestController extends Controller
 
         DB::table('formworkrequest')
             ->where('workID', request('workID'))
-            ->update(request()->except(['isDisable', 'workID', 'approvedby', 'empID_', 'status', 'reciever_emails', 'attachment']));
+            ->update(request()->except(['isDisable', 'workID', 'approvedby', 'empID_', 'status', 'reciever_emails', 'attachment','preferredITList']));
 
         return $response;
     }
@@ -279,6 +279,16 @@ class WorkRequestController extends Controller
         }
 
         return request()->all();
+    }
+
+    function getListITPersonnel(){
+        return DB::select('select Concat(e.fname," ", e.lname) as preferredIT from employee e 
+        left join department dept
+        on e.deptID_ = dept.deptID
+        where dept.deptID = 3
+        and e.status = 1
+        order by preferredIT
+        ');
     }
 
 }

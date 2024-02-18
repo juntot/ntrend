@@ -985,6 +985,13 @@ td.row-limit{
   white-space: nowrap;
 }
 
+td.row-limit-sm{
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .table>thead>tr>th{
   min-width: 150px;
 }

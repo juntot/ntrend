@@ -171,7 +171,7 @@ export default {
                        $(row).addClass("tr-pending");
                     }
                     if (cellValue=="Approved") {
-                       $(row).addClass("tr-approved");
+                       $(row).addClass("tr-verified");
                     }
                     if (cellValue=="Rejected") {
                        $(row).addClass("tr-rejected");

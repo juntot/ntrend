@@ -152,7 +152,7 @@ export default {
             let header = [
                             'WRF #',
                             'EMPLOYEE ID', 'EMPLOYEE NAME', 'DEPARTMENT NAME', 'POSITION', 'BRANCH',
-                            'DATE FILED', 'TIME CREATED', 'DATE NEEDED', 'URGENCY', 'TYPE OF WORK', 'DATE FROM', 'DATE TO',
+                            'DATE FILED', 'TIME CREATED', 'DATE NEEDED', 'URGENCY', 'TYPE OF WORK', 'PREFERRED IT', 'DATE FROM', 'DATE TO',
                             'REQUEST TYPE', 'CONTACT NUMBER', 'REQUEST DETAILS',
                             'APPROVER', 'EXECUTED BY', 'APPROVED DATE', 'EXECUTED DATE','EXECUTED TIME',
                             'CONFIRMED DATE', 'CONFIRMED TIME',
@@ -173,7 +173,7 @@ export default {
                           obj.status == 3? 'Executed':
                           obj.status == 4? 'Confirmed' : 'Pending';
 
-                worktype = obj.worktype > 1? 'Permanent' : 'Temporary';
+                worktype = obj.worktype > 1? 'Permanent' : obj.worktype == 1? 'Temporary': '';
                 date_from = obj.worktype == 1? obj.date_from : '';
                 date_to = obj.worktype == 1? obj.date_to : '';
 
@@ -202,7 +202,7 @@ export default {
                             obj.workID,
                             obj.empID_, obj.fullname, obj.deptname, obj.posname,
                             obj.branchname, obj.datefiled, moment(obj.datefiled_datetime).format('HH:mm:ss'), obj.dateneed, obj.urgency,
-                            worktype, date_from, date_to, obj.request_type,
+                            worktype, obj.preferredIT,date_from, date_to, obj.request_type,
                             obj.mobile, obj.reason, obj.approvedby_, obj.executedby_, obj.approveddate,
                             moment(obj.exec_datetime).format('YYYY-MM-DD'), moment(obj.exec_datetime).format('HH:mm:ss'),
                             moment(obj.confirm_datetime).format('YYYY-MM-DD'), moment(obj.confirm_datetime).format('HH:mm:ss'),

@@ -12,7 +12,7 @@ class SMSService{
 
   public function __construct() {
         $this->host     = env('SMS_HOST', 'http://sap4.northtrend.com');
-        $this->port     = env('SMS_PORT', '777');
+        $this->port     = env('SMS_PORT', '3000');
         $this->username = env('SMS_USER', 'apiuser');
         $this->password = env('SMS_PASS', 'apipass');
         $this->channel  = env('SMS_CHANNEL', 7);

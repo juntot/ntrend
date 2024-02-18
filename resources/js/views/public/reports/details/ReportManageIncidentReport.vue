@@ -266,7 +266,7 @@
                 <h5 class="form-subtitlex"><em><sup class="tr-executed">Initial Action Taken</sup></em></h5>
             </div>
             <div class="col-md-12">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="mdblblradio">
                         <span class="checklbl">Coaching</span>
                         <input type="radio" value="Coaching" v-model="actionTaken" name="action taken"
@@ -280,7 +280,7 @@
                         <span class="checkmark"></span>
                     </label>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="mdblblradio">
                         <span class="checklbl">Further Investigation</span>
                         <input type="radio" value="Further Investigation" v-model="actionTaken" name="action taken"
@@ -293,6 +293,19 @@
                         :disabled="$parent.$data.forapprover != 'approval' || (selected.approvedby && userinfo.empID != selected.approvedby)">
                         <span class="checkmark"></span>
                     </label>
+                </div>
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <select id="posname" v-model="disciplinaryaction" name="position" v-validate="'required'" class="form-field__input" :disabled="actionTaken != 'For Due Process'" >
+                                <option :value="'N/A'">N/A</option>
+                                <option :value="item" v-for="(item, key) in disciplinaryactionOptions" :key="key">{{ item }}</option>
+                            </select>
+                            <label class="form-field__label">Disciplinary Action</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('position') }}</span>
+                    </div>
                 </div>
             </div>
             <div class="clearfix"></div>
@@ -561,22 +574,22 @@
             </div>
             <div class="clearfix"></div>
             <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addIncidentReport" :disabled="
-                     disabledIfNoApprover || isDisable || !isFormValid" v-if="!incidentID && $parent.$data.forapprover != 'approval'">
+                    <!-- <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addIncidentReport" :disabled="
+                     disabledIfNoApprover || isDisable || !isFormValid" v-if="!incidentID && $parent.$data.forapprover != 'approval'"> -->
                     <!-- update -->
-                    <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateIncidentReport" 
+                    <!-- <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateIncidentReport" 
                     :disabled="isDisable || !isFormValid" 
-                    v-if="incidentID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput">
+                    v-if="incidentID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput"> -->
                     
                     <!-- delete -->
-                    <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteIncidentReport" 
+                    <!-- <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteIncidentReport" 
                         :disabled="isDisable" 
                         v-if="incidentID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput &&
                         userinfo.empID != selected.personsinvolve
-                    ">
+                    "> -->
                     <!-- main approver buttons -->
                     <!-- first level -->
-                    <input type="submit" class="btn btn-primary" value="Approve" 
+                    <!-- <input type="submit" class="btn btn-primary" value="Approve" 
                     :disabled="!actionTaken || 
                     (actionTaken == 'Further Investigation' && !endorse1) || 
                     (actionTaken == 'Coaching and Immediate Deduction' && !deduction_amt)
@@ -587,10 +600,10 @@
                     <input type="submit" class="btn btn-primary" value="Reject" 
                         @click.prevent="requestActionIncidentReport(4)" 
                         v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && status == 0 
-                    ">
+                    "> -->
 
                     <!-- first level endorse -->
-                    <input type="submit" class="btn btn-primary" value="Approve" 
+                    <!-- <input type="submit" class="btn btn-primary" value="Approve" 
                     :disabled="!actionTaken1 || 
                     (actionTaken1 == 'Further Investigation' && !endorse2) || 
                     (actionTaken1 == 'Coaching and Immediate Deduction' && !deduction_amt1)
@@ -600,10 +613,10 @@
 
                     <input type="submit" class="btn btn-primary" value="Reject" 
                         @click.prevent="requestActionIncidentReport(4)" 
-                        v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse1 && status == 1 ">
+                        v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse1 && status == 1 "> -->
 
                     <!-- end level and final endorser -->
-                    <input type="submit" class="btn btn-primary" value="Approve" 
+                    <!-- <input type="submit" class="btn btn-primary" value="Approve" 
                     :disabled="!actionTaken2 ||
                     (actionTaken2 == 'Coaching and Immediate Deduction' && !deduction_amt2)" 
                     @click.prevent="requestActionIncidentReport(3)" 
@@ -611,7 +624,7 @@
                     
                     <input type="submit" class="btn btn-primary" value="Reject" 
                         @click.prevent="requestActionIncidentReport(4)" 
-                        v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse2 && status >= 2 ">
+                        v-if="incidentID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel && userinfo.empID == selected.endorse2 && status >= 2 "> -->
                     
                     
                     <!-- <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionIncidentReport(0)" v-if="incidentID && $parent.$data.forapprover == 'approval' && $parent.$data.isCancel"> -->
@@ -664,6 +677,20 @@ export default {
 
             approvedby: '',
             actionTaken: '',
+            disciplinaryaction: 'N/A',
+            disciplinaryactionOptions: [
+                'Verbal Warning',
+                'Written Warning',
+                'Probation',
+                'Suspension',
+                'Demotion',
+                'Financial Penalties',
+                'Training or Counseling',
+                'Performance Improvement',
+                'Plan (PIP)',
+                'Transfer',
+                'Termination',
+            ],
             remarks: '',
 
             // endorse 1
@@ -937,7 +964,7 @@ export default {
         setDataForEdit(data = null){
             for(let i in this.$data)
             {
-                if(i != 'isDisable' && i!= 'employeeList')
+                if(i != 'isDisable' && i!= 'employeeList' && i != 'disciplinaryactionOptions')
                 this.$data[i] = data[i];
             
             }
@@ -953,7 +980,7 @@ export default {
             let obj = this.$data;
             Object.keys(obj).forEach((key)=>{
                 if(key != 'datefiled' && key != 'dateoccured' && key != 'incidenttime'
-                && key != 'incidenttype'){
+                && key != 'incidenttype' && key != 'disciplinaryactionOptions'){
                     this.$data[key] =  '';
                 }
                 if(key == 'datefiled' && key == 'dateoccured' && key == 'incidenttime') {
@@ -963,6 +990,9 @@ export default {
                 }
                 if(key == 'isDisable'){
                     this.$data[key] = false;
+                }
+                if(key == 'disciplinaryaction'){
+                    this.$data[key] = 'N/A';
                 }
                 
             });
