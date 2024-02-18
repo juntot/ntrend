@@ -43,7 +43,7 @@ class TransmittalController extends Controller
             inner join positiontbl pos on emp.posID_ = pos.posID
             inner join department dept on emp.deptID_ = dept.deptID
             inner join branchtbl branch on emp.branchID_ = branch.branchID
-        where form.recstat != 1 and form.empID_ = :empid', 
+        where form.recstat = 0 and form.empID_ = :empid', 
         [UserSession::getSessionID()]);
         
         return $data;
@@ -131,7 +131,7 @@ class TransmittalController extends Controller
         
         $affected = DB::table('formtransmittal')
         ->where(['transID'=>$leaveID, 'status'=>0])
-        ->update(['recstat'=>1]);
+        ->update(['recstat'=>404]);
         
         // mail notification
         $approverEmail = MailServices::getEmailsByEmpId(request('approvedby'));
@@ -169,7 +169,7 @@ class TransmittalController extends Controller
         //                         on branch.branchID = emp.branchID_
         //                     where eform.approverID_ = :approverID
         //                     and eform.Override0Form = 1
-        //                     and eleave.recstat != 1',
+        //                     and eleave.recstat = 0',
         //                     [UserSession::getSessionID()]);
         $data = DB::select('select eleave.*,
                             DATE_FORMAT(eleave.datefiled, "%m/%d/%Y %h:%i %p") as datefiled,
@@ -207,7 +207,7 @@ class TransmittalController extends Controller
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
                             where approvedby = :approverID
-                            and eleave.recstat != 1',
+                            and eleave.recstat = 0',
                             [UserSession::getSessionID()]);
         return $data;
     }    

@@ -64,7 +64,7 @@ class FinancialAdvantageController extends Controller
     // DELETE
     public function deleteFinancialAdvantage($faID  = null){
         $affected = DB::table('formfinancialadvantage')->where('faID', '=', $faID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
 
         $mailReceivers = FormApproverService::getApproverEmail('faID', $faID, 'formfinancialadvantage', 'Financial0Advance');
@@ -79,7 +79,7 @@ class FinancialAdvantageController extends Controller
         $data = DB::select('select form.*,
         DATE_FORMAT(form.datefiled, "%m/%d/%Y %h:%i %p") as datefiled,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formfinancialadvantage form left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid
         order by form.faID desc
         ', [UserSession::getSessionID()]);
         return $data;
@@ -122,7 +122,7 @@ class FinancialAdvantageController extends Controller
                                 on dept.deptID = emp.deptID_
                             where eform.approverID_ = :approverID
                             and eform.Financial0Advance  = 1
-                            and efadvantage.recstat != 1
+                            and efadvantage.recstat = 0
                             order by efadvantage.faID desc
                             ', [UserSession::getSessionID()]);
         return $data;

@@ -98,7 +98,7 @@ class CanvasController extends Controller
     // DELETE
     public function deleteCanvas($canvasID  = null){
         DB::table('formcanvas')->where('canvasID', '=', $canvasID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -110,7 +110,7 @@ class CanvasController extends Controller
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formcanvas form left join employee emp on
         form.approvedby = emp.empID where
-        form.recstat != 1 and
+        form.recstat = 0 and
         form.empID_ = :empid', [UserSession::getSessionID()]);
 
         // check if data has vale
@@ -151,7 +151,7 @@ class CanvasController extends Controller
             ecanvas.empID_ = eform.empID_
         right join employee emp
             on emp.empID = ecanvas.empID_
-        where ecanvas.recstat != 1 and eform.approverID_ = :approverID', [UserSession::getSessionID()]);
+        where ecanvas.recstat = 0 and eform.approverID_ = :approverID', [UserSession::getSessionID()]);
 
 
         // check if data has vale

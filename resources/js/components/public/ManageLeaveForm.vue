@@ -76,7 +76,7 @@
                     <div>
                         <label class="mdblblradio">
                         <span class="checklbl" >Whole-day</span>
-                        <input :disabled="$parent.disabledinput" type="radio" @change="handleChangeHalfday" v-model="halfday" value="0" name="halfday" checked="checked" >
+                        <input :disabled="$parent.disabledinput" type="radio" @change="handleChangeHalfday"  v-model="halfday" value="0" name="halfday" checked="checked" >
                         <span class="checkmark"></span>
                         </label>
                     </div>
@@ -85,7 +85,7 @@
                     <div>
                         <label class="mdblblradio">
                         <span class="checklbl" >Half-day AM</span>
-                        <input :disabled="$parent.disabledinput" type="radio" @change="handleChangeHalfday" v-model="halfday" value="1" name="halfday" checked="checked" >
+                        <input :disabled="$parent.disabledinput || totaldays > 1" type="radio" @change="handleChangeHalfday" v-model="halfday" value="1" name="halfday" checked="checked" >
                         <span class="checkmark"></span>
                         </label>
                     </div>
@@ -94,7 +94,7 @@
                     <div>
                         <label class="mdblblradio">
                         <span class="checklbl" >Half-day PM</span>
-                        <input :disabled="$parent.disabledinput" type="radio" @change="handleChangeHalfday" v-model="halfday" value="2" name="halfday"  >
+                        <input :disabled="$parent.disabledinput  || totaldays > 1" type="radio" @change="handleChangeHalfday" v-model="halfday" value="2" name="halfday"  >
                         <span class="checkmark"></span>
                         </label>
                     </div>
@@ -153,7 +153,7 @@
                     <div class="col-lg-4">
                         <div>
                             <label class="mdblblradio">
-                            <span class="checklbl">Solo Parent Leave</span>
+                            <span class="checklbl">Maternity Leave</span>
                             <input :disabled="$parent.disabledinput" type="radio" @change="handleChange" v-model="leavetype" value="7" name="radio">
                             <span class="checkmark"></span>
                             </label>
@@ -236,8 +236,8 @@
                     <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addLeave" :disabled="disabledIfNoApprover || isDisable || !isFormValid" v-if="submitBtn">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateLeave" :disabled="isDisable || !isFormValid" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteLeave" :disabled="isDisable" v-if="updateDeleteBtn">
-                    <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionLeave(1)" v-if="approveRejecBtn">
-                    <input type="submit" class="btn btn-primary" value="Reject" @click.prevent="requestActionLeave(2)" v-if="approveRejecBtn">
+                    <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionLeave(1)" :disabled="isDisable" v-if="approveRejecBtn">
+                    <input type="submit" class="btn btn-primary" value="Reject" @click.prevent="requestActionLeave(2)" :disabled="isDisable" v-if="approveRejecBtn">
                     <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionLeave(0)" v-if="cancelBtn">
                 </div>
             </form>
@@ -249,9 +249,12 @@
 // let leavetype = ['Sick Leave', 'Birthday Leave', 'Leave w/o Pay', 'Bereavement Leave', 'Vacation Leave', 'Others'];
 let leavetype = [
     'Sick Leave', 'Birthday Leave', 'Leave w/out Pay', 'Bereavement Leave', 'Vacation Leave',
-    'Descritionary Leave', 'Solo Parent Leave', 'Paternity Leave', 'Others'
+    'Descritionary Leave', 'Maternity Leave', 'Paternity Leave', 'Others'
     ];
 let status = ['Pending', 'Approved', 'Rejected'];
+const excludeBody = [
+    'isDisable',
+];
 export default {
     props: ['userinfo', 'selected', 'showCalendar', 'invokeParent'],
     data() {
@@ -277,6 +280,10 @@ export default {
         userinfo(val, old){
             this.MDBINPUT();
         },
+        totaldays(val, old){
+            if(val > 1)
+            this.halfday = "0";
+        }
 
     },
     methods:{
@@ -284,6 +291,7 @@ export default {
         //     this.$parent.Aws();
         // },
         handleChangeHalfday(){
+            
             // this.totaldays -=.5;
         },
         async handleChange(e){
@@ -351,13 +359,19 @@ export default {
         },
         // ACTIONS FOR LEAVE I.E APPROVE / REJECT / CANCEL
         requestActionLeave(status = null){
-            let params =  this.$data;
+            this.isDisable = true;
+            let params =  {};
+            for (const key in this.$data) {
+                if (!excludeBody.includes(key)) {
+                    params[key] = this.$data[key];   
+                }
+            }
             params['approvedby'] = this.$root.$data.userinfo.empID;
             params['empID_'] = this.$parent.$data.empID_;
             params['old_status'] = this.selected.status;
             params['status'] = status;
             params['email'] = this.$parent.$data.selected.email;
-            delete params.isDisable;
+            // delete params.isDisable;
             axios.post('api/actionformleave', params).then((response)=>{
                 this.$parent.updateRow(response.data);
                 this.closeModal();
@@ -393,7 +407,7 @@ export default {
                     $("#myModal").modal("hide");
                 }
             }
-            if(this.greater30Days && this.leavetype !=3 && this.greater30Days && this.leavetype != 1 && this.greater30Days && this.leavetype != 4){
+            if(this.greater30Days && this.leavetype == 5){
                 alert('3 days leave and up should be filed 30 days before the date filed');
                 this.leavetype = await 3;
                 return;
@@ -428,7 +442,8 @@ export default {
 
 
             if(totaldays >= 3 && totaldays_from_start_and_filed < 30 ){
-                if(this.leavetype !=3 && this.leavetype != 1){
+                // if(this.leavetype !=3 && this.leavetype != 1){
+                if(this.leavetype == 5){
                     alert('3 days leave and up should be filed 30 days before the date filed');
                     this.leavetype = await 3;
                     return;

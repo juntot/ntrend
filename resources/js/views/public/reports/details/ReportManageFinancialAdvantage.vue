@@ -2,7 +2,7 @@
     <div>
 
         <form action="post">
-            <h3 class="text-center form-title"><span class="dblUnderlined">FINANCIAL ADVANTAGE REQUEST</span></h3>
+            <h3 class="text-center form-title"><span class="dblUnderlined">FINANCIAL ADVANCE REPORT</span></h3>
             <div class="col-md-4">
                 <div class="mdb-form-field form-group-limit">
                         <div class="form-field__control">

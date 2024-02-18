@@ -119,7 +119,7 @@ class ReportController extends Controller
             // Supplementary
             // old use datefiled as paramter
             case 'supplementary':
-                    $data  = DB::select('select DISTINCT esup.supID, esup.empID_, esup.datefiled, esup.brand, esup.witnesses, esup.remarks, esup.approveddate, esup.remarks, esup.status,
+                    $data  = DB::select('select DISTINCT esup.supID, esup.empID_, esup.datefiled, esup.brand, esup.witnesses, esup.remarks, esup.approveddate, esup.remarks, esup.detailedreason, esup.status,
                     DATE_FORMAT(esup.datefiled, "%m/%d/%Y") as datefiled,
                     CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname, dept.deptname, comp.compname,
                     (
@@ -148,7 +148,7 @@ class ReportController extends Controller
                     AND
                         esup.status IN('.$status.')
                     AND esup.status IN('.$status.')
-                    AND esup.recstat != 1',
+                    AND esup.recstat = 0',
                     [
                         $datefrom, $dateto,
                     ]);
@@ -201,7 +201,7 @@ class ReportController extends Controller
                             AND
                                 esup.status IN('.$status.')
                             AND
-                                esup.recstat != 1',
+                                esup.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -258,7 +258,7 @@ class ReportController extends Controller
                             AND
                                 eccard.status IN('.$status.')
                             AND
-                                eccard.recstat != 1',
+                                eccard.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -302,7 +302,7 @@ class ReportController extends Controller
                             AND
                                 eformloan.status IN('.$status.')
                             AND
-                                eformloan.recstat != 1',
+                                eformloan.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -344,7 +344,7 @@ class ReportController extends Controller
                             AND
                                 efadvantage.status IN('.$status.')
                             AND
-                                efadvantage.recstat != 1
+                                efadvantage.recstat = 0
                             ORDER BY efadvantage.faID',
                             [
                                 $datefrom.' 00:00:00', $dateto.' 23:59:59',
@@ -407,7 +407,7 @@ class ReportController extends Controller
                             AND
                                 eIReport.status IN('.$status.')
                             AND
-                                eIReport.recstat != 1',
+                                eIReport.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -435,7 +435,7 @@ class ReportController extends Controller
                 //             AND
                 //                 eIReport.status IN('.$status.')
             //             AND
-                //                 eIReport.recstat != 1',
+                //                 eIReport.recstat = 0',
                 //             [
                 //                 $datefrom, $dateto,
                  //               $branch,
@@ -469,7 +469,7 @@ class ReportController extends Controller
                 //             AND
                 //                 eleave.status IN('.$status.')
                 //             AND
-                //                 eleave.recstat != 1',
+                //                 eleave.recstat = 0',
                 //             [
                 //                 $datefrom, $dateto,
                 //                $branch,
@@ -506,7 +506,7 @@ class ReportController extends Controller
 
                     eleave.status IN('.$status.')
                 AND
-                    eleave.recstat != 1',
+                    eleave.recstat = 0',
                 [
                     $datefrom, $dateto,
                     // $branch,
@@ -540,7 +540,7 @@ class ReportController extends Controller
                             AND
                                 emiis.status IN('.$status.')
                             AND
-                                emiis.recstat != 1',
+                                emiis.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -582,7 +582,7 @@ class ReportController extends Controller
                             AND
                                 eprf.status IN('.$status.')
                             AND
-                                eprf.recstat != 1',
+                                eprf.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -634,7 +634,7 @@ class ReportController extends Controller
                             AND
                                 ecanvas.status IN('.$status.')
                             AND
-                                ecanvas.recstat != 1',
+                                ecanvas.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -686,7 +686,7 @@ class ReportController extends Controller
                         AND
                             esaldisc.status IN('.$status.')
                         AND
-                            esaldisc.recstat != 1',
+                            esaldisc.recstat = 0',
                         [
                             $datefrom, $dateto,
                             // $branch,
@@ -724,7 +724,7 @@ class ReportController extends Controller
                     AND
                         eaccredit.status IN('.$status.')
                     AND
-                        eaccredit.recstat != 1',
+                        eaccredit.recstat = 0',
                     [
                         $datefrom, $dateto,
                         // $branch,
@@ -764,7 +764,7 @@ class ReportController extends Controller
                             AND
                                 etravel.status IN('.$status.')
                             AND
-                                etravel.recstat != 1',
+                                etravel.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -803,7 +803,7 @@ class ReportController extends Controller
                             AND
                                 eundertime.status IN('.$status.')
                             AND
-                                eundertime.recstat != 1',
+                                eundertime.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -841,7 +841,7 @@ class ReportController extends Controller
                             AND
                                 eurgent.status IN('.$status.')
                             AND
-                                eurgent.recstat != 1',
+                                eurgent.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -880,7 +880,7 @@ class ReportController extends Controller
                             AND
                                 eoffset.status IN('.$status.')
                             AND
-                                eoffset.recstat != 1',
+                                eoffset.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -939,7 +939,7 @@ class ReportController extends Controller
                             AND
                                 ework.status IN('.$status.')
                             AND
-                                ework.recstat != 1',
+                                ework.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -976,7 +976,7 @@ class ReportController extends Controller
                             AND
                                 overtime.status IN('.$status.')
                             AND
-                                overtime.recstat != 1',
+                                overtime.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -1055,7 +1055,7 @@ class ReportController extends Controller
                             AND
                                 overtime.status IN('.$status.')
                             AND
-                                overtime.recstat != 1',
+                                overtime.recstat = 0',
                             [
                                 $datefrom.' 00:00:00', $dateto.' 23:59:59',
                                 // $branch,
@@ -1110,7 +1110,7 @@ class ReportController extends Controller
                             AND
                                 trans.status IN('.$status.')
                             AND
-                                trans.recstat != 1',
+                                trans.recstat = 0',
                             [
                                 $datefrom.' 00:00:00', $dateto.' 23:59:59',
                                 // $branch,
@@ -1141,7 +1141,7 @@ class ReportController extends Controller
                 // AND
                 //     eccard.status IN('.$status.')
                 // AND
-                //     eccard.recstat != 1',
+                //     eccard.recstat = 0',
                 // [
                 //     $datefrom, $dateto,
                 //     // $branch,
@@ -1149,6 +1149,116 @@ class ReportController extends Controller
                 //     // UserSession::getSessionID()
 
                 // ]);
+                return $data;
+                break;
+
+            case 'enrollmentprogram':
+                // return [];
+                $data = DB::select('select enrolprog.*,
+                            enrolprog.dateenrolled as dateenrolled,
+                            CONCAT(emp.fname," ",emp.lname) as fullname, 
+                            emp.mobile, emp.lname, emp.fname, emp.email,
+                            branch.branchname, pos.posname, dept.deptname,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = enrolprog.approvedby
+                            ) as approvedby
+
+                            from formsalesprogramenrollment enrolprog right join employee emp
+                                on emp.empID = enrolprog.empID_
+                            inner join positiontbl pos
+                                on pos.posID = emp.posID_
+                            inner join department dept
+                                on dept.deptID = emp.deptID_
+                            inner join branchtbl branch
+                                on branch.branchID = emp.branchID_
+                            WHERE
+                                (enrolprog.dateenrolled BETWEEN :dateFrom AND :dateTo)
+                            AND
+                                emp.branchID_ IN('.$branch.')
+                            AND
+                                enrolprog.status IN('.$status.')
+                            AND
+                                enrolprog.recstat = 0',
+                            [
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
+                                // $branch,
+                                // $status
+                                // UserSession::getSessionID()
+
+                            ]);
+                
+                return $data;
+                break;
+            case 'enrollmentprogram':
+                // return [];
+                $data = DB::select('select enrolprog.*,
+                            enrolprog.dateenrolled as dateenrolled,
+                            CONCAT(emp.fname," ",emp.lname) as fullname, 
+                            emp.mobile, emp.lname, emp.fname, emp.email,
+                            branch.branchname, pos.posname, dept.deptname,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = enrolprog.approvedby
+                            ) as approvedby
+
+                            from formsalesprogramenrollment enrolprog right join employee emp
+                                on emp.empID = enrolprog.empID_
+                            inner join positiontbl pos
+                                on pos.posID = emp.posID_
+                            inner join department dept
+                                on dept.deptID = emp.deptID_
+                            inner join branchtbl branch
+                                on branch.branchID = emp.branchID_
+                            WHERE
+                                (enrolprog.dateenrolled BETWEEN :dateFrom AND :dateTo)
+                            AND
+                                emp.branchID_ IN('.$branch.')
+                            AND
+                                enrolprog.status IN('.$status.')
+                            AND
+                                enrolprog.recstat = 0',
+                            [
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
+                                // $branch,
+                                // $status
+                                // UserSession::getSessionID()
+
+                            ]);
+                
+                return $data;
+                break;
+            case 'minutesofmeeting':
+                // return [];
+                $data = DB::select('select enrolprog.*,
+                            enrolprog.datefiled as datefiled,
+                            CONCAT(emp.fname," ",emp.lname) as fullname, 
+                            emp.mobile, emp.lname, emp.fname, emp.email,
+                            branch.branchname, pos.posname, dept.deptname
+                            from formmeetingminutes enrolprog right join employee emp
+                                on emp.empID = enrolprog.empID_
+                            inner join positiontbl pos
+                                on pos.posID = emp.posID_
+                            inner join department dept
+                                on dept.deptID = emp.deptID_
+                            inner join branchtbl branch
+                                on branch.branchID = emp.branchID_
+                            WHERE
+                                (enrolprog.datefiled BETWEEN :dateFrom AND :dateTo)
+                            AND
+                                emp.branchID_ IN('.$branch.')
+                            AND
+                                enrolprog.status IN('.$status.')
+                            AND
+                                enrolprog.recstat = 0',
+                            [
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
+                                // $branch,
+                                // $status
+                                // UserSession::getSessionID()
+
+                            ]);
+                
                 return $data;
                 break;
         endswitch;

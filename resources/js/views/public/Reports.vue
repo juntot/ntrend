@@ -113,6 +113,7 @@ button.multiselect span.multiselect-selected-text{
                     <!-- <canvas id="myChart"></canvas> -->
                     <IRChart v-show="showChart"></IRChart>
                 </div>
+                <div class="clearfix"></div>
                 <div v-for="(compo, index) in $options.components" :key="index" v-show="reportComponent[index] == selectedRepType && !ishiddenComponent">
                     <!-- <{{index}}></{{index}}> -->
                     <component :is="index" :title="title" v-if="index != 'IRChart'" />
@@ -144,7 +145,10 @@ import ReportWorkRequest                from './reports/ReportWorkRequest';
 import ReportOvertimeRequest            from './reports/ReportOvertimeRequest';
 import ReportOverrideForm               from './reports/ReportOverrideForm';
 import ReportTransmittal                from './reports/ReportTransmittal';
+import ReportEnrollmentProgram          from './reports/ReportEnrollmentProgram';
 import IRChart                          from './reports/IRChart';
+import ReportMeetingMinute              from './reports/ReportMeetingMinute';
+
 // let brand = ['NTMC', 'APBW', 'PHILCREST', 'TYREPLUS'];
 // let status = ['Pending', 'Approved', 'Rejected'];
 
@@ -154,15 +158,15 @@ import IRChart                          from './reports/IRChart';
 */
 
 let typeofReportBus = {
-                supplementary:          'initSup',          callingcardrequest:     'initCallCard',         clearanceform:      'initClearance',
-                companyloan:            'initLoan',         financialadvance:       'initFA',               incidentreport:     'initIR',
-                laptopform:             'initLaptop',       leaveform:              'initLeave',            miis:               'initMIIS',
-                prs:                    'initPRS',          prf:                    'initPRF',              canvas:             'initCanvas',
-                salarydiscrepancy:      'initSalDis',       supplieraccreditation:  'initSupAccre',         travelform:         'initTravel',
-                undertimerequest:       'initUndertime',    urgentcheck:            'initUrgentCheck',      offset:             'initOffset',
-                workrequest:            'initWorkRequest',  overtimerequest:        'initOvertime',         overrideform:       'initOverride',
-                transmittal:            'initTransmittal',
-
+                supplementary:          'initSup',              callingcardrequest:     'initCallCard',         clearanceform:      'initClearance',
+                companyloan:            'initLoan',             financialadvance:       'initFA',               incidentreport:     'initIR',
+                laptopform:             'initLaptop',           leaveform:              'initLeave',            miis:               'initMIIS',
+                prs:                    'initPRS',              prf:                    'initPRF',              canvas:             'initCanvas',
+                salarydiscrepancy:      'initSalDis',           supplieraccreditation:  'initSupAccre',         travelform:         'initTravel',
+                undertimerequest:       'initUndertime',        urgentcheck:            'initUrgentCheck',      offset:             'initOffset',
+                workrequest:            'initWorkRequest',      overtimerequest:        'initOvertime',         overrideform:       'initOverride',
+                transmittal:            'initTransmittal',      
+                enrollmentprogram:      'initEnrollmentProgram', minutesofmeeting:      'initMeetingMinute',
             };
 
 export default {
@@ -188,7 +192,10 @@ export default {
         ReportOvertimeRequest,
         ReportOverrideForm,
         ReportTransmittal,
+        ReportEnrollmentProgram,
         IRChart,
+        ReportMeetingMinute
+        
     },
     data(){
         return{
@@ -237,7 +244,7 @@ export default {
                 // workrequest:            'ReportWorkRequest'
                 
                 /*
-                    //DEFINATION ===================================================================================
+                    //DEFINITION ===================================================================================
                     index = componentname
                     value =  selectype value
                 */
@@ -248,7 +255,8 @@ export default {
                 ReportSalaryDiscrepancy:    'salarydiscrepancy',      ReportSupplierAccreditation:  'supplieraccreditation',      ReportTravelForm:         'travelform',
                 ReportUndertimeRequest:     'undertimerequest',       ReportUrgentCheck:            'urgentcheck',                ReportOffset:             'offset',
                 ReportWorkRequest:          'workrequest',            ReportOvertimeRequest:        'overtimerequest',            ReportOverrideForm:       'overrideform',
-                ReportTransmittal:          'transmittal',
+                ReportTransmittal:          'transmittal',           
+                ReportEnrollmentProgram:    'enrollmentprogram',      ReportMeetingMinute:          'minutesofmeeting'
             },
         }
     },
@@ -345,6 +353,21 @@ export default {
                     {label: 'Further Investigation', title: 'Further Investigation', value: 8},
                     {label: 'Closed', title: 'Closed', value: 3},
                     {label: 'Rejected', title: 'Rejected', value: 4},
+                ];
+            }else if(el.target.value == 'minutesofmeeting'){
+                /**
+                 * 0 pending
+                 * 1 endorse 1
+                 * 2 endorse 2
+                 * 3 close
+                 * 4 rejected
+                 * 9 approved by the immidedate approver but not as a whole request
+                 */
+                options =  [
+                    // {label: '1st Endorsement', title: '1st Endorsement', value: 1},
+                    // {label: '2nd Endorsement', title: '2nd Endorsement', value: 2},
+                    {label: 'Open', title: 'Pending', value: 0},
+                    {label: 'Closed', title: 'Closed', value: 1},
                 ];
             }
             else{
@@ -560,7 +583,12 @@ export default {
             if(response.data.length > 0)
             {
                 // this.selectedRepType = ((response.data[0].formtitle).replace(/ /g, '')).toLowerCase();
-                this.reportType = response.data;
+                this.reportType = (response.data.sort((a, b)=>{
+                    var nameA = a.formtitle.toLowerCase();
+                    var nameB = b.formtitle.toLowerCase(); 
+                    if(nameA === nameB) return 0; 
+                    return nameA > nameB ? 1 : -1;
+                }));
                 // this.setSelectedRepTypeText = response.data[0].formtitle;
                 this.title = 'SUMMARY REPORT OF '+ (response.data[0].formtitle).toUpperCase();
 

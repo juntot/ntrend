@@ -2,25 +2,12 @@
     <div>
 
             <form method="post">
-                <h3 class="text-center form-title"><span class="dblUnderlined">ENROLLMENT PROGRAM FORM</span></h3>
+                <h3 class="text-center form-title"><span class="dblUnderlined">{{this.$route.name}}</span></h3>
                 <div class="col-md-12 col-lg-12">
                     <h5 class="form-subtitle"><em>&nbsp;</em></h5>
                 </div>
                 <div class="col-md-8">
                     <div class="mdb-form-field form-group-limitx">
-                        <!-- <div class="form-field__control">
-                            <select :disabled="$parent.disabledinput" v-model="company" name="company" v-validate="'required'" class="form-field__input" 
-                            >
-                                <option v-for="comp in compRows" 
-                                    :value="comp.name" 
-                                    :key="comp.id"
-                                    @click="selectCompany(comp)"
-                                >{{comp.name}}</option>
-                            </select>
-                            <label class="form-field__label">Company</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('company') }}</span> -->
                         <div class="relative-pos">
                             <div class="form-field__control">
                                 <input :disabled="$parent.disabledinput" type="text" :value="company" name="company"  class="form-field__input"
@@ -96,21 +83,17 @@
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput || isDisable" type="text" class="form-field__input" :value="dateoverride" name="dateoverride" readonly="true" >
-                            <label class="form-field__label">Date & Time Override</label>
+                            <input :disabled="$parent.disabledinput || isDisable" type="text" class="form-field__input" :value="dateenrolled" name="dateenrolled" readonly="true" >
+                            <label class="form-field__label">Date & Time</label>
                             <div class="form-field__bar"></div>
                         </div>
                     </div>
                 </div>
                 <div class="clearfix"></div>
                 <!-- for branch & div -->
-                <div class="col-md-4">
+                <div class="col-md-8">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <!-- <select :disabled="$parent.disabledinput" v-model="branch" name="branch" v-validate="'required'" readonly="true" class="form-field__input" 
-                            >
-                                <option v-for="branch in branchRows" :value="branch.name" :key="branch.id">{{branch.name}}</option>
-                            </select> -->
                             <input :disabled="true" type="text" :value="branch" name="branch"  v-validate="'required'" class="form-field__input">
                             <label class="form-field__label">Branch</label>
                             <div class="form-field__bar"></div>
@@ -131,323 +114,323 @@
                         <span class="errors">{{ errors.first('division') }}</span>
                     </div>
                 </div>
+                <div class="clearfix"></div>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <select :disabled="$parent.disabledinput" v-model="mode" name="mode" v-validate="'required'" class="form-field__input" 
-                            >
-                                <option value="PICK-UP">PICK-UP</option>
-                                <option value="DELIVERY IN-BASE">DELIVERY IN-BASE</option>
-                                <option value="DELIVERY OUT-BASE">DELIVERY OUT-BASE</option>
-                            </select>
-                            <label class="form-field__label">Mode</label>
+                            <input :disabled="$parent.disabledinput" type="text" v-model="program_code" name="program_code"  v-validate="'required'" class="form-field__input">
+                            <label class="form-field__label">BDP Code</label>
                             <div class="form-field__bar"></div>
                         </div>
-                        <span class="errors">{{ errors.first('mode') }}</span>
-                    </div>
-                </div>
-                <div class="col-md-8">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="relative-pos">
-                            <div class="form-field__control">
-                                <input :disabled="$parent.disabledinput" type="text" v-model="search_employee"  v-validate="'required'" name="sales employee"  class="form-field__input"
-                                @keyup.prevent="searchEmployee"
-                                >
-                                <label class="form-field__label">Sales Employee</label>
-                                <div class="form-field__bar"></div>
-                            </div>
-                            <span class="errors" v-if="!search_employee">{{ errors.first('sales employee') }}</span>
-                            <div class="absolute-pos bg-white suggestion_filter" 
-                                v-if="search_employee && !sales_employee && employeeList.length > 0
-                            ">
-                                <!-- loader and err msg -->
-                                <div v-if="loader">
-                                    <i class="fas fa-spinner fa-spin"></i> 
-                                    <span class="errors" style="padding-left: 8px">{{errMsg}}</span>
-                                </div>
-                                <ul>
-                                    <li v-for="emp in employeeList" 
-                                    @click.prevent="selectedEmployee(emp.fullname)"
-                                    :key="emp.empID">
-                                        {{emp.fullname}}
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+                        <span class="errors">{{ errors.first('program_code') }}</span>
                     </div>
                 </div>  
                 <div class="col-md-4">
-                            <div class="form-group-limitx">
-                                    <Datepicker :disabled="$parent.disabledinput" :value="commited_date"  wrapper-class="mdb-form-field" 
-                                    @selected="selectDateCommitment"
-                                    input-class="form-field__input datePicker" :typeable="false" :format="'MM/dd/yyyy'">
-                                    <label slot="afterDateInput" class="form-field__label">Commitment date</label>
-                                    <div slot="afterDateInput" class="form-field__bar"></div>
-                                    <span slot="afterDateInput" class="errors">{{ errors.first('mname') }}</span>
-                                    </Datepicker>
-                            </div>
-                </div>
-                <div class="col-md-8">
                     <div class="mdb-form-field form-group-limitx">
-                        <div class="relative-pos">
-                            <div class="form-field__control">
-                                <input :disabled="$parent.disabledinput" type="text" v-model="search_manager"  v-validate="'required'" name="sales manager"  class="form-field__input"
-                                @keyup.prevent="searchManager"
-                                >
-                                <label class="form-field__label">Sales Manager</label>
-                                <div class="form-field__bar"></div>
-                            </div>
-                            <span class="errors" v-if="!search_manager">{{ errors.first('sales manager') }}</span>
-                            <div class="absolute-pos bg-white suggestion_filter" 
-                                v-if="search_manager && !sales_manager && employeeList.length > 0
-                            ">
-                                <!-- loader and err msg -->
-                                <div v-if="loader">
-                                    <i class="fas fa-spinner fa-spin"></i> 
-                                    <span class="errors" style="padding-left: 8px">{{errMsg}}</span>
-                                </div>
-                                <ul>
-                                    <li v-for="emp in employeeList" 
-                                    @click.prevent="selectedEmployee(emp.fullname, 'manager')"
-                                    :key="emp.empID">
-                                        {{emp.fullname}}
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="form-field__control">
+                            <input :disabled="$parent.disabledinput" type="text" v-model="program_name" name="program_name"  v-validate="'required'" class="form-field__input">
+                            <label class="form-field__label">BDP Name</label>
+                            <div class="form-field__bar"></div>
                         </div>
+                        <span class="errors">{{ errors.first('program_name') }}</span>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
-                            <select :disabled="$parent.disabledinput" v-model="commited_time" name="commmitment time" v-validate="'required'" class="form-field__input" 
+                            <select :disabled="$parent.disabledinput" v-model="teritory" name="teritory" v-validate="'required'" class="form-field__input" 
                             >
-                                <option value="MORNING">MORNING</option>
-                                <option value="AFTERNOON">AFTERNOON</option>
+                                <option v-for="(div, index) in teritoryList" :value="div.teritoryName" :key="index">{{div.teritoryName}}</option>
                             </select>
-                            <label class="form-field__label">Commitment time</label>
+                            <label class="form-field__label">Teritory</label>
                             <div class="form-field__bar"></div>
                         </div>
-                        <span class="errors">{{ errors.first('commmitment time') }}</span>
+                        <span class="errors">{{ errors.first('teritory') }}</span>
                     </div>
                 </div>
-                <div class="col-md-8">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" v-validate="'required'" type="text" v-model="amount_order" class="form-field__input" name="amount of order" >
-                            <label class="form-field__label">Amount of Order</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('amount of order') }}</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" v-validate="'required'" type="text" v-model="po_so" class="form-field__input" name="PO/SO" >
-                            <label class="form-field__label">PO/SO</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('PO/SO') }}</span>
-                    </div>
-                </div>
+                
                 <div class="clearfix"></div>
                 <hr style="border-top: 8px solid #1F7193">
-                <div class="col-md-12 col-lg-12">
-                    <h4 class="text-center form-title"><span class="dblUnderlined">REASONS</span></h4>
-                </div>
+                <!-- <div class="col-md-12 col-lg-12">
+                    <h4 class="text-center form-title"><span class="dblUnderlined">ITEMS (optional)</span></h4>
+                </div> -->
                 <div class="col-md-12">
-                    <div class="mdb-table-overflow">
+                    <div class="panel-group" id="override-accordion">
+                        <div class="panel panel-default">
+                            <div class="panel-heading form-subtitle">
+                                <h5 class="form-subtitle panel-title">
+                                    <a data-toggle="collapse" data-parent="#override-accordion" :href="'#1'">
+                                        <em>
+                                            <span><i class="far fa-plus-square" style="direction: rtl; font-size: 19px;"></i></span>
+                                            ITEMS (optional)
+                                        </em>
+                                    </a>
+                                </h5>
+                            </div>
+                            <div :id="1" :class="'panel-collapse collapse'">
+                                <div class="panel-body">
+                                    <div class="col-md-12">
+                                            <div class="mdb-table-overflow">
                             <table width="100%" class="table table-hover mdb-table">
                                     <thead>
                                         <tr>
-                                            <th class="text-center" width="200px">DATE</th>
-                                            <th class="text-center">TIME IN (AM)</th>
-                                            <th class="text-center">TIME OUT (AM)</th>
-                                            <th class="text-center">TIME IN (PM)</th>
-                                            <th class="text-center">TIME OUT (PM)</th>
-                                            <th class="text-center" colspan="2">REASON</th>
+                                            <th class="text-center">ITEM NAME</th>
+                                            <th class="text-center">ITEM CODE</th>
+                                            <th class="text-center" style="min-width: 18px;">QTY</th>
+                                            <th class="text-center" style="min-width: 20px;">UOM</th>
+                                            <th class="text-center" colspan="2" style="width: 800px;">REMARKS</th>
 
                                         </tr>
                                         <tr v-if="!$parent.disabledinput">
-                                            <td>
-                                                <Datepicker :value="supdate" wrapper-class="mdb-form-field" input-class="form-field__input datePicker inline-input" @selected="selectSupDate" :typeable="false" :format="'MM/dd/yyyy'">
-                                                    <div slot="afterDateInput" class="form-field__bar"></div>
-                                                </Datepicker>
-                                            </td>
-                                            <td>
-                                                <div class="mdb-form-field form-group-limit">
+                                            <!-- line # -->
+                                            <!-- <td>
+                                                 <div class="mdb-form-field form-group-limitx">
                                                     <div class="form-field__control form-field--is-filled">
-                                                        <input type="time" name="timein" v-model="timein" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <input type="text" :disabled="!company" name="lineNo" v-model="lineNo" class="form-field__input inline-input" >
                                                         <div class="form-field__bar"></div>
                                                     </div>
-                                                    <span class="errors">{{ errors.first('timein') }}</span>
+                                                    <span class="errors">{{ errors.first('lineNo') }}</span>
+                                                </div>
+                                            </td> -->
+                                            
+                                            <!-- item name -->
+                                            <td colspan="1">
+                                                <div class="mdb-form-field form-group-limitx">
+                                                    <div class="mdb-form-field form-group-limitx">
+                                                        <div class="relative-pos">
+                                                            <div class="form-field__control form-field--is-filled">
+                                                                <input :disabled="$parent.disabledinput || !company" type="text" v-model="search_itemName" name="itemName"  class="form-field__input inline-input"
+                                                                @keyup.prevent="getItemName"
+                                                                @focus="itemNameFocus = true"
+                                                                @blur="handleBlur"
+                                                                >
+                                                                <div class="form-field__bar"></div>
+                                                            </div>
+                                                            <span class="errors">{{ errors.first('company') }}</span>
+                                                            <!-- loader and err msg -->
+                                                            <div v-if="loader3">
+                                                                <i class="fas fa-spinner fa-spin"></i> 
+                                                                <span class="errors" style="padding-left: 8px">{{errMsg}}</span>
+                                                            </div>
+                                                            <div class="fixed-pos bg-white suggestion_filter" 
+                                                                v-if="itemNameFocus">
+                                                                <ul>
+                                                                    <li v-for="comp in itemNameRows" 
+                                                                    @click.prevent="selectedItemName(comp)"
+                                                                    :key="comp.ItemCode">
+                                                                        {{comp.ItemName}}
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </td>
+                                            <!-- item code -->
                                             <td>
-                                                <div class="mdb-form-field form-group-limit">
+                                               <div class="mdb-form-field form-group-limitx">
                                                     <div class="form-field__control form-field--is-filled">
-                                                        <input type="time" name="timeout" v-model="timeout" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <input type="text" :readonly="true" name="itemCode" :value="itemCode" class="form-field__input inline-input" >
                                                         <div class="form-field__bar"></div>
                                                     </div>
-                                                    <span class="errors">{{ errors.first('timeout') }}</span>
+                                                    <span class="errors">{{ errors.first('itemCode') }}</span>
                                                 </div>
                                             </td>
-                                            <!-- afternoon -->
+                                            <!-- qty -->
                                             <td>
-                                                <div class="mdb-form-field form-group-limit">
+                                                <div class="mdb-form-field form-group-limitx">
                                                     <div class="form-field__control form-field--is-filled">
-                                                        <input type="time" name="timein" v-model="timein2" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <input type="text" :disabled="!company" name="qty" v-model="qty" class="form-field__input inline-input" >
                                                         <div class="form-field__bar"></div>
                                                     </div>
-                                                    <span class="errors">{{ errors.first('timein2') }}</span>
+                                                    <span class="errors">{{ errors.first('qty') }}</span>
                                                 </div>
                                             </td>
+                                            <!-- oum -->
                                             <td>
-                                                <div class="mdb-form-field form-group-limit">
+                                                <div class="mdb-form-field form-group-limitx">
                                                     <div class="form-field__control form-field--is-filled">
-                                                        <input type="time" name="timeout" v-model="timeout2" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <input type="text" :disabled="!company" name="oum" v-model="uom" class="form-field__input inline-input" >
                                                         <div class="form-field__bar"></div>
                                                     </div>
-                                                    <span class="errors">{{ errors.first('timeout2') }}</span>
+                                                    <span class="errors">{{ errors.first('uom') }}</span>
                                                 </div>
                                             </td>
-                                            <!-- END -->
+                                            <!-- remarks -->
                                             <td>
+                                                
                                                 <div class="mdb-form-field">
                                                     <div class="form-field__control">
-                                                        <select v-model="reason" id="posname" name="position" class="form-field__input inline-input" >
-                                                            <option :value="'Failure to log-in / out'">Failure to log-in / out</option>
-                                                            <option :value="'Delivery team doing out base deliveries'">Delivery team doing out base deliveries</option>
-                                                            <option :value="'Out of town for buiness travel'">Out of town for buiness travel</option>
-                                                            <option :value="'Multiple logs'">Multiple logs</option>
-                                                            <option :value="'Out of office on officials'">Out of office on officials</option>
-                                                        </select>
+                                                        <input type="text" :disabled="!company" class="form-field__input inline-input" v-model="itemRemarks" v-validate="" name="itemRemarks" @keydown.enter.prevent="appendTable">
                                                         <div class="form-field__bar"></div>
                                                     </div>
-                                                <span class="errors">{{ errors.first('position') }}</span>
+                                                    <span class="errors">{{ errors.first('itemRemarks') }}</span>
                                                 </div>
-                                                <!-- <div class="mdb-form-field">
-                                                    <div class="form-field__control">
-                                                        <input type="text" class="form-field__input inline-input" v-model="reason" v-validate="'required'" name="reason" @keydown.enter.prevent="appendTable">
-                                                        <div class="form-field__bar"></div>
-                                                    </div>
-                                                    <span class="errors">{{ errors.first('reason') }}</span>
-                                                </div> -->
                                             </td>
-                                            <td>
+                                            <td style="width: 10px;">
                                                 <button class="btn btn-primary" @click.prevent="appendTable">add</button>
                                             </td>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- <tr v-for="(item, index) in entries" :key="index">
+                                        <tr v-for="(item, index) in entries" :key="index">
+                                            
+                                            <!-- <td>
+                                                {{item.lineNo}}
+                                            </td> -->
                                             <td>
-                                                <div>
-                                                    <span style="padding: 0 12px;">
-                                                        <a v-if="!$parent.disabledinput" @click="removeRow(index)"><i class="fas fa-trash text-danger"></i></a>
-                                                    </span>
-                                                    {{item.supdate | customDateFormat}}
-                                                </div>
+                                                <span style="padding: 0 12px;">
+                                                    <a v-if="!$parent.disabledinput" @click="removeRow(index)"><i class="fas fa-trash text-danger"></i></a>
+                                                </span>
+                                                <span style="padding-right: 8px;">{{index + 1}} </span>
+                                                {{item.itemName}}
                                             </td>
                                             <td>
-                                                {{item.timein}}
+                                                {{item.itemCode}}
                                             </td>
                                             <td>
-                                                {{item.timeout}}
+                                                {{item.qty}}
                                             </td>
                                             <td>
-                                                {{item.timein2}}
-                                            </td>
-                                            <td>
-                                                {{item.timeout2}}
+                                                {{item.uom}}
                                             </td>
                                             <td colspan="2">
-                                                {{item.reason}}
+                                                {{item.remarks}}
                                             </td>
-                                        </tr> -->
+                                        </tr>
 
                                     </tbody>
                             </table>
 
                     </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="clearfix"></div>
                 <!-- <div class="col-md-12 col-lg-12">
-                    <h5 class="form-subtitle"><em>&nbsp;</em></h5>
+                    <h4 class="form-subtitle text-center form-title"><em><span class="dblUnderlinedx">ITEMS (optional)</span></em></h4>
                 </div> -->
-                <hr style="border-top: 8px solid #1F7193">
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="cl"  v-validate="'required'" name="CL"  class="form-field__input">
-                            <label class="form-field__label">CL</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('CL') }}</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="pdc"  v-validate="'required'" name="PDC"  class="form-field__input">
-                            <label class="form-field__label">PDC</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('PDC') }}</span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" :value="computedTotal" readonly="true" v-validate="'required'" name="Total"  class="form-field__input">
-                            <label class="form-field__label">TOTAL</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('Total') }}</span>
-                    </div>
-                </div>
-                <div class="clearfix"></div>
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="ar"  v-validate="'required'" name="A/R"  class="form-field__input">
-                            <label class="form-field__label">A/R</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('A/R') }}</span>
-                    </div>
-                </div>
-                
-                <div class="col-md-4">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" v-model="order"  v-validate="'required'" name="Order"  class="form-field__input">
-                            <label class="form-field__label">ORDER</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('Order') }}</span>
-                    </div>
-                </div>
-                <div class="col-xs-7 col-sm-7 col-md-2">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" :value="computedExcess2" readonly="true"  v-validate="'required'" name="excess2"  class="form-field__input">
-                            <label class="form-field__label">EXCESS</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('excess2') }}</span>
-                    </div>
-                </div>
-                <div class="col-xs-5 col-sm-5 col-md-2">
-                    <div class="mdb-form-field form-group-limitx">
-                        <div class="form-field__control">
-                            <input :disabled="$parent.disabledinput" type="text" :value="computedPercent2" readonly="true" v-validate="'required'" name="percent2"  class="form-field__input">
-                            <label class="form-field__label">% (ex: 100)</label>
-                            <div class="form-field__bar"></div>
-                        </div>
-                        <span class="errors">{{ errors.first('percent2') }}</span>
-                    </div>
+                <div class="col-md-12">
+                    <!-- <div class="mdb-table-overflow"> -->
+                            <!-- <table width="100%" class="table table-hover mdb-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">ITEM NAME</th>
+                                            <th class="text-center">ITEM CODE</th>
+                                            <th class="text-center" style="min-width: 18px;">QTY</th>
+                                            <th class="text-center" style="min-width: 20px;">UOM</th>
+                                            <th class="text-center" colspan="2" style="width: 800px;">REMARKS</th>
+
+                                        </tr>
+                                        <tr v-if="!$parent.disabledinput">
+                                            <td colspan="1">
+                                                <div class="mdb-form-field form-group-limitx">
+                                                    <div class="mdb-form-field form-group-limitx">
+                                                        <div class="relative-pos">
+                                                            <div class="form-field__control form-field--is-filled">
+                                                                <input :disabled="$parent.disabledinput || !company" type="text" v-model="search_itemName" name="itemName"  class="form-field__input inline-input"
+                                                                @keyup.prevent="getItemName"
+                                                                @focus="itemNameFocus = true"
+                                                                @blur="handleBlur"
+                                                                >
+                                                                <div class="form-field__bar"></div>
+                                                            </div>
+                                                            <span class="errors">{{ errors.first('company') }}</span>
+                                                            
+                                                            <div v-if="loader3">
+                                                                <i class="fas fa-spinner fa-spin"></i> 
+                                                                <span class="errors" style="padding-left: 8px">{{errMsg}}</span>
+                                                            </div>
+                                                            <div class="fixed-pos bg-white suggestion_filter" 
+                                                                v-if="itemNameFocus">
+                                                                <ul>
+                                                                    <li v-for="comp in itemNameRows" 
+                                                                    @click.prevent="selectedItemName(comp)"
+                                                                    :key="comp.ItemCode">
+                                                                        {{comp.ItemName}}
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            
+                                            <td>
+                                               <div class="mdb-form-field form-group-limitx">
+                                                    <div class="form-field__control form-field--is-filled">
+                                                        <input type="text" :readonly="true" name="itemCode" :value="itemCode" class="form-field__input inline-input" >
+                                                        <div class="form-field__bar"></div>
+                                                    </div>
+                                                    <span class="errors">{{ errors.first('itemCode') }}</span>
+                                                </div>
+                                            </td>
+                                            
+                                            <td>
+                                                <div class="mdb-form-field form-group-limitx">
+                                                    <div class="form-field__control form-field--is-filled">
+                                                        <input type="text" :disabled="!company" name="qty" v-model="qty" class="form-field__input inline-input" >
+                                                        <div class="form-field__bar"></div>
+                                                    </div>
+                                                    <span class="errors">{{ errors.first('qty') }}</span>
+                                                </div>
+                                            </td>
+                                            
+                                            <td>
+                                                <div class="mdb-form-field form-group-limitx">
+                                                    <div class="form-field__control form-field--is-filled">
+                                                        <input type="text" :disabled="!company" name="oum" v-model="uom" class="form-field__input inline-input" >
+                                                        <div class="form-field__bar"></div>
+                                                    </div>
+                                                    <span class="errors">{{ errors.first('uom') }}</span>
+                                                </div>
+                                            </td>
+                                            
+                                            <td>
+                                                
+                                                <div class="mdb-form-field">
+                                                    <div class="form-field__control">
+                                                        <input type="text" :disabled="!company" class="form-field__input inline-input" v-model="itemRemarks" v-validate="" name="itemRemarks" @keydown.enter.prevent="appendTable">
+                                                        <div class="form-field__bar"></div>
+                                                    </div>
+                                                    <span class="errors">{{ errors.first('itemRemarks') }}</span>
+                                                </div>
+                                            </td>
+                                            <td style="width: 10px;">
+                                                <button class="btn btn-primary" @click.prevent="appendTable">add</button>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(item, index) in entries" :key="index">
+                                            
+                                            <td>
+                                                <span style="padding: 0 12px;">
+                                                    <a v-if="!$parent.disabledinput" @click="removeRow(index)"><i class="fas fa-trash text-danger"></i></a>
+                                                </span>
+                                                <span style="padding-right: 8px;">{{index + 1}} </span>
+                                                {{item.itemName}}
+                                            </td>
+                                            <td>
+                                                {{item.itemCode}}
+                                            </td>
+                                            <td>
+                                                {{item.qty}}
+                                            </td>
+                                            <td>
+                                                {{item.uom}}
+                                            </td>
+                                            <td colspan="2">
+                                                {{item.remarks}}
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                            </table> -->
+                    <!-- </div> -->
                 </div>
                 <div class="clearfix"></div>
 
@@ -462,6 +445,30 @@
                         <h6><span class="errors">{{ errors.first('additional-info') }}</span></h6>
                     </div>
                 </div>
+                <div class="clearfix"></div>
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <!-- <img id="work-attachments" :src="'public/images/priemer_jacket.jpg'" alt="Avatar"> -->
+                    <label for="prog__attachment1">
+                        <span class="profile-cam-icon" style="position: relative;"><i class="fas fa-camera"></i></span>
+                         <span style="position: relative; left: 10px; bottom: 3px;">
+                             <span v-show="!progmechanic_attachment" id="file-label">Program Mechanics</span>
+                             <a id="file-label1" :href="'storage/app/'+progmechanic_attachment" target="_blank" v-show="progmechanic_attachment">attachment - {{'Program Mechanics'}}</a>
+                        </span>
+                    </label>
+                    <input id="prog__attachment1" class="program-attachment" type="file" @change="attachFile" style="display:none;">
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <!-- <img id="work-attachments" :src="'public/images/priemer_jacket.jpg'" alt="Avatar"> -->
+                    <label for="prog__attachment2" >
+                        <span class="profile-cam-icon" style="position: relative;"><i class="fas fa-camera"></i></span>
+                         <span style="position: relative; left: 10px; bottom: 3px;">
+                             <span v-show="!progagree_attachment" id="file-label">Program Agreement</span>
+                             <a id="file-label2" :href="'storage/app/'+progagree_attachment" target="_blank" v-show="progagree_attachment">attachment - {{'Program Agreement'}}</a>
+                        </span>
+                    </label>
+                    <input id="prog__attachment2" class="program-attachment" type="file" @change="attachFile" style="display:none;">
+                </div>
+                <div class="clearfix"></div>
                 <div class="col-lg-12">
                 <h5 class="form-subtitle"></h5>
                     <div class="mdb-form-field">
@@ -496,7 +503,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3" v-show="selected.status > 1">
+                    <div class="col-md-3" v-show="selected.status > 0">
                         <div class="mdb-form-field form-group-limit">
                             <div class="form-field__control">
                                 <input :disabled="!$parent.$data.forapprover == 'approval'" type="text" class="form-field__input" :value="selected.approvedby || ''" name="approve" readonly="true">
@@ -517,14 +524,13 @@
                 </div>
                 <div class="clearfix"></div>
                 <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addOverride" :disabled="disabledIfNoApprover || isDisable || !isFormValid || !isRequiredFieldsValid" v-if="!overrideID && $parent.$data.forapprover != 'approval'">
-                    <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateOverride" :disabled="isDisable || !isFormValid || !isRequiredFieldsValid" v-if="overrideID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
-                    <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteOverride" :disabled="isDisable" v-if="overrideID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
-                    
-                    <input type="submit" class="btn btn-primary" value="Endorse" @click.prevent="requestActionOverride(1)" v-if="overrideID && $parent.$data.forapprover == 'approval' && (!(selected.endorsedby_ || '').includes(userinfo.fullname) && selected.status < 2) && endorser.length < 2">
-                    <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionOverride(2)" v-if="overrideID && $parent.$data.forapprover == 'approval' && selected.status != 2">
-                    <input type="submit" class="btn btn-primary" value="Reject" @click.prevent="requestActionOverride(3)" v-if="overrideID && $parent.$data.forapprover == 'approval' && selected.status != 3">
-                    <!-- <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionOverride(0)" v-if="overrideID && $parent.$data.forapprover == 'approval' && selected.status >= 1"> -->
+                    <!-- disabledIfNoApprover || isDisable || !isFormValid || !isRequiredFieldsValid" -->
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addEnrollmentProgram" :disabled="isDisable || !isFormValid || !isRequiredFieldsValid || disabledIfNoApprover"  v-if="!enrollmentID && $parent.$data.forapprover != 'approval'">
+                    <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateEnrollmentProgram" :disabled="isDisable || !isFormValid || !isRequiredFieldsValid || disabledIfNoApprover" v-if="enrollmentID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
+                    <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteenrollmentprog" :disabled="isDisable" v-if="enrollmentID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
+                    <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionEnrollmentProgram(1)" v-if="enrollmentID && $parent.$data.forapprover == 'approval' && !this.$parent.$data.isCancel">
+                    <input type="submit" class="btn btn-primary" value="Reject" @click.prevent="requestActionEnrollmentProgram(2)" v-if="enrollmentID && $parent.$data.forapprover == 'approval' && !this.$parent.$data.isCancel">
+                    <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionEnrollmentProgram(0)" v-if="enrollmentID && $parent.$data.forapprover == 'approval' && selected.status >= 1">
                 </div>
             </form>
 
@@ -540,36 +546,64 @@ let excludeBody = [
             'compRows',
             'divRows',
             'branchRows',
-            'check_fields',
-            'overdue_fields',
             'reciever_emails',
             'isDisable',
             'search_customer',
             'customerList',
             'employeeList',
-            'search_manager',
             'search_employee',
+            'search_itemName',
             'compFocus',
             'selectedComp',
             'loader',
             'loader2',
+            'loader3',
             'errBranch',
             'errMsg',
             'headers',
-            'disableCustomerField'
+            'disableCustomerField',
+
+            'qty',
+            'itemCode',
+            'itemNameFocus',
+            'itemName',
+            'itemNameRows',
+            'itemRemarks',
+            'lineNo',
+            'uom',
+            'progmechanic_attachment',
+            'progagree_attachment',
+            'teritoryList',
+            'oldDataprogmechanic_attachment',
+            'oldDataprogagree_attachment',
         ];
 
 export default {
     props: ['userinfo', 'selected'],
     data() {
 		return {
-        // headers: '',
+        oldDataprogmechanic_attachment:'',
+        oldDataprogagree_attachment: '',
+        
+        enrollmentID:'',
         search_customer: '',
-        search_manager: '',
         search_employee: '',
 
         customerList: [],
         employeeList: [],
+        teritoryList: [
+            { teritoryName: 'South Luzon'},
+            { teritoryName: 'North Luzon'},
+            { teritoryName: 'GMA'},
+            { teritoryName: 'Commercial'},
+            { teritoryName: 'Visayas'},
+            { teritoryName: 'North Mindanao'},
+            { teritoryName: 'South Mindanao'},
+            { teritoryName: 'Office Account'},
+        ],
+        teritory: '',
+        progmechanic_attachment: '',
+        progagree_attachment: '',
 
         // customerData: {},
         loader: false,
@@ -583,67 +617,44 @@ export default {
         errMsg: '',
 
         empID_: '',
-        dateoverride: moment(new Date()).format('MM/DD/YYYY hh:mm A'),
-        mode: '',
-        commited_time: '',
-        commited_date: moment(new Date()).format('MM/DD/YYYY'),
-        po_so: '',
+        dateenrolled: moment(new Date()).format('MM/DD/YYYY hh:mm A'),
+
         // company
+        compRows: [],
         selectedComp: '',
         company: '',
-        // end
-        division: '',
-        branch: '',
         customer_name: '',
-        sales_employee: '',
-        sales_manager: '',
-        amount_order: '',
         
-        // reasons section
-        reason: '',
-        current_stat: '',
-        comment: '',
+        // end
+        branch: '',
+        division: '',
+        program_code: '',
+        program_name: '',    
 
-        cl: '',
-        ar: '',
-        pdc: '',
-        order: '',
-        total: '',
-        excess: '',
-        excess2: '',
-        last_cl: '',
-        commit_cl: '',
-        paying_habit: '',
-        check_type: [],
         additional_info: '',
-        remarks: '',
-        
-        overrideID:'',
-        percent: '',
-        percent2: '',
         
         approvedby: '',
 
         // tables
-        overdue_tbl: [],
-        overdue_fields: {
-            invoice_num: '',
-            invoice_date: moment(new Date()).format('MM/DD/YYYY'),
-            amount: '',
-            age: '',
-            division: '',
-        },
-        check_tbl: [],
-        check_fields: {
-            bank: '',
-            checkno: '',
-            check_date: moment(new Date()).format('MM/DD/YYYY'),
-            amount: '',
-        },
+        loader3: false,
+        itemNameFocus: false,
+        // lineNo: '',
+        itemCode: '',
+        qty: '',
+        uom: '',
+        search_itemName: '',
+        itemRemarks: '',
+        itemName:'',
+        itemNameRows:[],
+        // table items contents
+        entries: [],
+        
+
+       
         status: 0,
-        compRows: [],
         divRows: [],
         branchRows: [],
+        remarks: '',
 		}
     },
     watch:{
@@ -653,104 +664,188 @@ export default {
         
     },
     filters: {
+        filter_attachment(val){
+            if(val && typeof val == 'string'){
+                return  (val.split("/")[3]);
+            }
+
+            return val;
+        },
         endorsTerm(val) {
             // return this.selected.endorsedby_
-            return val > 2? (val+1) + countTerms[3]: (val+1) + countTerms[val]
+            // return val > 2? (val+1) + countTerms[3]: (val+1) + countTerms[val]
             // return val == 0? 'Pending':
             //        val == 1 ? 'Endorsed':
             //        val == 2 ? 'Approved': 'Rejected'
         }
     },
     methods:{
-        addOverride(){
+        attachFile(e){
+            
+            //  input.program-attachment[type=file]
+            // input.program-attachment[type=file]
+            
+            if(e.target.value != ''){
+			    let file    = e.target.files[0]; //sames as here
+
+			    let type = file['type'];
+                
+			    const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'application/pdf'];
+			    if (!validImageTypes.includes(type)) {
+				      alert('Invalid file type');
+				      return false;
+				}
+				if(file.size >= 4000000)
+				{
+					alert('Filesize exceed 4MB');
+				    return false;
+				}
+
+				if (file) {
+                    // document.querySelector(elementLabel).innerHTML = file.name;
+                    // document.querySelector(elementLabel).innerHTML = file.name;
+                    
+				    let reader  = new FileReader();
+                    let preview = '';
+                    if(e.target.id == 'prog__attachment1'){
+                        preview = document.querySelector('#file-label1'); //selects the query named img
+                        this.progmechanic_attachment = file;
+                    }
+                    else{
+                        preview = document.querySelector('#file-label2'); //selects the query named img
+                        this.progagree_attachment = file;
+                        console.log(preview);
+                    }
+
+
+                    reader.onloadend = function () {
+				          preview.href = reader.result;
+				     }
+				     reader.readAsDataURL(file);
+                    
+				    //  return file;
+                    
+                    // if(e.target.id == 'prog__attachment1'){
+                    //     this.progmechanic_attachment = file;
+                    // }
+                    // else{
+                    //     this.progagree_attachment = file;
+                    // }
+				}
+			}else{
+
+				return null;
+			}
+        },
+        async addEnrollmentProgram(){
+            // console.log( 
+            //     'mechanic', typeof this.progmechanic_attachment,
+            //     'progagree', typeof this.progagree_attachment);
+            //     return;
             if(this.isFormValid){
                 
                 this.isDisable = true;
-                let params = {};
+                
+                
+                // if(file)
+                const formData = new FormData();
+                
+                if(this.progagree_attachment){
+                    await formData.append('attachment[]', this.progagree_attachment || '');
+                    await formData.append('attachtype[]', 'progagree_attachment');
+                }
+                
+                
+                if(this.progmechanic_attachment){
+                    await formData.append('attachment[]', this.progmechanic_attachment || '');
+                    await formData.append('attachtype[]', 'progmechanic_attachment');
+                }
+                
                 
                 for (const key in this.$data) {
                     if (!excludeBody.includes(key)) {
-                        if(key == 'overdue_tbl' || key == 'check_tbl'){
-                            params[key] = JSON.stringify(this.$data[key]);
-                        } else if(key=='check_type') {
-                            params[key] = this.$data[key].toString();
+                        if(key == 'entries'){
+                            formData.append(key, JSON.stringify(this.$data[key]));
                         }else {
-                            params[key] = this.$data[key];
+                            formData.append(key, this.$data[key]);
                         }
                         
                     }
                 }
-                params['reciever_emails'] = this.$parent.reciever_emails;
-                
-                axios.post('api/addoverride', params).then(({data})=>{
+
+                formData.append('reciever_emails[]', this.$parent.reciever_emails);
+                axios.post('api/addenrollmentprog', formData).then(({data})=>{
                     this.$parent.addRow(data);
                     $("#myModal").modal("hide");
                 }).catch((err)=>{console.log(err);});
             }
         },
-        updateOverride(){
+        async updateEnrollmentProgram(){
             if(this.isFormValid){
                 
                 this.isDisable = true;
-                let params = {};
+                const oldDataprogmechanic_attachment = this.oldDataprogmechanic_attachment;
+                const oldDataprogagree_attachment = this.oldDataprogagree_attachment;
+
+                const formData = new FormData();
+                // console.log( 
+                // 'mechanic', typeof this.progmechanic_attachment,
+                // 'progagree', typeof this.progagree_attachment);
+                // return;
+                
+                if(typeof this.progagree_attachment == 'object'){
+                    await formData.append('attachment[]', this.progagree_attachment || '');
+                    await formData.append('attachtype[]', 'progagree_attachment');
+                    await formData.append('attachmentOldPath[]', oldDataprogagree_attachment);
+                }else{
+                    await formData.append('progagree_attachment', oldDataprogagree_attachment);   
+                }
+                
+                if(typeof this.progmechanic_attachment == 'object'){
+                    await formData.append('attachment[]', this.progmechanic_attachment || '');
+                    await formData.append('attachtype[]', 'progmechanic_attachment');
+                    await formData.append('attachmentOldPath[]', oldDataprogmechanic_attachment);
+                }else{
+                    await formData.append('progmechanic_attachment', oldDataprogmechanic_attachment);
+                }
                 
                 for (const key in this.$data) {
                     if (!excludeBody.includes(key)) {
-                        if(key == 'overdue_tbl' || key == 'check_tbl'){
-                            params[key] = JSON.stringify(this.$data[key]);
-                        } else if(key=='check_type') {
-                            params[key] = this.$data[key].toString();
+                        if(key == 'entries'){
+                            formData.append(key, JSON.stringify(this.$data[key]));
                         }else {
-                            params[key] = this.$data[key];
+                            formData.append(key, this.$data[key]);
                         }
                         
                     }
                 }
-                axios.post('api/updateoverride', params).then(({data})=>{
+                axios.post('api/updateenrollmentprog', formData).then(({data})=>{
                     this.$parent.updateRow(data);
                     $("#myModal").modal("hide");
                 }).catch((err)=>{console.log(err);});
             }
         },
-        async deleteOverride(){
+        async deleteenrollmentprog(){
             const reciever_emails = await this.$parent.reciever_emails;
-            axios.post('api/deleteoverride/'+this.overrideID, {reciever_emails})
+            axios.post('api/deleteenrollmentprog/'+this.enrollmentID, {reciever_emails})
             .then(({data})=>{
-                this.$parent.deleteRow(this.overrideID);
+                this.$parent.deleteRow(this.enrollmentID);
                 $("#myModal").modal("hide");
             }).catch((err)=>{console.log(err);});
         },
          // ACTIONS FOR LEAVE I.E APPROVE / REJECT / CANCEL
-        async requestActionOverride(status = null){
-            let params =  {};
-            for (const key in this.$data) {
-                if (!excludeBody.includes(key)) {
-                    if(key == 'overdue_tbl' || key == 'check_tbl'){
-                        params[key] = JSON.stringify(this.$data[key]);
-                    } else if(key=='check_type') {
-                        params[key] = await this.$data[key].toString();
-                    }else {
-                        params[key] = await this.$data[key];
-                    }
-                    
-                }
-            }
-            //  ENDORSE 
-            if(status == 1) {
-                params.endorsedby_ = await params.endorsedby_? 
-                                    params.endorsedby_ + ','+(this.userinfo.fullname || '') 
-                                    : this.userinfo.fullname || '';
-                if(params.endorsedby_.includes(',')){
-                    params['next_endorser'] = 'next_endorser';
-                }
-            }
+        async requestActionEnrollmentProgram(status = null){
+            let params =  this.$data;
+           
+          
             //  APPROVE
-            if(status >= 2) {
+            if(status >= 1) {
                 params.approvedby = (this.userinfo.fullname || '');
             }
 
             params['status'] = status;
-            axios.post('api/actionformOverride', params).then((response)=>{
+            
+            axios.post('api/actionenrollmentprog', params).then((response)=>{
                 this.$parent.updateRow(response.data);
                 $("#myModal").modal("hide");
             }).catch((err)=>{ console.log(err); });
@@ -825,49 +920,45 @@ export default {
                 this.errBranch = true;
             });
         },
-        selectDateCommitment(val){
-            this.commited_date = moment(val).format('MM/DD/YYYY');
+        selectedItemName(val) {
+            
+            this.search_itemName = val.ItemName;
+            this.itemName = val.ItemName;
+            // this.errItemName = false;
+            this.itemNameFocus = false;
+            this.itemCode = val.ItemCode;
         },
-        selectDateInvoice(val){
-            this.overdue_fields['invoice_date'] = moment(val).format('MM/DD/YYYY');
-        },
-        selectDateCheck(val){
-            this.check_fields['check_date'] = moment(val).format('MM/DD/YYYY');
-        },
+       
         appendTable(){
-            const tbl = Object.values(this.overdue_fields);
-            if(!tbl.includes('')) {
-                this.overdue_tbl.unshift(this.overdue_fields);
-                this.overdue_fields ={
-                    invoice_num: '',
-                    invoice_date: moment(new Date()).format('MM/DD/YYYY'),
-                    amount: '',
-                    age: '',
-                    division: '',
-                };
+            if(this.itemName == '' || this.qty == '' || this.uom == '' || this.itemRemarks == ''){
+                alert('Add values for this row');
+                return;
             }
+            
+
+            this.entries.push({
+                // lineNo: this.lineNo,
+                itemCode: this.itemCode,
+                itemName: this.itemName,
+                qty: this.qty,
+                uom: this.uom,
+                remarks: this.itemRemarks
+            });
+
+            // this.lineNo = '';
+            this.itemCode = '';
+            this.itemName = '';
+            this.search_itemName = '';
+            this.qty = '';
+            this.uom = '';
+            this.itemRemarks = '';
         },
-        appendTable2(){
-            const tbl = Object.values(this.check_fields);
-            if(!tbl.includes('')) {
-                
-                this.check_tbl.unshift(this.check_fields);
-                this.check_fields = {
-                    bank: '',
-                    checkno: '',
-                    check_date: moment(new Date()).format('MM/DD/YYYY'),
-                    amount: '',
-                };
-            }
-        },
+       
         removeRow(index)
         {
-            this.overdue_tbl.splice(index, 1);
+            this.entries.splice(index, 1);
         },
-        removeRow2(index)
-        {
-            this.check_tbl.splice(index, 1);
-        },
+        
         closeModal(hideModal = true){
 
             if(!hideModal){
@@ -881,7 +972,7 @@ export default {
             Object.keys(obj).forEach((key)=>{
 
                 if(key != 'compRows' && key != 'divRows' && key != 'branchRows'
-                && key != 'overrideID' && key != 'isDisable'
+                 && key != 'isDisable' && key != 'teritoryList'
                 ) {
                     // this will be use for update button not be replaced by submit
                     //  when text field is cleared
@@ -890,35 +981,19 @@ export default {
                     
                 }
                 if(key == 'loader' || key == 'errBranch' ||
-                   key == 'compFocus' || key == 'loader2' ||
-                   key == 'isDisable'){
+                   key == 'compFocus' || key == 'loader2' || 
+                   key == 'loader3' || key == 'isDisable'){
                     this.$data[key] = false;
                 }
                 
-                if(key == 'dateoverride'){
-                    this.dateoverride = moment(new Date()).format('MM/DD/YYYY hh:mm A');
+                if(key == 'dateenrolled'){
+                    this.dateenrolled = moment(new Date()).format('MM/DD/YYYY hh:mm A');
                 }
-                if(key == 'commited_date'){
-                    
-                    this.commited_date = moment(new Date()).format('MM/DD/YYYY');
+                if(key == 'entries'){
+                    this.entries = [];
                 }
             });
-            this.$data['check_type'] = [];
-            this.$data['overdue_tbl'] = [];
-            this.$data['overdue_fields'] = {
-                invoice_num: '',
-                invoice_date: moment(new Date()).format('MM/DD/YYYY'),
-                amount: '',
-                age: '',
-                division: '',
-            };
-            this.$data['check_tbl'] = [];
-            this.$data['check_fields'] = {
-                bank: '',
-                checkno: '',
-                check_date: moment(new Date()).format('MM/DD/YYYY'),
-                amount: '',
-            };
+            
             this.$data['disableCustomerField'] = true;
             // $("#myModal").modal("hide");
         },
@@ -931,25 +1006,24 @@ export default {
                     this.$data['search_customer'] = await data[i];
                     // parse json data here for customerList
                 }
-                if(i == 'sales_employee') {
-                    this.$data['search_employee'] = await data[i];
+                if(i == 'entries') {
+                    this.$data['entries'] = await JSON.parse(data[i]);
                     // parse json data here for customerList
                 }
-                if(i == 'sales_manager') {
-                    this.$data['search_manager'] = await data[i];
-                    // parse json data here for customerList
-                }
-                // if(i == 'customerData') {
-                //     let jsonCustomer = await JSON.parse(data[i]);
-                //     this.$data[i] = jsonCustomer;
-                //     this.$data['customerList'] = [jsonCustomer];
-                // }
-                if(i == 'check_tbl' || i == 'overdue_tbl')
-                    this.$data[i] = await JSON.parse(data[i]);
-                if(i == 'check_type' && data[i]) 
-                    this.$data[i] = await (data[i]).split(",");
-                if(i == 'check_type' && !data[i])
-                    this.$data[i] = [];
+                if(i == 'progagree_attachment')
+                this.$data['oldDataprogagree_attachment'] = await data[i];
+
+                if(i == 'progmechanic_attachment')
+                this.$data['oldDataprogmechanic_attachment'] = await data[i];
+
+
+                if(i == 'progagree_attachment' && typeof data[i] == 'object')
+                this.$data[i] = '';
+
+                if(i == 'progmechanic_attachment' && typeof data[i] == 'object')
+                this.$data[i] = '';
+                
+                
             }
             
             // console.log(data, this.$data);
@@ -991,7 +1065,7 @@ export default {
 				
                 // FOR UPDATE GET ONLY THE LAST NAME
                 let search = '';
-                if(this.selected.overrideID) {
+                if(this.selected.enrollmentID) {
                     search = (this.search_employee).split(", ");
                     search = search[0];
                     // return;
@@ -1010,33 +1084,33 @@ export default {
 			}
 
 		},
-        searchManager(){
-            this.loader = false;
-			let validSearch = /^[a-zA-Z0-9, Ññ)\._-]+$/g
-			let regex = RegExp(validSearch);
-            this.sales_manager = '';
-            this.errMsg = '';
-			if(regex.test((this.search_manager))){
+        // searchManager(){
+        //     this.loader = false;
+		// 	let validSearch = /^[a-zA-Z0-9, Ññ)\._-]+$/g
+		// 	let regex = RegExp(validSearch);
+        //     this.sales_manager = '';
+        //     this.errMsg = '';
+		// 	if(regex.test((this.search_manager))){
 				
-                let search = '';
-                if(this.selected.overrideID) {
-                    search = (this.search_manager).split(", ");
-                    search = search[0];
-                    // return;
-                }else{
-                    search = this.search_manager;
-                }
+        //         let search = '';
+        //         if(this.selected.enrollmentID) {
+        //             search = (this.search_manager).split(", ");
+        //             search = search[0];
+        //             // return;
+        //         }else{
+        //             search = this.search_manager;
+        //         }
                 
-				axios.post('api/search-override-emp',{keyword: search}).then(res=>{
-					if(res.data.length > 0 && res.status == 200){
-						this.employeeList = res.data;
-					}
-                    this.loader = false;
-				})
-				.catch(err => this.errMsg = 'Network problem please contact your IT-Department');
-			}
+		// 		axios.post('api/search-override-emp',{keyword: search}).then(res=>{
+		// 			if(res.data.length > 0 && res.status == 200){
+		// 				this.employeeList = res.data;
+		// 			}
+        //             this.loader = false;
+		// 		})
+		// 		.catch(err => this.errMsg = 'Network problem please contact your IT-Department');
+		// 	}
 
-		},
+		// },
         getCustomer(){
             this.customer_name = '';
             this.errMsg = '';
@@ -1059,40 +1133,44 @@ export default {
             }).catch(()=>{
                 this.errMsg = 'Network problem please contact your IT-Department';
             });
+        },
+        getItemName(){
+            this.itemName = '';
+            this.errMsg = '';
+            this.loader3 = true;
+            // Items?$select=ItemCode,ItemName&$filter=startswith(ItemName, 'A')&$orderby=ItemCode&$top=1000
+            const searchStr = ((this.search_itemName).trim()).toUpperCase();
+            axios.post(`api/consume-api`, {
+                query:'Items?$select=ItemCode,ItemName',
+                params: `&$filter=(startswith(ItemName,\'${searchStr}\'))`,
+                order: '&$orderby=ItemCode&$top=1000',
+                method: 'GET'
+            })
+            .then(({data})=>{
+                if(data.status == 200) {
+                    this.loader3 = false;
+                    this.itemNameRows = data.data.value;     
+                }else{
+                    this.errMsg = 'Invalid data please try again';
+                }
+                
+            }).catch(()=>{
+                this.errMsg = 'Network problem please contact your IT-Department';
+            });
         }
     },
     computed:{
         disabledIfNoApprover(){
             return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+            
         },
-        computedTotal(){
-            const ar = Number(this.ar.replace(/,/g,'')) || 0;
-            const pdc = Number(this.pdc.replace(/,/g, '')) || 0;
-            const order = Number(this.order.replace(/,/g,'')) || 0;
-            return this.total = (new Intl.NumberFormat().format((ar + pdc + order)));
-        },
-        computedExcess2(){
-            const ar = Number(this.ar.replace(/,/g,'')) || 0;
-            const pdc = Number(this.pdc.replace(/,/g, '')) || 0;
-            const order = Number(this.order.replace(/,/g,'')) || 0;
-            const cl = Number(this.cl.replace(/,/g,'')) || 0;
-            const excess = (ar + pdc + order) - cl;
-            return this.excess2 = (new Intl.NumberFormat().format(excess));
-        },
-        computedPercent2(){
-            const ar = Number(this.ar.replace(/,/g,'')) || 0;
-            const pdc = Number(this.pdc.replace(/,/g, '')) || 0;
-            const order = Number(this.order.replace(/,/g,'')) || 0;
-            const cl = Number(this.cl.replace(/,/g,'')) || 0;
-            const excess = (ar + pdc + order) - cl;
-            const percent2 = (( excess/cl )*100) || 0;
-            return this.percent2 = (new Intl.NumberFormat().format((percent2).toFixed(2)));
-        },
+       
         isFormValid(){
+            // return true;
             return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },
         isRequiredFieldsValid(){
-            return this.customer_name != '' && this.branch != '';
+            return this.customer_name != '' && (this.progagree_attachment != '' && this.progmechanic_attachment != '');
         },
         endorser(){
             return (this.selected.endorsedby_? this.selected.endorsedby_.split(',') : []);
@@ -1109,39 +1187,12 @@ export default {
         },
         computedStatus() {
             const val = this.status;
-            let endorseCount = (this.selected.endorsedby_? this.selected.endorsedby_.split(',') : []).length;
-            
-            const lastdigit = endorseCount.toString().split('').pop();
-            if(lastdigit == '1'){
-                endorseCount = endorseCount+countTerms[endorseCount-1];
-            } else if(lastdigit == '2') {
-                endorseCount = endorseCount+countTerms[endorseCount-1];
-            } else if(lastdigit == '3') {
-                endorseCount = endorseCount+countTerms[endorseCount-1];
-            } else if(lastdigit == '11') {
-                endorseCount = endorseCount+countTerms[3];
-            }else {
-                endorseCount = endorseCount+countTerms[endorseCount-1];
-            }
-            return val == 0? 'Pending':
-                   val == 1 ? endorseCount + ' Endorsement':
-                   val == 2 ? 'Approved': 'Rejected'
+            return val == 0 ? 'Pending':
+                   val == 1 ? 'Approved': 'Rejected'
         }
     },
 
     created(){
-        VeeValidate.Validator.extend('is_time', {
-            getMessage: field => `The format must be HH:MM AM/PM`,
-            validate: (value) => new Promise(resolve => {
-                // let regex = new RegExp("([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])");
-                // let regex = new RegExp("^(1[0-2]|0?[1-9]):[0-5][0-9] (AM|PM)$");
-                let regex = new RegExp("^(((([0-1][0-9])|(2[0-3])):?[0-5][0-9])|(24:?00))");
-                resolve({
-                    valid: value && regex.test(value)
-                });
-            })
-        });
-
         axios.get('api/get-override-company')
         .then(({data})=>{
             data.forEach( val => {
@@ -1172,6 +1223,7 @@ export default {
         // EVENT BUS
         bus.$on('setupdate', this.setDataForEdit);
 
+
         // accordion
         $('#override-accordion')
         .on('shown.bs.collapse', function() {
@@ -1179,7 +1231,6 @@ export default {
         }).on('hide.bs.collapse', function() {
             $('.collapse.in').prev().find("span").html('<i class="far fa-plus-square" style="direction: rtl; font-size: 19px;"></i>');
         });
-
     }
 }
 

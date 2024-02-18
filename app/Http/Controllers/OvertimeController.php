@@ -56,7 +56,7 @@ class OvertimeController extends Controller
     public function deleteOvertime($overtimeID  = null){
         $affected = DB::table('formovertime')
         ->where('overtimeID', '=', $overtimeID)
-        ->update(['recstat'=>1]);
+        ->update(['recstat'=>404]);
         // ->delete();
 
         $mailReceivers = FormApproverService::getApproverEmail('overtimeID', $overtimeID, 'formovertime', 'Overtime0Request');
@@ -73,7 +73,7 @@ class OvertimeController extends Controller
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         DATE_FORMAT(form.date_overtime, "%m/%d/%Y") as date_overtime,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formovertime form left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
 
         return $data;
     }
@@ -107,7 +107,7 @@ class OvertimeController extends Controller
                             and
                                 eform.Overtime0Request = 1
                             and 
-                                eovertime.recstat != 1', [UserSession::getSessionID()]);
+                                eovertime.recstat = 0', [UserSession::getSessionID()]);
         return $data;
     }
 

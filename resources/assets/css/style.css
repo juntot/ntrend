@@ -46,6 +46,12 @@ body, header, article, footer{
   cursor: pointer;
 }
 
+.f-left{
+  float:left;
+}
+.f-right{
+  float:right;
+}
 
 .hidden-overflow{
   /* overflow: hidden; */
@@ -82,7 +88,6 @@ body, header, article, footer{
 .color-redorange{
  color: #dc0202; 
 }
-
 
 /* vueityfy */
 .calendar-container .v-toolbar__content{
@@ -158,6 +163,7 @@ label{
 
 .with-margin-bottom {
   margin-bottom: 16px;
+  z-index: 1;
 }
 
 .nomargin{
@@ -185,6 +191,25 @@ label{
     list-style: none;
 }
 
+
+/* zindex */
+.z-1{
+  z-index: 1;
+}
+.z-2{
+  z-index: 2;
+}
+.z-3{
+  z-index: 3;
+}
+.z-9{
+  z-index: 9;
+}
+
+.z-10{
+  z-index: 10;
+}
+/* done */
 
 .normal-weight{
   font-weight: normal;
@@ -1476,6 +1501,9 @@ background-color: darkgrey;
   height: 5px !important;
 }
 
+.dataTables_scrollBody::-webkit-scrollbar:horizontal {
+  height: 8px !important;
+}
 /* Track */
 ::-webkit-scrollbar-track:horizontal {
   -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -1697,6 +1725,9 @@ ul.nopadding.nomargin.nostyle-list.emplist li:last-child label {
   float: left;
   margin-left: 30px;
 }
+#printArea .borders{
+  border: 1px solid gray;
+}
 
 /* PRINT SECTION */
 
@@ -1709,7 +1740,9 @@ ul.nopadding.nomargin.nostyle-list.emplist li:last-child label {
 @media print {
   body * {
     visibility:hidden;
-
+  }
+  body.visible * {
+    visibility:visible !important;
   }
   body div#root article section:first-child{
     display: none;

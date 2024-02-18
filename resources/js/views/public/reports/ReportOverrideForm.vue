@@ -99,12 +99,12 @@ export default {
 
             let rows = [];
             let header = [
-                'OVERRIDE ID', 'CREATOR NAME', 'DATABASE', 'BRANCH', 'DIVISION', 'DATE OVERRIDE & TIME', 
+                'OVERRIDE ID', 'CREATOR NAME', 'DATABASE', 'BRANCH', 'DIVISION', 'DATE OVERRIDE & TIME', 'LAST UPDATE',
                 'CUSTOMER NAME', 'MODE', 'SALES EMPLOYEE', 'SALES MANAGER', 'COMMITMENT DATE', 
                 'COMMITMENT TIME', 'AMOUNT ORDER', 'PO/SO', 
                 'CL', 'PDC', 'A/R', 'ORDER', 'TOTAL', 'EXCESS', '%',
                 
-                'ADDITIONAL INFO', 'REASONS',
+                'COMMITMENT FOR FOLLOW-UP', 'ADDITIONAL INFO', 'REASONS',
                 '1ST ENDORSER', '1ST ENDORSER DATE & TIME', '2ND ENDORSER', '2ND ENDORSER DATE & TIME', 
                 'APPROVED BY', 'APPROVED DATE & TIME', 'APPROVER REMARKS', 'STATUS',
                 'REQUEST TO 1ST ENDORSEMENT DURATION', 
@@ -119,12 +119,12 @@ export default {
             for (const obj of this.rows) {
                 
                 let records = [
-                            obj.overrideID, obj.fullname, obj.company, obj.branch, obj.division, obj.dateoverride, 
+                            obj.overrideID, obj.fullname, obj.company, obj.branch, obj.division, obj.dateoverride, obj.lastupdate,
                             obj.customer_name, obj.mode, obj.sales_employee, obj.sales_manager, obj.commited_date, 
                             obj.commited_time, obj.amount_order, obj.po_so, 
                             obj.cl, obj.pdc, obj.ar, obj.order, obj.total, obj.excess2, obj.percent2,
 
-                            obj.additional_info, obj.reasons, 
+                            obj.commitmentfollowup, obj.additional_info, obj.reasons, 
                             obj.endorsedby_, obj.endorseddate, obj.endorsedby2_, obj.endorseddate2, 
                             obj.approvedby, obj.approveddate, obj.remarks, obj.status == 1? 'Endorsed': obj.status == 2 ? 'Approved': obj.status == 3?
                             'Rejected' : 'Pending',

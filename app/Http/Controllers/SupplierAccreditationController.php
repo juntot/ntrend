@@ -51,7 +51,7 @@ class SupplierAccreditationController extends Controller
     // DELETE
     public function deleteSupplierAccreditation($accredID  = null){
         DB::table('formaccreditation')->where('accredID', '=', $accredID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -61,7 +61,7 @@ class SupplierAccreditationController extends Controller
         $data = DB::select('select form.*,
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formaccreditation form left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
 
         return $data;
     }
@@ -87,7 +87,7 @@ class SupplierAccreditationController extends Controller
             right join employee emp
             on emp.empID = eaccredit.empID_
         where eform.approverID_ = :approverID and
-        eaccredit.recstat != 1', [UserSession::getSessionID()]);
+        eaccredit.recstat = 0', [UserSession::getSessionID()]);
 
         // $data = DB::select('select eaccredit.*, CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname
         //                     from formaccreditation eaccredit left join eformapproverbyemp eform

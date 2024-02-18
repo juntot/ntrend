@@ -55,7 +55,7 @@ class SalaryDiscrepancyController extends Controller
     // DELETE
     public function deleteSalaryDiscrepancy($saldiscID  = null){
         DB::table('formsalarydiscrepancy')->where('saldiscID', '=', $saldiscID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -66,7 +66,7 @@ class SalaryDiscrepancyController extends Controller
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         DATE_FORMAT(form.discrepancydate, "%m/%d/%Y") as discrepancydate,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formsalarydiscrepancy form left join employee emp on
-        form.approvedby = emp.empID where form.recstat !=1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
 
         return $data;
     }
@@ -100,7 +100,7 @@ class SalaryDiscrepancyController extends Controller
                                 on pos.posID = emp.posID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
-                            where eform.approverID_ = :approverID and esaldisc.recstat != 1', [UserSession::getSessionID()]);
+                            where eform.approverID_ = :approverID and esaldisc.recstat = 0', [UserSession::getSessionID()]);
 
         return $data;
     }

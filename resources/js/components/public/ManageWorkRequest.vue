@@ -267,8 +267,8 @@
                             <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="11" name="radio" >
                             <span class="checkmark"></span>
                             </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">Setup Telephone
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Setup Telephone" v-model="request_type">
+                            <label class="mdblbl inline-blocklbl mdblblradio">Layout Design
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Layout Design" v-model="request_type">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
@@ -480,26 +480,28 @@
     </div>
 </template>
 <script>
-// let worktype = ['System Access (SAP, HRIS etc.)',
-//                 'Borrow item',
-//                 'System Autorization',
-//                 'RDP Access',
-//                 'Password Reset',
-//                 'Internet Access',
-//                 'Email Setup',
-//                 'Install Apps(Spark, Skype, etc.)',
-//                 'Setup Workstation',
-//                 'Setup Printer'
-//                 ,'Setup Telephone',
-//                 'Cleaning / Maintenance',
-//                 'Repair',
-//                 'Format',
-//                 'System Report',
-//                 'System Layout',
-//                 'GPS Report',
-//                 'Conversation History',
-//                 'CCTV Report',
-//                 'File & Data Recovery'];
+// let worktypeFilter = ['system access',
+//                 'borrow item',
+//                 'system autorization',
+//                 'rdp access',
+//                 'password reset',
+//                 'internet access',
+//                 'email setup',
+//                 'install apps (spark, skype etc.)',
+//                 'setup workstation',
+//                 'setup printer',
+//                 'layout design',
+//                 'cleaning / maintenance',
+//                 'repair',
+//                 'format',
+//                 'system report',
+//                 'system layout',
+//                 'gps report',
+//                 'conversation history',
+//                 'cctv report',
+//                 'file & data recovery',
+//                 'assistance',
+//                 ];
 
 let status = ['Pending', 'Approved', 'Rejected'];
 export default {
@@ -522,7 +524,7 @@ export default {
         remarks: '',
         urgency: 'Medium',
         request_type: [],
-
+        
 		}
     },
     watch:{

@@ -103,7 +103,7 @@ export default {
             this.selected = {};
         },
         setInit(data = null){
-            console.log('data === ', data)
+            // console.log('data === ', data)
             this.rows = data;
         },
         downloadXLS(){

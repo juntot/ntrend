@@ -36,7 +36,7 @@ class FormMail extends Mailable
      */
     public function build()
     {
-        return $this->from('no-reply@northtrend.com',)
+        return $this->from('e-Portal@northtrend.com',)
                     ->subject($this->subject)
                     ->view('emails.formNotif');
     }

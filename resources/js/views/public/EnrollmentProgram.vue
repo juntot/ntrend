@@ -10,7 +10,7 @@
             <div class="col-lg-6 col-md-6  with-margin-bottom nopadding">
                 <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">ADD NEW</button>
             </div>
-            <table id="overrideform" class="mdl-data-table" style="width:100%"></table>
+            <table id="enrollmentprogramform" class="mdl-data-table" style="width:100%"></table>
 
             <!-- Modal -->
             <div id="myModal" class="modal fade" role="dialog" ref="vuemodal">
@@ -75,7 +75,7 @@ export default {
         {
             let row = this.$data.rows;
             row.forEach((item, index)=>{
-                if(item.overrideID == val)
+                if(item.enrollmentID == val)
                 {
                     this.$data.rows.splice(index, 1);
                     $("#myModal").modal("hide");
@@ -88,7 +88,7 @@ export default {
         {
             let row = this.$data.rows;
             row.forEach((item, index)=>{
-                if(item.overrideID == val.overrideID)
+                if(item.enrollmentID == val.enrollmentID)
                 {
                     this.$data.rows.splice(index, 1);
                     this.$data.rows.unshift(val);
@@ -122,7 +122,7 @@ export default {
         // this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
         this.formtitle = this.$route.name;
         
-        axios.get('api/getoverride').then((response)=>{
+        axios.get('api/getenrollmentprog').then((response)=>{
             this.loader = false;
             this.rows=response.data;
 
@@ -154,8 +154,8 @@ export default {
                     return b - a;
                 }
             });
-            this.dtHandle=$('#overrideform').DataTable({
-            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [2] }],
+            this.dtHandle=$('#enrollmentprogramform').DataTable({
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [1] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
@@ -185,7 +185,7 @@ export default {
             let rows = this.rows.length;
             let self = this;
             // Add event listener for opening and closing details
-            $("#overrideform tbody").on('click', 'tr', function() {
+            $("#enrollmentprogramform tbody").on('click', 'tr', function() {
                 var tr = $(this).closest('tr');
                 var row = table.row( tr );
                 if(
@@ -197,7 +197,8 @@ export default {
                     // return;
                 }
                 let dataforedit = row.data();
-                self.selected = row.data();
+                // dataforedit.entries = JSON.parse(dataforedit.entries);
+                self.selected = dataforedit;
 
                 self.setUpdate(dataforedit);
 
@@ -209,35 +210,33 @@ export default {
         });
 
         // APPROVERS
-        axios.get('api/getOverrideApprover').then((response)=>{
+        axios.get('api/getEnrollmentProgApprover').then((response)=>{
             this.approvers =  response.data;
         })
         .catch((err)=>{});
 
         let columnDefs = [
             {
-            title: "Override #", data: 'overrideID', visible: true,
-        },{
-            title: "Division", data: 'division'
+            title: "Program #", data: 'enrollmentID', visible: true,
         },
         {
-            title: "Date Override", data: 'dateoverride',
+            title: "Date & Time", data: 'dateenrolled',
         },
         {
             title: "Customer Name", data: 'customer_name'
         },
-        // {
-        //     title: "Creator", data: 'empID_'
-        // },
         {
-            title: 'Amount of order', data: 'amount_order'
+            title: 'Program Code', data: 'program_code'
+        },
+        {
+            title: 'Program Name', data: 'program_name'
         },
         {
             title: "Status", data: 'status',
             render: function(data){
                 return data == 0? 'Pending':
-                       data == 1 ? 'Endorsed':
-                       data == 2 ? 'Approved': 'Rejected'
+                       data == 1 ? 'Approved':
+                       data == 2 ? 'Rejected': ''
             }
         }];
 

@@ -6,13 +6,11 @@ use Illuminate\Http\Request;
 use DB;
 use Hash;
 use App\Services\UserSession;
+use App\Services\CurlService;
 
 class EmployeeController extends Controller
 {
     //
-
-
-
     public function defaultForms($deptId = ''){
         $setdefaultforms = [];
         if($deptId == '')
@@ -85,6 +83,20 @@ class EmployeeController extends Controller
 
         DB::table('eform_reportbyuser')->insertOrIgnore(['empID_'=>request('empID')]);
 
+
+
+        $postfields = request()->except(['isDisable', 'image']);
+
+        try {
+            CurlService::httpCurl(
+                'https://ams.northtrend.com/aws/addemp',
+                'POST',
+                $postfields
+            );
+        } catch (\Throwable $th) {
+            //throw $th;
+            // return $result;
+        }
 
         return request()->except(['isDisable']);
 
@@ -272,7 +284,7 @@ class EmployeeController extends Controller
                     emp.emergency_contactperson, emp.emergency_contactnum, emp.employee_status,
                     DATE_FORMAT(emp.dhired, "%M %e, %Y") as dhired, emp.birthdate,
                     user.canPost, user.isAdmin, user.addDept, user.addPos, user.addBranch, user.addEmp, user.addPayslip, 
-                    user.uploadDtr, user.viewDTRReport, user.viewReports, user.status,
+                    user.uploadDtr, user.viewDTRReport, user.viewReports, user.addDelivery, user.status,
                     emp.deptID_, emp.branchID_, pos.posID, emp.compID_, pos.posname, branch.branchname, dept.deptname, comp.compname
                     from employee emp
                     inner join users user on emp.empID = user.empID
@@ -292,7 +304,7 @@ class EmployeeController extends Controller
     {
         $data = DB::select('select emp.empID, emp.avatar,emp.mname, emp.fname, emp.lname, emp.gender,  emp.email, emp.dhired, emp.birthdate,
                     user.canPost, user.isAdmin, user.addDept, user.addPos, user.addBranch, user.addEmp, user.addPayslip, 
-                    user.uploadDtr, user.viewDTRReport, user.viewReports, user.status, 
+                    user.uploadDtr, user.viewDTRReport, user.viewReports, user.addDelivery, user.status, 
                     emp.deptID_, emp.branchID_, emp.posID_, emp.compID_, emp.mobile,
                     emp.SSS, emp.TIN, emp.PhHealth, emp.HDMF, emp.SL, emp.VL, emp.BL, emp.DL,
                     emp.emergency_contactperson, emp.emergency_contactnum, emp.employee_status,

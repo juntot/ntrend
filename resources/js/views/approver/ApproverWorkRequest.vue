@@ -1,3 +1,10 @@
+<style scoped>
+.dropdown-menu.worktypefilter {
+    min-width: 298px !important;
+    max-height: 400px;
+    overflow: auto;
+}
+</style>
 <template>
     <div>
         <div id="loader2" v-if="loader">
@@ -8,52 +15,76 @@
 		</div>
         <div class="col-lg-12 margin-15">
             <div class="col-md-6">
-                    <div :class="openFilter?'dropdown open':'dropdown'">
-                    <button class="btn btn-primary dropdown-toggle" type="button" @click.prevent="openFilter = !openFilter">
-                        Filter Status
-                    <span class="caret"></span></button>
+                <div class="dflex">
+                        <div :class="openFilter?'dropdown open z-1':'dropdown z-1'" style="margin-right: 15px;" >
+                            <button class="btn btn-primary dropdown-toggle" type="button" @click.prevent="openFilter = !openFilter">
+                                Filter Status
+                            <!-- <span class="caret"></span> -->
+                            </button>
+                            
+                            <ul class="dropdown-menu" style="padding: 10px">
+                                <button type="button" class="close" 
+                                
+                                @click="openFilter = !openFilter">×</button>
+                                <li style="padding: 4px 15px">
+                                    <label>
+                                        <input type="checkbox" value="0" v-model="status" name="status" >
+                                        <span class="mdbcheckmark"></span>
+                                        Pending
+                                    </label>
+                                </li>
+                                <li style="padding: 4px 15px">
+                                    <label>
+                                        <input type="checkbox" value="3" v-model="status" name="status" >
+                                        <span class="mdbcheckmark"></span>
+                                        Executed
+                                    </label>
+                                </li>
+                                <li style="padding: 4px 15px">
+                                    <label>
+                                        <input type="checkbox" value="1" v-model="status" name="status" >
+                                        <span class="mdbcheckmark"></span>
+                                        Approved
+                                    </label>
+                                </li>
+                                <li style="padding: 4px 15px">
+                                    <label>
+                                        <input type="checkbox" value="2" v-model="status" name="status" >
+                                        <span class="mdbcheckmark"></span>
+                                        Rejected
+                                    </label>
+                                </li>
+                                <li style="padding: 4px 15px">
+                                    <label>
+                                        <input type="checkbox" value="4" v-model="status" name="status" >
+                                        <span class="mdbcheckmark"></span>
+                                        Confirmed
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- filter req type -->
+                        <div :class="openFilterReqType?'dropdown open z-1':'dropdown z-1'">
+                            <button class="btn btn-primary dropdown-toggle" type="button" @click.prevent="openFilterReqType = !openFilterReqType">
+                                Filter Request Type
+                            <!-- <span class="caret"></span> -->
+                            </button>
+                            
+                            <ul class="dropdown-menu worktypefilter" style="padding: 10px">
+                                <button type="button" class="close" 
+                                
+                                @click="openFilterReqType = !openFilterReqType">×</button>
+                                <li v-for="(val, i) in worktypeFilter" style="padding: 4px 15px" :key="i">
+                                    <label>
+                                        <input type="checkbox" v-model="worktype" :value="val" name="worktype" >
+                                        <span class="mdbcheckmark"></span>
+                                        {{val}}
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                </div>
                     
-                    <ul class="dropdown-menu" style="padding: 10px">
-                        <button type="button" class="close" 
-                        
-                        @click="openFilter = !openFilter">×</button>
-                        <li style="padding: 4px 15px">
-                            <label>
-                                <input type="checkbox" value="0" v-model="status" name="status" >
-                                <span class="mdbcheckmark"></span>
-                                Pending
-                            </label>
-                        </li>
-                        <li style="padding: 4px 15px">
-                            <label>
-                                <input type="checkbox" value="3" v-model="status" name="status" >
-                                <span class="mdbcheckmark"></span>
-                                Executed
-                            </label>
-                        </li>
-                        <li style="padding: 4px 15px">
-                            <label>
-                                <input type="checkbox" value="1" v-model="status" name="status" >
-                                <span class="mdbcheckmark"></span>
-                                Approved
-                            </label>
-                        </li>
-                        <li style="padding: 4px 15px">
-                            <label>
-                                <input type="checkbox" value="2" v-model="status" name="status" >
-                                <span class="mdbcheckmark"></span>
-                                Rejected
-                            </label>
-                        </li>
-                        <li style="padding: 4px 15px">
-                            <label>
-                                <input type="checkbox" value="4" v-model="status" name="status" >
-                                <span class="mdbcheckmark"></span>
-                                Confirmed
-                            </label>
-                        </li>
-                    </ul>
-                    </div>
             </div>
             <table id="workrequest" class="mdl-data-table" style="width:100%"></table>
 
@@ -79,26 +110,28 @@
 </template>
 <script>
 import ManageWorkRequest from '../../components/public/ManageWorkRequest';
-// let worktype = ['System Access (SAP, HRIS etc.)',
-//                 'Borrow item',
-//                 'System Autorization',
-//                 'RDP Access',
-//                 'Password Reset',
-//                 'Internet Access',
-//                 'Email Setup',
-//                 'Install Apps(Spark, Skype, etc.)',
-//                 'Setup Workstation',
-//                 'Setup Printer'
-//                 ,'Setup Telephone',
-//                 'Cleaning / Maintenance',
-//                 'Repair',
-//                 'Format',
-//                 'System Report',
-//                 'System Layout',
-//                 'GPS Report',
-//                 'Conversation History',
-//                 'CCTV Report',
-//                 'File & Data Recovery'];
+let worktype = ['system access',
+                'borrow item',
+                'system autorization',
+                'rdp access',
+                'password reset',
+                'internet access',
+                'email setup',
+                'install apps (spark, skype etc.)',
+                'setup workstation',
+                'setup printer',
+                'layout design',
+                'cleaning / maintenance',
+                'repair',
+                'format',
+                'system report',
+                'system layout',
+                'gps report',
+                'conversation history',
+                'cctv report',
+                'file & data recovery',
+                'assistance',
+                ].sort();
 
 // let status = ['Pending', 'Approved', 'Rejected'];
 let defaultRows = [];
@@ -109,6 +142,7 @@ export default {
     data(){
         return{
             openFilter: false,
+            openFilterReqType: false,
             status: ['0', '1', '2', '3', '4'],
             formtitle: '',
             forapprover: '',
@@ -119,6 +153,8 @@ export default {
             loader: true,
             empID_: '', //requestedby
             selected: {},
+            worktype: worktype,
+            worktypeFilter: worktype
         }
     },
     watch:{
@@ -127,8 +163,10 @@ export default {
             // if(val.includes('1.1')){
                 // rows = 
             // }
+            let tempReqType = [];
             rows = defaultRows.filter(data=>{
-                return val.includes(data.status+'');
+                tempReqType = (data.request_type.toLowerCase()).split(',');
+                return val.includes(data.status+'') && this.worktype.some((type)=>tempReqType.indexOf(type)>=0);
             });
 
             this.dtHandle.clear();
@@ -138,9 +176,22 @@ export default {
         rows(val, old){
             let rows = [];
             // let row = val;
-
+            let tempReqType = [];
             rows = defaultRows.filter(data=>{
-                return this.status.includes(data.status+'');
+                tempReqType = (data.request_type.toLowerCase()).split(',');
+                return this.status.includes(data.status+'') && this.worktype.some((type)=>tempReqType.indexOf(type)>=0);
+            });
+            
+            this.dtHandle.clear();
+            this.dtHandle.rows.add(rows);
+            this.dtHandle.draw();
+        },
+        worktype(val, old){
+            let rows = [];
+            let tempReqType = [];
+            rows = defaultRows.filter(data=>{
+                tempReqType = (data.request_type.toLowerCase()).split(',');
+                return this.status.includes(data.status+'') && (tempReqType.some((type) => val.indexOf(type)>=0))
             });
             
             this.dtHandle.clear();
@@ -232,7 +283,6 @@ export default {
             });
             this.dtHandle=$('#workrequest').DataTable({
             aoColumnDefs: [{ "sType": "date-uk", "aTargets": [3] }],
-            "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
             "sPaginationType": "simple_numbers",

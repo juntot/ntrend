@@ -717,7 +717,23 @@
                     </div>
                 </div>
                 <div class="clearfix"></div>
-
+                <div class="col-md-4">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <select v-model="commitmentfollowup" name="commitmentfollowup" class="form-field__input" >
+                                <option :value="'No need follow-up'" >No need follow-up</option>
+                                <option :value="'For follow-up'" >For follow-up</option>
+                                <option :value="'Settled'" >Settled</option>
+                                <option :value="'For CL increase'" >For CL increase</option>
+                                <option :value="'For CL allocation'" >For CL allocation</option>
+                            </select>
+                            <label class="form-field__label">Commitment For Followup</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('commitmentfollowup') }}</span>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
                 <div class="col-lg-12">
                 <h5 class="form-subtitle"></h5>
                     <div class="mdb-form-field">
@@ -788,6 +804,8 @@
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateOverride" :disabled="isDisable || !isFormValid || !isRequiredFieldsValid" v-if="overrideID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteOverride" :disabled="isDisable" v-if="overrideID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
                     
+
+                    <input type="submit" class="btn btn-primary" value="Update." @click.prevent="updateOverride2" :disabled="isDisable || !isFormValid || !isRequiredFieldsValid" v-if="overrideID && $parent.$data.forapprover == 'approval'">
                     <input type="submit" class="btn btn-primary" value="Endorse" @click.prevent="requestActionOverride(1)" v-if="overrideID && $parent.$data.forapprover == 'approval' && (!(selected.endorsedby_ || '').includes(userinfo.fullname) && selected.status < 2) && endorser.length < 2">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionOverride(2)" v-if="overrideID && $parent.$data.forapprover == 'approval' && selected.status != 2">
                     <input type="submit" class="btn btn-primary" value="Reject" @click.prevent="requestActionOverride(3)" v-if="overrideID && $parent.$data.forapprover == 'approval' && selected.status != 3">
@@ -882,6 +900,7 @@ export default {
         commit_cl: '',
         paying_habit: '',
         check_type: [],
+        commitmentfollowup: '',
         additional_info: '',
         remarks: '',
         
@@ -975,6 +994,21 @@ export default {
                 }
                 axios.post('api/updateoverride', params).then(({data})=>{
                     this.$parent.updateRow(data);
+                    $("#myModal").modal("hide");
+                }).catch((err)=>{console.log(err);});
+            }
+        },
+        updateOverride2(){
+            if(this.isFormValid){
+                
+                this.isDisable = true;
+                let params = {
+                    overrideID: this.overrideID,
+                    commitmentfollowup: this.commitmentfollowup,
+                    remarks: this.remarks
+                };
+                axios.post('api/updateoverride2', params).then(({data})=>{
+                    this.$parent.updateRow({...this.selected, ...params});
                     $("#myModal").modal("hide");
                 }).catch((err)=>{console.log(err);});
             }
@@ -1148,7 +1182,7 @@ export default {
             Object.keys(obj).forEach((key)=>{
 
                 if(key != 'compRows' && key != 'divRows' && key != 'branchRows'
-                && key != 'overrideID' && key != 'isDisable'
+                 && key != 'isDisable'
                 ) {
                     // this will be use for update button not be replaced by submit
                     //  when text field is cleared

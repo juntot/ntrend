@@ -70,7 +70,7 @@ class IncidentReportController extends Controller
     public function deleteIncidentReport($incidentID  = null){
         $affected = DB::table('formincidentreport')
         ->where('incidentID', '=', $incidentID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
         
         $record = DB::table('formincidentreport')
@@ -132,7 +132,7 @@ class IncidentReportController extends Controller
         form.approvedby = emp.empID 
         where form.empID_ = :empid 
             OR form.personsinvolve = :personinvolve
-            and form.recstat !=1', 
+            and form.recstat = 0', 
         ['empid'=> UserSession::getSessionID(), 'personinvolve'=> UserSession::getSessionID()]);
 
         return $data;
@@ -193,7 +193,7 @@ class IncidentReportController extends Controller
                             OR eIReport.endorse1 = :endorse1ID 
                             OR eIReport.endorse2 = :endorse2ID 
 
-                            and eIReport.recstat != 1', [
+                            and eIReport.recstat = 0', [
                                 UserSession::getSessionID(),
                                 UserSession::getSessionID(),
                                 UserSession::getSessionID()

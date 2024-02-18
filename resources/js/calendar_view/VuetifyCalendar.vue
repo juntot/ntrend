@@ -1,3 +1,13 @@
+<style>
+/* .v-calendar-weekly__week {
+    display: flex;
+    flex: 1;
+    height: unset;
+    min-height: 129px;
+} */
+/* commented above and use check the v-sheet value to extend the height month*/
+</style>
+
 <template>
     <div>
         <v-app id="inspire">
@@ -60,7 +70,7 @@
                     </v-toolbar>
                     </v-sheet>
                     </div>
-                    <v-sheet :height="type=='month'? 600: 'auto'">
+                    <v-sheet :height="type=='month'? calendarHeight || 600: 'auto'">
                         <v-calendar
                         ref="calendar"
                         interval-count="0"
@@ -70,12 +80,13 @@
                         :events="events"
                         :event-color="getEventColor"
                         :type="type"
+                        
                         @click:event="showEvent"
                         @click:more="viewDay"
                         @click:date="viewDay"
                         @change="updateRange"
                         ></v-calendar>
-                        
+                        <!-- event-more-text="{0} events hidden" -->
                         <v-menu
                             v-model="selectedOpen"
                             :close-on-content-click="false"
@@ -109,7 +120,7 @@
 </style>
 <script>
 export default {
-    props: ['getEventDetails', 'getNext', 'getPrev'],
+    props: ['getEventDetails', 'getNext', 'getPrev', 'calendarHeight'],
     data(){
         return{
             // dialog: false,

@@ -28,7 +28,7 @@ class BranchController extends Controller
 
     public function getBranch()
     {
-    	$data = DB::select('select * from branchtbl where status = 1');
+    	$data = DB::select('select * from branchtbl where status = 1 order by branchname');
    	 	return $data;
     }
 
