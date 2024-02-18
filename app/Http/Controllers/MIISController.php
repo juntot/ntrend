@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\UserSession;
 use App\Services\MailServices;
+use App\Services\FormApproverService;
 use DB;
 
 class MIISController extends Controller
@@ -49,7 +50,7 @@ class MIISController extends Controller
     // DELETE
     public function deleteMIIS($miisID  = null){
         DB::table('formMIIS')->where('miisID', '=', $miisID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -57,7 +58,7 @@ class MIISController extends Controller
     public function getMIISByEmployee(){
         // SESSION ID
         $data = DB::select('select form.*, CONCAT(emp.fname," ", emp.lname) as approvedby from formMIIS form left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
 
         return $data;
     }
@@ -66,7 +67,9 @@ class MIISController extends Controller
     // GET LEAVE FORM EMPLOYEE APPROVERS
     public function getMIISApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.MIIS = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.MIIS = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.MIIS = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('MIIS');
         return $data;
     }
 
@@ -88,7 +91,7 @@ class MIISController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
-                            where eform.approverID_ = :approverID and emiis.recstat != 1', [UserSession::getSessionID()]);
+                            where eform.approverID_ = :approverID and emiis.recstat = 0', [UserSession::getSessionID()]);
         return $data;
     }
 

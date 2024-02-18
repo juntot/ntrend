@@ -138,7 +138,7 @@ export default {
                         var month = parseInt(dateA[0], 10);
                         var year = parseInt(dateA[2], 10);
                         var date = new Date(year, month - 1, day)
-                        x = date.getTime();
+                        x = moment(a).valueOf();
                     }
                     catch (err) {
                         x = new Date().getTime();
@@ -156,7 +156,7 @@ export default {
                 }
             });
             this.dtHandle=$('#fadvantage').DataTable({
-            // aoColumnDefs: [{ "sType": "date-uk", "aTargets": [0] }],
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [1] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
@@ -211,13 +211,13 @@ export default {
 
         let columnDefs = [
             {
-            title: "FA ID", data: 'faID', visible: false,
+            title: "FA#", data: 'faID', visible: true,
         },
         // {
         //     title: "Employee ID", data: 'empID_'
         // },
         {
-            title: "Date Filed", data: 'datefiled'
+            title: "Date & Time Filed", data: 'datefiled'
         },{
             title: "Amount", data: 'amount'
         },{

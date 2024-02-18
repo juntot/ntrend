@@ -119,15 +119,17 @@ export default {
 
             let rows = [];
             let header = [
-                        'EMPLOYEE ID', 'EMPLOYEE NAME', 'DEPARTMENT NAME', 'POSITION', 'DATE FILED',
+                        'FA#','EMPLOYEE ID', 'EMPLOYEE NAME', 'DEPARTMENT NAME', 'POSITION', 'DATE FILED',
                         'AMOUNT', 'AMOUNT IN WORDS', 'MODE OF RELEASE',
-                        'REASON', 'APPROVER', 'APPROVED DATE', 'REMARKS', 'STATUS'
+                        'INCLUSIVE DATE FROM','INCLUSIVE DATE TO','LIQUIDATION DATE',
+                        'REASON', 'APPROVER', 'APPROVED DATE & TIME', 'REMARKS', 'STATUS'
                         ];
             rows.push(header);
             this.rows.forEach(obj => {
                 let records = [
-                            obj.empID_, obj.fullname, obj.deptname, obj.posname, obj.datefiled,
+                            obj.faID, obj.empID_, obj.fullname, obj.deptname, obj.posname, obj.datefiled,
                             obj.amount, obj.amountwords, obj.modtype,
+                            obj.inclusiveDateFrom, obj.inclusiveDateTo, obj.liqDate,
                             obj.reason, obj.approvedby, obj.approveddate,
                             obj.remarks, obj.status
                         ];
@@ -153,15 +155,15 @@ export default {
     },
     mounted(){
         let columnDefs = [
-        //     {
-        //     title: "FA ID", data: 'faID'
-        // },
+        {
+            title: "FA#", data: 'faID'
+        },
         {
             title: "Employee ID", data: 'empID_'
         },{
             title: "Employee Name", data: 'fullname'
         },{
-            title: "Date Filed", data: 'datefiled'
+            title: "Date & Time Filed", data: 'datefiled'
         },{
             title: "Amount", data: 'amount'
         },{
@@ -187,7 +189,20 @@ export default {
             "sPaginationType": "simple_numbers",
             "dom": '<"top with-margin-bottom"f>rt<"mdl-grid"<"mdl-cell mdl-cell--4-col"i><"mdl-cell mdl-cell--8-col"p>><"clear">',
             "scrollX": true,
-            "order":[[0, "desc"]]
+            "order":[[0, "desc"]],
+            "rowCallback": function(row, data, index) {
+                var cellValue = status.indexOf(data["status"]);
+                    if (cellValue==1) { // approved
+                       $(row).addClass("tr-verified");
+                    }
+                    if (cellValue==2) { // rejected
+                       $(row).addClass("tr-rejected");
+                    }
+                    if (cellValue==3) { // executed
+                       $(row).addClass("tr-executed");
+                    }
+
+                }
             });
 
             let table = this.dtHandle;

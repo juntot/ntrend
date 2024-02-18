@@ -259,7 +259,7 @@
                 </div>
                 <div class="clearfix"></div>
                     <div class="modal-footer">
-                        <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addCanvas" :disabled="isDisable || !isFormValid || !hasEntries" v-if="submitBtn">
+                        <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addCanvas" :disabled="disabledIfNoApprover || isDisable || !isFormValid || !hasEntries" v-if="submitBtn">
                         <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateCanvas" :disabled="isDisable || !isFormValid || !hasEntries" v-if="updateDeleteBtn">
                         <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteCanvas" :disabled="isDisable" v-if="updateDeleteBtn">
                         <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionCanvas(1)" v-if="approveRejecBtn">
@@ -307,7 +307,7 @@ export default {
         addCanvas(){
             if(this.isFormValid)
             {
-                
+                this.isDisable = true;
                 let params = this.$data;
                 params['reciever_emails'] = this.$parent.reciever_emails;
                 axios.post('api/addCanvas', params).then((response)=>{
@@ -438,6 +438,9 @@ export default {
 
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         isFormValid(){
             return !Object.keys(this.fields).some((key )=>{ 
 

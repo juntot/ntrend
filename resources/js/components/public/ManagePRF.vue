@@ -299,7 +299,7 @@
                 </div>
                 <div class="clearfix"></div>
                 <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addPRF" :disabled="isDisable || !isFormValid || !hasEntries" v-if="submitBtn">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addPRF" :disabled="disabledIfNoApprover || isDisable || !isFormValid || !hasEntries" v-if="submitBtn">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updatePRF" :disabled="isDisable || !isFormValid || !hasEntries" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deletePRF" :disabled="isDisable" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionPRF(1)" v-if="approveRejecBtn">
@@ -488,7 +488,9 @@ export default {
 
     },
     computed:{
-
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         getDiff(){
             this.datestart =  moment(this.datestart).format('YYYY-MM-DD');
             this.dateend = moment(this.dateend).format('YYYY-MM-DD');

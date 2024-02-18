@@ -1,3 +1,11 @@
+<style>
+/* hide overlapping labels for multi select dropdowns */
+button.multiselect span.multiselect-selected-text{
+    display: inline-block;
+    width: 100%;
+    overflow: hidden;
+}
+</style>
 <template>
     <div>
         <div id="loader2" v-if="loader">
@@ -92,18 +100,25 @@
                 </div>
             </div> -->
             <div class="clearfix"></div>
-            <div class="col-lg-4 col-md-4">
+            <div class="col-lg-12 col-md-12">
                 <input type="submit" class="btn btn-primary" @click.prevent="getReport" value="Generate Report" :disabled="isDisabled || disabledBtn">
+                <input type="submit" class="btn btn-primary" v-if="showGenerateChartBtn" @click.prevent="generateChart" value="Generate Chart" :disabled="isDisabled">
             </div>
+            
         </div>
         <div class="clearfix"></div>
         <div>
                 <!-- dynamic call components -->
+                <div v-show="showGenerateChartBtn" >
+                    <!-- <canvas id="myChart"></canvas> -->
+                    <IRChart v-show="showChart"></IRChart>
+                </div>
+                <div class="clearfix"></div>
                 <div v-for="(compo, index) in $options.components" :key="index" v-show="reportComponent[index] == selectedRepType && !ishiddenComponent">
                     <!-- <{{index}}></{{index}}> -->
-                    <component :is="index" :title="title" />
+                    <component :is="index" :title="title" v-if="index != 'IRChart'" />
                 </div>
-
+                
         </div>
 
     </div>
@@ -128,17 +143,30 @@ import ReportUrgentCheck                from './reports/ReportUrgentCheck';
 import ReportOffset                     from './reports/ReportOffset';
 import ReportWorkRequest                from './reports/ReportWorkRequest';
 import ReportOvertimeRequest            from './reports/ReportOvertimeRequest';
+import ReportOverrideForm               from './reports/ReportOverrideForm';
+import ReportTransmittal                from './reports/ReportTransmittal';
+import ReportEnrollmentProgram          from './reports/ReportEnrollmentProgram';
+import IRChart                          from './reports/IRChart';
+import ReportMeetingMinute              from './reports/ReportMeetingMinute';
 
 // let brand = ['NTMC', 'APBW', 'PHILCREST', 'TYREPLUS'];
 // let status = ['Pending', 'Approved', 'Rejected'];
+
+/*
+    BUS report for request list
+    add prefix - Report for bus event in component
+*/
+
 let typeofReportBus = {
-                supplementary:          'initSup',          callingcardrequest:     'initCallCard',         clearanceform:      'initClearance',
-                companyloan:            'initLoan',         financialadvance:       'initFA',               incidentreport:     'initIR',
-                laptopform:             'initLaptop',       leaveform:              'initLeave',            miis:               'initMIIS',
-                prs:                    'initPRS',          prf:                    'initPRF',              canvas:             'initCanvas',
-                salarydiscrepancy:      'initSalDis',       supplieraccreditation:  'initSupAccre',         travelform:         'initTravel',
-                undertimerequest:       'initUndertime',    urgentcheck:            'initUrgentCheck',      offset:             'initOffset',
-                workrequest:            'initWorkRequest',  overtimerequest:        'initOvertime'
+                supplementary:          'initSup',              callingcardrequest:     'initCallCard',         clearanceform:      'initClearance',
+                companyloan:            'initLoan',             financialadvance:       'initFA',               incidentreport:     'initIR',
+                laptopform:             'initLaptop',           leaveform:              'initLeave',            miis:               'initMIIS',
+                prs:                    'initPRS',              prf:                    'initPRF',              canvas:             'initCanvas',
+                salarydiscrepancy:      'initSalDis',           supplieraccreditation:  'initSupAccre',         travelform:         'initTravel',
+                undertimerequest:       'initUndertime',        urgentcheck:            'initUrgentCheck',      offset:             'initOffset',
+                workrequest:            'initWorkRequest',      overtimerequest:        'initOvertime',         overrideform:       'initOverride',
+                transmittal:            'initTransmittal',      
+                enrollmentprogram:      'initEnrollmentProgram', minutesofmeeting:      'initMeetingMinute',
             };
 
 export default {
@@ -161,7 +189,13 @@ export default {
         ReportUrgentCheck,
         ReportOffset,
         ReportWorkRequest,
-        ReportOvertimeRequest
+        ReportOvertimeRequest,
+        ReportOverrideForm,
+        ReportTransmittal,
+        ReportEnrollmentProgram,
+        IRChart,
+        ReportMeetingMinute
+        
     },
     data(){
         return{
@@ -170,6 +204,7 @@ export default {
             title: '',
             // disabledinput: false,
             disabledBtn: false,
+            showChart: false,
             dtHandle: null,
             loader: false,
             datefrom: moment(new Date()).format('YYYY-MM-DD'),
@@ -193,6 +228,9 @@ export default {
             selectedStatus: [],
             selectedCompany:[],
 
+            selectedBranchText:[],
+            selectedStatusText:[],
+
             // setSelectedRepTypeText: '',
             docReady: false,
 
@@ -204,38 +242,36 @@ export default {
                 // salarydiscrepancy:      'ReportSalaryDiscrepancy',      supplieraccreditation:  'ReportSupplierAccreditation',      travelform:         'ReportTravelForm',
                 // undertimerequest:       'ReportUndertimeRequest',       urgentcheck:            'ReportUrgentCheck',                offset:             'ReportOffset',
                 // workrequest:            'ReportWorkRequest'
-
+                
+                /*
+                    //DEFINITION ===================================================================================
+                    index = componentname
+                    value =  selectype value
+                */
                 ReportSupplementary:        'supplementary',          ReportCallingCardRequest:     'callingcardrequest',         ReportClearance:          'clearanceform',
                 ReportCompanyLoan:          'companyloan',            ReportFinancialAdvantage:     'financialadvance',           ReportIncidentReport:     'incidentreport',
                 ReportLaptopAgreement:      'laptopform',             ReportLeaveForm:              'leaveform',                  ReportMIIS:               'miis',
                 ReportPRS:                  'prs',                    ReportPRF:                    'prf',                        ReportCanvas:             'canvas',
                 ReportSalaryDiscrepancy:    'salarydiscrepancy',      ReportSupplierAccreditation:  'supplieraccreditation',      ReportTravelForm:         'travelform',
                 ReportUndertimeRequest:     'undertimerequest',       ReportUrgentCheck:            'urgentcheck',                ReportOffset:             'offset',
-                ReportWorkRequest:          'workrequest',            ReportOvertimeRequest:         'overtimerequest',
+                ReportWorkRequest:          'workrequest',            ReportOvertimeRequest:        'overtimerequest',            ReportOverrideForm:       'overrideform',
+                ReportTransmittal:          'transmittal',           
+                ReportEnrollmentProgram:    'enrollmentprogram',      ReportMeetingMinute:          'minutesofmeeting'
             },
         }
     },
     watch:{
-
-        // rows(val, old){
-        //     let row = val;
-
-        //     row.forEach((item, index)=>{
-        //         if(!isNaN(item.brand) && !isNaN(item.status)){
-        //             row[index]['brand'] = brand[item.brand - 1];
-        //             row[index]['status'] = status[item.status];
-        //         }
-        //     });
-        //     this.dtHandle.clear();
-        //     this.dtHandle.rows.add(row);
-        //     this.dtHandle.draw();
-        // },
 
     },
     computed:{
         isDisabled(){
             return this.selectedBranch.length < 1 || this.selectedStatus.length < 1 || this.selectedRepType == 'select';
         },
+
+        showGenerateChartBtn(){
+            // show dashboard chart if incident report is selected from form type
+            return this.selectedRepType == 'incidentreport' ||  false;
+        }
 
     },
     methods:{
@@ -280,13 +316,72 @@ export default {
                     {label: 'Pending', title: 'Pending', value: 0},
 
                 ];
-            }else{
+            }else if(el.target.value == "overrideform"){
+
+                options =  [
+                    {label: 'Endorsed', title: 'Endored', value: 1},
+                    {label: 'Approved', title: 'Approved', value: 2},
+                    {label: 'Rejected', title: 'Rejected', value:3},
+                    {label: 'Pending', title: 'Pending', value: 0},
+
+                ];
+
+            }else if(el.target.value == "transmittal"){
+
+                options =  [
+                    {label: 'Partially Received', title: 'Partially Received', value: 1},
+                    {label: 'Received', title: 'Received', value: 2},
+                    {label: 'Rejected', title: 'Rejected', value:3},
+                    {label: 'Pending', title: 'Pending', value: 0},
+
+                ];
+
+            }else if(el.target.value == 'incidentreport'){
+                /**
+                 * 0 pending
+                 * 1 endorse 1
+                 * 2 endorse 2
+                 * 3 close
+                 * 4 rejected
+                 * 9 approved by the immidedate approver but not as a whole request
+                 */
+                options =  [
+                    // {label: '1st Endorsement', title: '1st Endorsement', value: 1},
+                    // {label: '2nd Endorsement', title: '2nd Endorsement', value: 2},
+                    {label: 'Pending', title: 'Pending', value: 0},
+                    {label: 'Approved', title: 'Approved', value: 9},
+                    {label: 'Further Investigation', title: 'Further Investigation', value: 8},
+                    {label: 'Closed', title: 'Closed', value: 3},
+                    {label: 'Rejected', title: 'Rejected', value: 4},
+                ];
+            }else if(el.target.value == 'minutesofmeeting'){
+                /**
+                 * 0 pending
+                 * 1 endorse 1
+                 * 2 endorse 2
+                 * 3 close
+                 * 4 rejected
+                 * 9 approved by the immidedate approver but not as a whole request
+                 */
+                options =  [
+                    // {label: '1st Endorsement', title: '1st Endorsement', value: 1},
+                    // {label: '2nd Endorsement', title: '2nd Endorsement', value: 2},
+                    {label: 'Open', title: 'Pending', value: 0},
+                    {label: 'Closed', title: 'Closed', value: 1},
+                ];
+            }
+            else{
                 options =  [
                     {label: 'Approved', title: 'Approved', value: 1},
                     {label: 'Rejected', title: 'Rejected', value: 2},
                     {label: 'Pending', title: 'Pending', value: 0}
                 ];
             }
+
+           
+            if(el.target.value != 'incidentreport')
+            this.showChart = false;
+
             this.selectedStatus = [];
             let self = this;
             // $('.multiselect2').multiselect('destroy');
@@ -305,27 +400,39 @@ export default {
                     if(element){
                         let brands = $('.multiselect2 option:selected');
                         let selected = [];
+                        let selectedText = [];
+
                         $(brands).each(function(index, brand){
                             selected.push([$(this).val()]);
+                            selectedText.push($(this).text().toLowerCase());
                         });
                         self.selectedStatus = selected;
+                        self.selectedStatusText = selectedText;
                     }else{
                         let brands = $('.multiselect2 option:selected');
                         let selected = [];
+                        let selectedText = [];
+
                         $(brands).each(function(index, brand){
                             selected.push([$(this).val()]);
+                            selectedText.push($(this).text().toLowerCase());
                         });
                         self.selectedStatus = selected;
+                        self.selectedStatusText = selectedText;
                     }
                 },
                 onChange: function(element, checked) {
                     let brands = $('.multiselect2 option:selected');
                     let selected = [];
+                    let selectedText = [];
+
                     $(brands).each(function(index, brand){
                         selected.push([$(this).val()]);
+                        selectedText.push($(this).text().toLowerCase());
                     });
 
                     self.selectedStatus = selected;
+                    self.selectedStatusText = selectedText;
                 }
             });
             // $('.multiselect2').multiselect('rebuild');
@@ -336,16 +443,38 @@ export default {
             this.disabledBtn = true;
             this.ishiddenComponent = false;
             // console.log(`api/getreport/${this.datefrom}/${this.dateto}/${this.selectedRepType}/${this.selectedBranch}/${this.selectedStatus}`);
-            axios.get(`api/getreport/${this.datefrom}/${this.dateto}/${this.selectedRepType}/${this.selectedBranch}/${this.selectedStatus}/${this.selectedCompany}`)
+           
+           axios.get(`api/getreport/${this.datefrom}/${this.dateto}/${this.selectedRepType}/${this.selectedBranch}/${this.selectedStatus}/${this.selectedCompany}`)
             .then(res=>{
-                // this.rows = res.data;
                 bus.$emit(`${typeofReportBus[this.selectedRepType]}Report`, res.data, this.status || '');
-                this.disabledBtn = false;
+                // this.disabledBtn = false;
             })
             .catch(err => console.log(err));
         },
+
+        generateChart(){
+
+// ${this.datefrom}/${this.dateto}/${this.selectedRepType}/${this.selectedBranch}/${this.selectedStatus}/${this.selectedCompany}
+            axios.get(`api/get-ir-chart/${this.datefrom}/${this.dateto}/${this.selectedRepType}/${this.selectedBranch}/${this.selectedStatus}/${this.selectedCompany}`,
+            {
+                // params: {
+                //     branch: this.selectedBranchText,
+                // }
+            })
+            .then(res=>{
+                this.showChart = true;
+                bus.$emit(`${typeofReportBus[this.selectedRepType]}ReportChart`, res.data, { 
+                    pie: this.selectedStatusText,
+                    bar: this.selectedBranchText
+                });
+                
+            })
+            .catch(err => console.log(err));
+            
+        },
+
         closeModal(){
-            // this.disabledinput = false;
+            $('.multiple').removeClass('form-field__control');
         },
 
 
@@ -382,6 +511,70 @@ export default {
 
     mounted(){
 
+// const labels = [
+//     'January',
+//     'February',
+//     'March',
+//     'April',
+//     'May',
+//     'June',
+//   ];
+
+//   const data = {
+//     labels: labels,
+//     datasets: [{
+//       label: 'My First dataset',
+//       backgroundColor: 'rgb(255, 99, 132)',
+//       borderColor: 'rgb(255, 99, 132)',
+//       data: [0, 10, 5, 2, 20, 30, 45],
+//     }]
+//   };
+
+//   const config = {
+//     type: 'line',
+//     data: data,
+//     options: {}
+//   };
+//   const myChart = new Chart(
+//     document.getElementById('myChart'),
+//     config
+//   );
+        // const ctx = document.getElementById('reportChart');
+        // const myChart = new Chart(ctx, {
+        //     type: 'bar',
+        //     data: {
+        //         labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+        //         datasets: [{
+        //             label: '# of Votes',
+        //             data: [12, 19, 3, 5, 2, 3],
+        //             backgroundColor: [
+        //                 'rgba(255, 99, 132, 0.2)',
+        //                 'rgba(54, 162, 235, 0.2)',
+        //                 'rgba(255, 206, 86, 0.2)',
+        //                 'rgba(75, 192, 192, 0.2)',
+        //                 'rgba(153, 102, 255, 0.2)',
+        //                 'rgba(255, 159, 64, 0.2)'
+        //             ],
+        //             borderColor: [
+        //                 'rgba(255, 99, 132, 1)',
+        //                 'rgba(54, 162, 235, 1)',
+        //                 'rgba(255, 206, 86, 1)',
+        //                 'rgba(75, 192, 192, 1)',
+        //                 'rgba(153, 102, 255, 1)',
+        //                 'rgba(255, 159, 64, 1)'
+        //             ],
+        //             borderWidth: 1
+        //         }]
+        //     },
+        //     options: {
+        //         scales: {
+        //             y: {
+        //                 beginAtZero: true
+        //             }
+        //         }
+        //     }
+        // });
+
         this.MDBINPUT();
         // this.forapprover = ((this.$route.path).slice(1)).toLowerCase().split('-')[];
         this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
@@ -390,7 +583,12 @@ export default {
             if(response.data.length > 0)
             {
                 // this.selectedRepType = ((response.data[0].formtitle).replace(/ /g, '')).toLowerCase();
-                this.reportType = response.data;
+                this.reportType = (response.data.sort((a, b)=>{
+                    var nameA = a.formtitle.toLowerCase();
+                    var nameB = b.formtitle.toLowerCase(); 
+                    if(nameA === nameB) return 0; 
+                    return nameA > nameB ? 1 : -1;
+                }));
                 // this.setSelectedRepTypeText = response.data[0].formtitle;
                 this.title = 'SUMMARY REPORT OF '+ (response.data[0].formtitle).toUpperCase();
 
@@ -413,27 +611,36 @@ export default {
                         if(element){
                             let brands = $('.multiselect1 option:selected');
                             let selected = [];
+                            let selectedText = [];
                             $(brands).each(function(index, brand){
+                                selectedText.push($(this).text().toLowerCase());
                                 selected.push([$(this).val()]);
                             });
                             self.selectedBranch = selected;
+                            self.selectedBranchText = selectedText;
                         }else{
                             let brands = $('.multiselect1 option:selected');
                             let selected = [];
+                            let selectedText = [];
                             $(brands).each(function(index, brand){
+                                selectedText.push($(this).text().toLowerCase());
                                 selected.push([$(this).val()]);
                             });
                             self.selectedBranch = selected;
+                            self.selectedBranchText = selectedText;
                         }
                     },
                     onChange: function(element, checked) {
                         let brands = $('.multiselect1 option:selected');
                         let selected = [];
+                        let selectedText = [];
                         $(brands).each(function(index, brand){
+                            selectedText.push($(this).text().toLowerCase());
                             selected.push([$(this).val()]);
                         });
 
                         self.selectedBranch = selected;
+                        self.selectedBranchText = selectedText;
                     }
                 });
 
@@ -487,7 +694,7 @@ export default {
         .catch(err=>console.log(err))
 
         // MODAL
-        $('#myModal').on("hidden.bs.modal", this.closeModal);
+        $('.modal').on("hidden.bs.modal", this.closeModal);
 
 
         // multi select status
@@ -512,6 +719,7 @@ export default {
                     let selected = [];
                     $(brands).each(function(index, brand){
                         selected.push([$(this).val()]);
+                        
                     });
                     self.selectedStatus = selected;
                 }else{

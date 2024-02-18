@@ -25,7 +25,8 @@
   		<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-lite/1.1.0/material.min.css">
 		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.material.min.css"> -->
 
-		<link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+		<!-- <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet"> -->
+		<link href="{{URL::asset('resources/assets/css/materialdesignicons.min.css')}}" rel="stylesheet">
 		<!-- <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet"> -->
 		<link rel="stylesheet" href="{{URL::to('/public/css/vuetify.css')}}">
 
@@ -100,10 +101,10 @@
 										<div class="panel panel-default">
 											<div class="panel-heading active">
 												<h4 class="panel-title">
-                                                    <div class="dflex d-align-center">
-                                                        <router-link to="/" @click.native="hideMobileNav" class="accordion-menu collapseall">Dashboard</router-link>
+													<div class="dflex d-align-center">
+															<router-link to="/" @click.native="hideMobileNav" class="accordion-menu collapseall">Dashboard</router-link>
 													    <span class="caret"></span>
-                                                    </div>
+													</div>
 												</h4>
 											</div>
 											<div id="dashboard" class="panel-collapse collapse">
@@ -127,22 +128,28 @@
 										<div class="panel panel-default">
 											<div class="panel-heading">
 												<h4 class="panel-title">
-                                                    <div class="dflex d-align-center">
-                                                        <a  data-toggle="collapse" data-parent="#accordion" href="#users" class="accordion-menu">Users</a>
-                                                        <span></span>
-                                                    </div>
+														<div class="dflex d-align-center">
+																<a  data-toggle="collapse" data-parent="#accordion" href="#users" class="accordion-menu">Manage Users</a>
+																<span></span>
+														</div>
 												</h4>
 											</div>
 											<div id="users" class="panel-collapse collapse">
 												<div class="panel-body">
 														<ul class="submenu">
-                                                            <li><router-link @click.native="hideMobileNav" to="/manage-users">Manage Users</router-link></li>
-                                                            <li><router-link @click.native="hideMobileNav" to="/user-role">User roles</router-link></li>
+																<li><router-link @click.native="hideMobileNav" to="/manage-users">Users</router-link></li>
+																<li><router-link @click.native="hideMobileNav" to="/job-position">Job Position</router-link></li>
+																<li><router-link @click.native="hideMobileNav" to="/dept">Department</router-link></li>
+																<li><router-link @click.native="hideMobileNav" to="/branch">Branch</router-link></li>
+																<li><router-link @click.native="hideMobileNav" to="/company">Company</router-link></li>
+																<li><router-link @click.native="hideMobileNav" to="/form-approver-byuser">Approver per users</router-link></li>
+																<li><router-link @click.native="hideMobileNav" to="/resigned-users">Resigned Employees</router-link></li>
+																<!-- <li><router-link @click.native="hideMobileNav" to="/user-role">User roles</router-link></li> -->
 														</ul>
 												</div>
 											</div>
 										</div>
-										<div class="panel panel-default">
+										<!-- <div class="panel panel-default">
 											<div class="panel-heading">
 												<h4 class="panel-title">
                                                     <div class="dflex d-align-center">
@@ -172,7 +179,7 @@
 											<div class="panel-heading">
 												<h4 class="panel-title">
                                                     <div class="dflex d-align-center">
-														<!-- <a data-toggle="collapse" data-parent="#accordion" href="#branch" class="accordion-menu">Branch</a> -->
+														!-- <a data-toggle="collapse" data-parent="#accordion" href="#branch" class="accordion-menu">Branch</a> --
 														<router-link @click.native="hideMobileNav" to="/branch" class="accordion-menu collapseall">Branch</router-link>
                                                         <span></span>
                                                     </div>
@@ -181,7 +188,7 @@
 											<div class="panel-heading">
 												<h4 class="panel-title">
                                                     <div class="dflex d-align-center">
-														<!-- <a data-toggle="collapse" data-parent="#accordion" href="#branch" class="accordion-menu">Branch</a> -->
+														!-- <a data-toggle="collapse" data-parent="#accordion" href="#branch" class="accordion-menu">Branch</a> --
 														<router-link @click.native="hideMobileNav" to="/company" class="accordion-menu collapseall">Company</router-link>
                                                         <span></span>
                                                     </div>
@@ -190,28 +197,31 @@
 											<div id="branch" class="panel-collapse collapse">
 												<div class="panel-body" v-show="false"></div>
 											</div>
-										</div>
+										</div> -->
 										<div class="panel panel-default">
 										<div class="panel-heading">
 												<h4 class="panel-title">
-                                                    <div class="dflex d-align-center">
-                                                        <a data-toggle="collapse" data-parent="#accordion" href="#collapse3" class="accordion-menu">Manage Modules</a>
-                                                        <span></span>
-                                                    </div>
+														<div class="dflex d-align-center">
+																<a data-toggle="collapse" data-parent="#accordion" href="#collapse3" class="accordion-menu">Authorizations</a>
+																<span></span>
+														</div>
 												</h4>
 											</div>
 											<div id="collapse3" class="panel-collapse collapse">
 												<div class="panel-body">
 														<ul class="submenu">
-															<li><router-link @click.native="hideMobileNav" to="/form-group">Form Groups</router-link></li>
-															<li><router-link @click.native="hideMobileNav" to="/witness-supplementary">Witness-Supplementary</router-link></li>
+															<li><router-link @click.native="hideMobileNav" to="/user-role">User roles</router-link></li>
+															<li><router-link @click.native="hideMobileNav" to="/manage-reports">Reports</router-link></li>
+															<!-- <li><router-link @click.native="hideMobileNav" to="/form-group">Form Groups</router-link></li> -->
+															<!-- <li><router-link @click.native="hideMobileNav" to="/witness-supplementary">Witness-Supplementary</router-link></li> -->
 															<li><a>e-Forms</a>
 																<ul class="submenu">
-																	<li><router-link @click.native="hideMobileNav" to="/manage-form">Manage By Department</router-link></li>
-																	<li><router-link @click.native="hideMobileNav" to="/manage-user-form">Manage By User</router-link></li>
-																	<li><router-link @click.native="hideMobileNav" to="/form-approver">Form Approvers</router-link></li>
-																	<li><router-link @click.native="hideMobileNav" to="/form-approver-byuser">Set Approver Per Users</router-link></li>
-																	<li><router-link @click.native="hideMobileNav" to="/manage-reports">Reports By Users</router-link></li>
+																	<li><router-link @click.native="hideMobileNav" to="/form-group">Form Groups</router-link></li>
+																	<li><router-link @click.native="hideMobileNav" to="/manage-form">Department Access</router-link></li>
+																	<li><router-link @click.native="hideMobileNav" to="/manage-user-form">User Access</router-link></li>
+																	<li><router-link @click.native="hideMobileNav" to="/form-approver">Form Approver Accesss</router-link></li>
+																	<li><router-link @click.native="hideMobileNav" to="/form-approver-byuser">Approver Per Users</router-link></li>
+																	
 																	<li><router-link @click.native="hideMobileNav" to="/terms-conditions">Terms and Conditions</router-link></li>
 																</ul>
 															</li>
@@ -224,7 +234,7 @@
 															<li><router-link @click.native="hideMobileNav" to="/videos">Videos</router-link></li>
 															<li><router-link @click.native="hideMobileNav" to="/payslip">Payslip</router-link></li>
 															<li><router-link @click.native="hideMobileNav" to="/directory">Directory</router-link></li>
-															<li><router-link @click.native="hideMobileNav" to="/manage-comp-profile">Company Profile</router-link></li>
+															<!-- <li><router-link @click.native="hideMobileNav" to="/manage-comp-profile">Company Profile</router-link></li> -->
 														</ul>
 												</div>
 											</div>
@@ -249,6 +259,21 @@
                                                     <div class="dflex d-align-center">
                                                         <!-- <a data-toggle="collapse" data-parent="#accordion" href="#settings" class="accordion-menu">Settings</a> -->
 														<router-link @click.native="hideMobileNav" to="/settings" class="accordion-menu collapseall">Maintenance</router-link>
+                                                        <span></span>
+                                                    </div>
+												</h4>
+											</div>
+											<div id="settings" class="panel-collapse collapse">
+												<div class="panel-body" v-show="false"></div>
+											</div>
+										</div>
+										<div class="panel panel-default">
+											<div class="panel-heading">
+												<h4 class="panel-title">
+                                                    <div class="dflex d-align-center">
+                                                        <!-- <a data-toggle="collapse" data-parent="#accordion" href="#settings" class="accordion-menu">Settings</a> -->
+														<!-- <router-link @click.native="hideMobileNav" to="/settings" class="accordion-menu collapseall">Maintenance</router-link> -->
+														<router-link @click.native="hideMobileNav" to="/manage-comp-profile">Organizational Chart</router-link>
                                                         <span></span>
                                                     </div>
 												</h4>
@@ -511,8 +536,8 @@
 		</div> <!--ROOT-->
             <script src="{{URL::asset('resources/assets/js/jquery/jquery3.3.1.min.js')}}"></script>
 
-			<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
-			<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
+			<link href="{{ URL::asset('resources/assets/js/summernote/summernote.min.css') }}" rel="stylesheet">
+			<script src="{{ URL::asset('resources/assets/js/summernote/summernote.min.js') }}"></script>
 
 
 			<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.js"></script> -->

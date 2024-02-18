@@ -8,11 +8,11 @@
                             <table width="100%" class="table table-hover mdb-table">
                                     <thead>
                                         <tr>
-                                            <th class="text-center" width="200px">DATE</th>
-                                            <th class="text-center">TIME IN (AM)</th>
-                                            <th class="text-center">TIME OUT (AM)</th>
-                                            <th class="text-center">TIME IN (PM)</th>
-                                            <th class="text-center">TIME OUT (PM)</th>
+                                            <th class="text-center" style="min-width:100px; width: 100px;">DATE</th>
+                                            <th class="text-center" style="min-width:100px;">TIME IN (AM)</th>
+                                            <th class="text-center" style="min-width:100px;">TIME OUT (AM)</th>
+                                            <th class="text-center" style="min-width:100px;">TIME IN (PM)</th>
+                                            <th class="text-center" style="min-width:100px;">TIME OUT (PM)</th>
                                             <th class="text-center" colspan="2">REASON</th>
 
                                         </tr>
@@ -25,7 +25,7 @@
                                             <td>
                                                 <div class="mdb-form-field form-group-limit">
                                                     <div class="form-field__control form-field--is-filled">
-                                                        <input type="time" name="timein" v-model="timein" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <input type="time" name="timein" v-model="timein" v-validate="''" class="form-field__input inline-input" >
                                                         <div class="form-field__bar"></div>
                                                     </div>
                                                     <span class="errors">{{ errors.first('timein') }}</span>
@@ -34,7 +34,7 @@
                                             <td>
                                                 <div class="mdb-form-field form-group-limit">
                                                     <div class="form-field__control form-field--is-filled">
-                                                        <input type="time" name="timeout" v-model="timeout" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <input type="time" name="timeout" v-model="timeout" v-validate="''" class="form-field__input inline-input" >
                                                         <div class="form-field__bar"></div>
                                                     </div>
                                                     <span class="errors">{{ errors.first('timeout') }}</span>
@@ -44,7 +44,7 @@
                                             <td>
                                                 <div class="mdb-form-field form-group-limit">
                                                     <div class="form-field__control form-field--is-filled">
-                                                        <input type="time" name="timein" v-model="timein2" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <input type="time" name="timein" v-model="timein2" v-validate="''" class="form-field__input inline-input" >
                                                         <div class="form-field__bar"></div>
                                                     </div>
                                                     <span class="errors">{{ errors.first('timein2') }}</span>
@@ -53,7 +53,7 @@
                                             <td>
                                                 <div class="mdb-form-field form-group-limit">
                                                     <div class="form-field__control form-field--is-filled">
-                                                        <input type="time" name="timeout" v-model="timeout2" v-validate="'is_time|required'" class="form-field__input inline-input" >
+                                                        <input type="time" name="timeout" v-model="timeout2" v-validate="''" class="form-field__input inline-input" >
                                                         <div class="form-field__bar"></div>
                                                     </div>
                                                     <span class="errors">{{ errors.first('timeout2') }}</span>
@@ -69,6 +69,9 @@
                                                             <option :value="'Out of town for buiness travel'">Out of town for buiness travel</option>
                                                             <option :value="'Multiple logs'">Multiple logs</option>
                                                             <option :value="'Out of office on officials'">Out of office on officials</option>
+                                                            <option :value="'Biometric Problem'">Biometric Problem</option>
+                                                            <option :value="'Work Suspension due to bad weather'">Work Suspension due to bad weather</option>
+                                                            <option :value="'Company Discretionary no Work/Early out'">Company Discretionary no Work/Early out</option>åå
                                                         </select>
                                                         <div class="form-field__bar"></div>
                                                     </div>
@@ -88,7 +91,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(item, index) in entries" :key="index">
+                                        <tr v-for="(item, index) in entries" :key="index" class="text-center">
                                             <td>
                                                 <div>
                                                     <span style="padding: 0 12px;">
@@ -162,6 +165,18 @@
                         </div>
                 </div>
                 <div class="clearfix"></div> -->
+                <div class="clearfix"></div>
+                <div class="col-lg-12">
+                    <h5 class="form-subtitle"></h5>
+                    <div class="mdb-form-field">
+                            <div class="form-field__control mdb-bgcolor">
+                                <textarea :disabled="$parent.disabledinput" class="form-field__textarea" v-validate="'required'" id="" cols="4" rows="4" v-model="detailedreason" name="detailedreason"></textarea>
+                                <label class="form-field__label">Detailed Reason</label>
+                                <div class="form-field__bar"></div>
+                            </div>
+                            <span class="errors">{{ errors.first('detailedreason') }}</span>
+                    </div>
+                </div>
                 <div class="col-lg-12">
                     <h5 class="form-subtitle"><em>Requested By</em></h5>
                 </div>
@@ -275,11 +290,11 @@
                 </div>
                 <div class="clearfix"></div>
                     <div class="modal-footer">
-                        <em style="color: red;" v-if="!witnesses_list">No witness is set. please contact your I.T Administrator &nbsp;&nbsp;</em>
+                        <em style="color: red;" v-if="!witnesses_list">No witness is set. please contact HR Department &nbsp;&nbsp;</em>
                         <input type="submit" class="btn btn-primary" value="Verify as witness" @click.prevent="confirmWitness" :disabled="isDisable || !isFormValid || !hasEntries" v-if="$parent.witness_approval">
-                        <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addSupplementary" :disabled="isDisable || !isFormValid || !hasEntries || !witnesses_list" v-if="!supID && $parent.$data.forapprover != 'approval'">
+                        <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addSupplementary" :disabled="disabledIfNoApprover || isDisable || !isFormValid || !hasEntries || !witnesses_list" v-if="!supID && $parent.$data.forapprover != 'approval'">
                         <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateSupplementary" :disabled="isDisable || !isFormValid || !hasEntries" v-if="supID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput">
-                        <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteSupplementary" :disabled="isDisable" v-if="supID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
+                        <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteSupplementary" :disabled="isDisable" v-if="supID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput">
                         <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionSupplementary(2)" v-if="supID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel " :disabled="selected.status < 1">
                         <input type="submit" class="btn btn-primary" value="Reject" @click.prevent="requestActionSupplementary(3)" v-if="supID && $parent.$data.forapprover == 'approval' && !$parent.$data.isCancel" :disabled="selected.status < 1">
                         <input type="submit" class="btn btn-primary" value="Cancel" @click.prevent="requestActionSupplementary(1)" v-if="supID && $parent.$data.forapprover == 'approval' && $parent.$data.isCancel" :disabled="selected.status < 1">
@@ -300,16 +315,16 @@ export default {
 			isDisable: false,
             datefiled: moment(new Date()).format('MM/DD/YYYY'),
             supdate: moment(new Date()).format('YYYY/MM/DD'),
-            // supdate: moment(new Date()).format('MM/DD/YYYY'),
-            // timein: moment(new Date()).format('HH:mm'),
-            // timeout: moment(new Date()).add(30, 'minutes').format('HH:mm'),
-            // timein2: moment(new Date().setHours(13,0,0,0)).format('HH:mm'),
+            timein: '',
+            timeout: '',
+            timein2: '',
+            timeout2: '',
+
+
+            // timein: moment(new Date().setHours(8,0,0,0)).format('HH:mm'),
+            // timeout: moment(new Date().setHours(12,0,0,0)).format('HH:mm'),
+            // timein2: moment(new Date().setHours(12,0,0,0)).format('HH:mm'),
             // timeout2: moment(new Date().setHours(17,0,0,0)).format('HH:mm'),
-            supdate: moment(new Date()).format('YYYY/MM/DD'),
-            timein: moment(new Date().setHours(24,0,0,0)).format('HH:mm'),
-            timeout: moment(new Date().setHours(24,0,0,0)).format('HH:mm'),
-            timein2: moment(new Date().setHours(24,0,0,0)).format('HH:mm'),
-            timeout2: moment(new Date().setHours(24,0,0,0)).format('HH:mm'),
             entries: [],
             brand: 1,
             reason: 'Failure to log-in / out',
@@ -318,6 +333,7 @@ export default {
             witnesses_list: '',
             approvedby: '',
             remarks: '',
+            detailedreason: '',
 		}
     },
     watch:{
@@ -366,16 +382,21 @@ export default {
             */
         },
         addSupplementary(){
+            
             if(this.isFormValid)
             {
-
+                this.isDisable = true;
                 let params = this.$data;
                 // params['reciever_emails'] = this.$parent.reciever_emails;
                 params['reciever_emails'] = witness_emails;
                 axios.post('api/addSupplementary', params).then((response)=>{
+                    // this.isDisable = false;
                     this.$parent.addRow(response.data);
                     this.closeModal();
-                }).catch((err)=>{console.log(err);});
+                }).catch((err)=>{
+                    // this.isDisable = false;
+                    console.log(err);
+                });
             }
         },
         updateSupplementary(){
@@ -397,28 +418,29 @@ export default {
             }).catch((err)=>{ console.log(err); });
         },
         appendTable(){
-                this.$validator.validate('timein', this.timein);
-                this.$validator.validate('timeout', this.timeout);
+                // this.$validator.validate('timein', this.timein);
+                // this.$validator.validate('timeout', this.timeout);
+
                 // this.$validator.validate('reason', this.reason);
 
-                if(regex.test(this.timein) && regex.test(this.timeout) && this.reason !='')
-                {
+                // if(regex.test(this.timein) && regex.test(this.timeout) && this.reason !='')
+                // {
                     this.entries.push({
                         supdate: this.supdate,
-                        timein: moment(this.timein, ["HH:mm"]).format('hh:mm A'),
-                        timeout: moment(this.timeout, ["HH:mm"]).format('hh:mm A'),
-                        timein2: moment(this.timein2, ["HH:mm"]).format('hh:mm A'),
-                        timeout2: moment(this.timeout2, ["HH:mm"]).format('hh:mm A'),
+                        timein: this.timein? moment(this.timein, ["HH:mm"]).format('hh:mm A') : '',
+                        timeout: this.timeout? moment(this.timeout, ["HH:mm"]).format('hh:mm A') : '',
+                        timein2: this.timein2? moment(this.timein2, ["HH:mm"]).format('hh:mm A') : '',
+                        timeout2: this.timeout2? moment(this.timeout2, ["HH:mm"]).format('hh:mm A') : '',
                         reason: this.reason
                     });
                     this.reason = '';
                     this.supdate = moment(new Date()).format('YYYY/MM/DD');
-                    this.timein = moment(new Date().setHours(24,0,0,0)).format('HH:mm');
-                    this.timeout = moment(new Date().setHours(24,0,0,0)).format('HH:mm');
-                    this.timein2 = moment(new Date().setHours(24,0,0,0)).format('HH:mm');
-                    this.timeout2 = moment(new Date().setHours(24,0,0,0)).format('HH:mm');
+                    this.timein =  '';
+                    this.timeout = '';
+                    this.timein2 = '';
+                    this.timeout2 = '';
 
-                }
+                // }
 
         },
         removeRow(index)
@@ -445,7 +467,7 @@ export default {
                 if(i != 'isDisable' && i != 'supdate' &&
                     i != 'timein' && i != 'timeout' &&
                     i != 'timein2' && i != 'timeout2' )
-                    this.$data[i] = data[i];
+                    this.$data[i] = data[i]; //moment(this.timein, ["HH:mm"]).format('hh:mm A');
                 if(i == 'brand')
                     this.$data[i] = (brand.indexOf(data[i]) + 1);
             }
@@ -459,7 +481,7 @@ export default {
         closeModal(){
             let obj = this.$data;
             Object.keys(obj).forEach((key)=>{
-                if(key == 'witnesses' || key == 'supID'){
+                if(key == 'witnesses' || key == 'supID' || key == 'detailedreason'){
                     this.$data[key] = '';
                 }
                 if(key == 'brand')
@@ -472,6 +494,9 @@ export default {
                 if(key === 'entries')
                 {
                     this.$data[key] = [];
+                }
+                if(key === 'datefiled'){
+                    this.$data[key] = moment(new Date()).format('MM/DD/YYYY');
                 }
 
             });
@@ -505,6 +530,9 @@ export default {
 
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         confirm_witness(){
             // return this.witnesses.slice(2);
             return this.witnesses;

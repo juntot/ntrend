@@ -76,7 +76,7 @@
 
 
 <script>
-
+	localStorage.clear();
 	Vue.use(VeeValidate,{local: 'en'});
 
 	 new Vue({

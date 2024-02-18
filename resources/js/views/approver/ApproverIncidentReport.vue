@@ -1,3 +1,17 @@
+<style>
+.td-approve {
+  color: #2979ff !important;
+}
+.td-reject {
+  color: #ab003c !important;
+}
+.td-close {
+  color: #00a732 !important;
+}
+.td-endorse {
+  color: #651fff !important;
+}
+</style>
 <template>
     <div>
         <div id="loader2" v-if="loader">
@@ -34,12 +48,12 @@
 </template>
 <script>
 import ManageIncidentReport from '../../components/public/ManageIncidentReport';
-let incidenttype = [
-        'Inventory Discrepancy', 'Habitual Tardiness', 'Habitual Absences', 'TYREPLUSAbsence w/o official leave', 'Insubordination',
-        'Non-compliance to policies/procedures', 'Delivery Discrepancy', 'Theft', 'Falsification/Tampering of Documents', 'Loss/Damage of Company Property',
-        'Non remittance/short of collections', 'Others'
-    ];
-let status = ['Pending', 'Approved', 'Rejected'];
+// let incidenttype = [
+//         'Inventory Discrepancy', 'Habitual Tardiness', 'Habitual Absences', 'TYREPLUSAbsence w/o official leave', 'Insubordination',
+//         'Non-compliance to policies/procedures', 'Delivery Discrepancy', 'Theft', 'Falsification/Tampering of Documents', 'Loss/Damage of Company Property',
+//         'Non remittance/short of collections', 'Others'
+//     ];
+// let status = ['Pending', 'Approved', 'Rejected'];
 
 export default {
     components:{
@@ -62,12 +76,12 @@ export default {
         rows(val, old){
             let row = val;
 
-            row.forEach((item, index)=>{
-                if(!isNaN(item.incidenttype) && !isNaN(item.status)){
-                    row[index]['incidenttype'] = incidenttype[item.incidenttype - 1];
-                    row[index]['status'] = status[item.status];
-                }
-            });
+            // row.forEach((item, index)=>{
+            //     if(!isNaN(item.incidenttype) && !isNaN(item.status)){
+            //         row[index]['incidenttype'] = incidenttype[item.incidenttype - 1];
+            //         row[index]['status'] = status[item.status];
+            //     }
+            // });
             this.dtHandle.clear();
             this.dtHandle.rows.add(row);
             this.dtHandle.draw();
@@ -96,11 +110,8 @@ export default {
             row.forEach((item, index)=>{
                 if(item.incidentID == val.incidentID)
                 {
-                    let data = item;
-                    data['status'] = status[val.status];
-                    data['remarks'] = val.remarks;
                     this.$data.rows.splice(index, 1);
-                    this.$data.rows.unshift(data);
+                    this.$data.rows.unshift(val);
                 }
             });
 
@@ -113,6 +124,32 @@ export default {
         closeModal(){
             this.isCancel = false;
             this.selected = {};
+        },
+        renderDisciplinaryAction(row){
+            let finalActionTaken = 'N/A';
+            if(row.status == 3){
+                if(row.disciplinaryaction2 && row.disciplinaryaction2 != 'N/A'){
+                    finalActionTaken = row.disciplinaryaction2;   
+                }
+                else if(row.actionTaken2 && row.actionTaken2 != 'N/A'){
+                    finalActionTaken = row.actionTaken2;
+                }
+                else if(row.disciplinaryaction1 && row.disciplinaryaction1 != 'N/A'){
+                    finalActionTaken = row.disciplinaryaction1;
+                }
+                else if(row.actionTaken1 && row.actionTaken1 != 'N/A'){
+                    finalActionTaken = row.actionTaken2;
+                }else if(row.disciplinaryaction && row.disciplinaryaction != 'N/A'){
+                    finalActionTaken = row.disciplinaryaction;
+                }else{
+                    finalActionTaken = row.actionTaken;
+                }
+                
+            }
+            // if(row.status = 4)
+            // finalActionTaken = 'Rejected';
+
+            return finalActionTaken;
         }
     },
     created(){
@@ -122,7 +159,8 @@ export default {
     mounted(){
 
         this.forapprover = ((this.$route.path).slice(1)).toLowerCase().split('-')[0];
-        this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
+        // this.formtitle = ((this.$router.currentRoute.path).slice(1)).replace(/-/g, ' ').toUpperCase();
+        this.formtitle = this.$route.name;
 
         axios.get('api/approvalIncidentReportRequest').then((response)=>{
             this.loader = false;
@@ -137,7 +175,8 @@ export default {
                         var month = parseInt(dateA[0], 10);
                         var year = parseInt(dateA[2], 10);
                         var date = new Date(year, month - 1, day)
-                        x = date.getTime();
+                        // x = date.getTime();
+                        x = moment(a).valueOf();
                     }
                     catch (err) {
                         x = new Date().getTime();
@@ -163,17 +202,21 @@ export default {
             "sPaginationType": "simple_numbers",
             "dom": '<"top with-margin-bottom"f>rt<"mdl-grid"<"mdl-cell mdl-cell--4-col"i><"mdl-cell mdl-cell--8-col"p>><"clear">',
             "scrollX": true,
-            "order": [[ 3, "desc" ]],
+            "order": [[ 0, "desc" ]],
             "rowCallback": function(row, data, index) {
+                
                 var cellValue = data["status"];
-                    if (cellValue=="Pending") {
-                       $(row).addClass("tr-pending");
+                    if (cellValue==1 && !data['endorse2']) { // approved
+                       $(row).addClass("td-approve");
                     }
-                    if (cellValue=="Approved") {
-                       $(row).addClass("tr-approved");
+                    if (cellValue==2 || (cellValue == 1 && data['endorse1'])) { // rejected
+                       $(row).addClass("td-endorse");
                     }
-                    if (cellValue=="Rejected") {
-                       $(row).addClass("tr-rejected");
+                    if (cellValue==3) { // executed
+                       $(row).addClass("td-close");
+                    }
+                    if (cellValue==4) { // executed
+                       $(row).addClass("td-reject");
                     }
 
                 }
@@ -187,7 +230,7 @@ export default {
                 var tr = $(this).closest('tr');
                 var row = table.row( tr );
                 // CHECK IF STATUS IS APPROVED TO BE READY FOR CANCELLATION
-                if(status.indexOf(row.data().status) >= 1){
+                if((row.data().status) >= 3){
                     self.isCancel = true;
                 }
                 let dataforedit = row.data();
@@ -206,22 +249,40 @@ export default {
 
         let columnDefs = [
         {
-            title: "INCIDENT ID", data: 'incidentID', visible: false,
+            title: "Incident #", className:"td-ellipses row-limit-sm",  data: 'incidentID', visible: true,
         },
         {
-            title: "Employee ID", data: 'empID_'
-        },{
-            title: "Employee Name", data: 'fullname'
+            title: "Date Filed", className:"td-ellipses row-limit-sm",  data: 'datefiled'
         },
-
         {
-            title: "Date Filed", data: 'datefiled'
-        },{
-            title: "Nature of incident", data: 'incidenttype'
-        },{
-            title: "Details of incident", data: 'details', className: "row-limit"
-        },{
-            title: "Status", data: 'status'
+            title: "Person Involved", className:"td-ellipses row-limit-sm",  data: 'search_employee'
+        },
+        {
+            title: "Disciplinary Action", className:"td-ellipses row-limit-sm",  render: (data, type, row)=>{
+                return this.renderDisciplinaryAction(row);
+            }
+        },
+        {
+            title: "Nature of incident", className:"td-ellipses row-limit-sm",  data: 'incidenttype'
+        },
+        // {
+        //     title: "Details of incident", className:"td-ellipses row-limit-sm",  data: 'details', className: "row-limit"
+        // },
+        {
+            title: "Status", className:"td-ellipses row-limit-sm",  data: 'status',
+            render: function(data){
+                /**
+                 * 0 pending
+                 * 1 endorse 1
+                 * 2 endorse 2
+                 * 3 close
+                 * 4 rejected
+                 */
+                return data == 0 ? 'Pending':
+                       data == 1 || data == 2 ? 'Further Investigation':
+                    //    data == 2 ? '2nd Endorsed': 
+                       data == 3 ? 'Closed': 'Rejected';
+            }
         }];
 
 

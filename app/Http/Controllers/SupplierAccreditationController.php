@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\UserSession;
+use App\Services\FormApproverService;
 use DB;
 
 class SupplierAccreditationController extends Controller
@@ -50,7 +51,7 @@ class SupplierAccreditationController extends Controller
     // DELETE
     public function deleteSupplierAccreditation($accredID  = null){
         DB::table('formaccreditation')->where('accredID', '=', $accredID)
-        ->update(['recstat' => 1]);
+        ->update(['recstat' => 404]);
         // ->delete();
     }
 
@@ -60,7 +61,7 @@ class SupplierAccreditationController extends Controller
         $data = DB::select('select form.*,
         DATE_FORMAT(form.datefiled, "%m/%d/%Y") as datefiled,
         CONCAT(emp.fname," ", emp.lname) as approvedby from formaccreditation form left join employee emp on
-        form.approvedby = emp.empID where form.recstat != 1 and form.empID_ = :empid', [UserSession::getSessionID()]);
+        form.approvedby = emp.empID where form.recstat = 0 and form.empID_ = :empid', [UserSession::getSessionID()]);
 
         return $data;
     }
@@ -69,7 +70,9 @@ class SupplierAccreditationController extends Controller
     // GET SupplierAccreditation FORM EMPLOYEE APPROVERS
     public function getSupplierAccreditationApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Supplier0Accreditation = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Supplier0Accreditation = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers, emp.email from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Supplier0Accreditation = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Supplier0Accreditation');
         return $data;
     }
 
@@ -84,7 +87,7 @@ class SupplierAccreditationController extends Controller
             right join employee emp
             on emp.empID = eaccredit.empID_
         where eform.approverID_ = :approverID and
-        eaccredit.recstat != 1', [UserSession::getSessionID()]);
+        eaccredit.recstat = 0', [UserSession::getSessionID()]);
 
         // $data = DB::select('select eaccredit.*, CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname
         //                     from formaccreditation eaccredit left join eformapproverbyemp eform

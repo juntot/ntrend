@@ -134,20 +134,34 @@ export default {
         setInit(data = null){
             this.rows = data;
         },
+        getDuration(from, to) {
+              
+            var ms = moment(to,"YYYY-MM-DD HH:mm:ss").diff(moment(from,"YYYY-MM-DD HH:mm:ss"));
+            var d = moment.duration(ms);
+            var s = Math.floor(d.asHours()) + moment.utc(ms).format(":mm:ss");
+            
+            s = s.slice(0, (s.indexOf(':'))).length <= 1 ? '0'+s: s;
+
+            return s || '';
+        },
         downloadXLS(){
 
             let wb = XLSX.utils.book_new();
 
             let rows = [];
             let header = [
+                            'WRF #',
                             'EMPLOYEE ID', 'EMPLOYEE NAME', 'DEPARTMENT NAME', 'POSITION', 'BRANCH',
-                            'DATE FILED', 'DATE NEEDED', 'URGENCY', 'TYPE OF WORK', 'DATE FROM', 'DATE TO',
+                            'DATE FILED', 'TIME CREATED', 'DATE NEEDED', 'URGENCY', 'TYPE OF WORK', 'PREFERRED IT', 'DATE FROM', 'DATE TO',
                             'REQUEST TYPE', 'CONTACT NUMBER', 'REQUEST DETAILS',
                             'APPROVER', 'EXECUTED BY', 'APPROVED DATE', 'EXECUTED DATE','EXECUTED TIME',
                             'CONFIRMED DATE', 'CONFIRMED TIME',
                             'REMARKS', 'STATUS',
+                            'REQUEST TO EXECUTE DURATION',
                             'REQUEST TO APPROVED DURATION', 'APPROVED TO EXECUTION DURATION', 
-                            'EXECUTED TO CONFIRMED DURATION', 'REQUEST TO CONFIRMED DURATION'
+                            'EXECUTED TO CONFIRMED DURATION', 'REQUEST TO CONFIRMED DURATION',
+                            'RE GRADE', 'AE GRADE', 'RC GRADE',
+
                         ];
             rows.push(header);
 
@@ -159,23 +173,63 @@ export default {
                           obj.status == 3? 'Executed':
                           obj.status == 4? 'Confirmed' : 'Pending';
 
-                worktype = obj.worktype > 1? 'Permanent' : 'Temporary';
+                worktype = obj.worktype > 1? 'Permanent' : obj.worktype == 1? 'Temporary': '';
                 date_from = obj.worktype == 1? obj.date_from : '';
                 date_to = obj.worktype == 1? obj.date_to : '';
 
+
+                let requestToExecution = this.getDuration(obj.datefiled_datetime, obj.exec_datetime);
+                let approveToExecution = this.getDuration(obj.approveddate, obj.exec_datetime);
+                let requestToConfirm   = this.getDuration(obj.datefiled_datetime, obj.confirm_datetime);
+
+                let urgencyType = obj.urgency;
+                if(urgencyType == 'Highest')
+                    urgencyType = 2;
+                
+                if(urgencyType == 'High')
+                    urgencyType = 48;
+                
+                if(urgencyType == 'Medium')
+                    urgencyType = 144;
+
+                if(urgencyType == 'Low')
+                    urgencyType = 384;
+
+                if(urgencyType == 'Lowest')
+                    urgencyType = 768;
+                
                 let records = [
+                            obj.workID,
                             obj.empID_, obj.fullname, obj.deptname, obj.posname,
-                            obj.branchname, obj.datefiled, obj.dateneed, obj.urgency,
-                            worktype, date_from, date_to, obj.request_type,
+                            obj.branchname, obj.datefiled, moment(obj.datefiled_datetime).format('HH:mm:ss'), obj.dateneed, obj.urgency,
+                            worktype, obj.preferredIT,date_from, date_to, obj.request_type,
                             obj.mobile, obj.reason, obj.approvedby_, obj.executedby_, obj.approveddate,
                             moment(obj.exec_datetime).format('YYYY-MM-DD'), moment(obj.exec_datetime).format('HH:mm:ss'),
                             moment(obj.confirm_datetime).format('YYYY-MM-DD'), moment(obj.confirm_datetime).format('HH:mm:ss'),
                             obj.remarks, status,
 
-                            moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.datefiled_datetime, "HH:mm:ss"))).format("HH:mm:ss"),
-                            moment.utc(moment(obj.exec_datetime, "HH:mm:ss").diff(moment(obj.approveddate, "HH:mm:ss"))).format("HH:mm:ss"),
-                            moment.utc(moment(obj.confirm_datetime, "HH:mm:ss").diff(moment(obj.exec_datetime, "HH:mm:ss"))).format("HH:mm:ss"),
-                            moment.utc(moment(obj.confirm_datetime, "HH:mm:ss").diff(moment(obj.datefiled_datetime, "HH:mm:ss"))).format("HH:mm:ss"),
+                            // request to execution
+                            requestToExecution, // this.getDuration(obj.datefiled_datetime, obj.exec_datetime),
+
+                            this.getDuration(obj.datefiled_datetime, obj.approveddate),
+                            // moment.utc(moment(obj.approveddate, "HH:mm:ss").diff(moment(obj.datefiled_datetime, "HH:mm:ss"))).format("HH:mm:ss"),
+                            
+                            // approve to execution
+                            approveToExecution, // this.getDuration(obj.approveddate, obj.exec_datetime),
+                            // moment.utc(moment(obj.exec_datetime, "HH:mm:ss").diff(moment(obj.approveddate, "HH:mm:ss"))).format("HH:mm:ss"),
+                            
+                            this.getDuration(obj.exec_datetime, obj.confirm_datetime),
+                            // moment.utc(moment(obj.confirm_datetime, "HH:mm:ss").diff(moment(obj.exec_datetime, "HH:mm:ss"))).format("HH:mm:ss"),
+
+                            // request to confirm
+                            requestToConfirm, // this.getDuration(obj.datefiled_datetime, obj.confirm_datetime),
+                            // moment.utc(moment(obj.confirm_datetime, "HH:mm:ss").diff(moment(obj.datefiled_datetime, "HH:mm:ss"))).format("HH:mm:ss"),
+
+                            urgencyType >= parseInt(requestToExecution.slice(0, (requestToExecution.indexOf(':')))) ? 'PASSED': 'FAILED',
+                            urgencyType >= parseInt(approveToExecution.slice(0, (approveToExecution.indexOf(':')))) ? 'PASSED': 'FAILED',
+                            urgencyType >= parseInt(requestToConfirm.slice(0, (requestToConfirm.indexOf(':')))) ? 'PASSED': 'FAILED',
+
+
                         ];
                 // records.push();
                 rows.push(records);

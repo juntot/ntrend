@@ -175,7 +175,7 @@
             </div>
             <div class="clearfix"></div>
             <div class="modal-footer">
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addCard" :disabled="isDisable || !isFormValid || !isBtnValid" v-if="submitBtn">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addCard" :disabled="disabledIfNoApprover || isDisable || !isFormValid || !isBtnValid" v-if="submitBtn">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateCard" :disabled="isDisable || !isFormValid || !isBtnValid" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteCard" :disabled="isDisable" v-if="updateDeleteBtn">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionCard(1)" v-if="approveRejecBtn">
@@ -328,6 +328,9 @@ export default {
         },
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         isFormValid(){
             return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },

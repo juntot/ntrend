@@ -24,11 +24,11 @@ import Settings from './views/Settings';
 import TermsCondition from './views/TermsCondition';
 import PageNotFound from './views/404';
 import AdminCalendar from './calendar_view/Admin_Calendar'
-
+import EmployeeSettings from './views/settings_details/EmployeeSettings'
 export default{
 
     mode: 'history',
-    base: '/ntrends/',
+    // base: '/ntrends/',
     routes:[
         // graph
         {
@@ -51,6 +51,10 @@ export default{
         {
             path: '/user-role',
             component: UserRole,
+        },
+        {
+            path:'/resigned-users',
+            component: EmployeeSettings
         },
         // jobposition
         {

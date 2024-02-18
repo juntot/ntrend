@@ -123,7 +123,15 @@ class SettingsController extends Controller
     }
 
     public function getFormRecords(){
+        // return request()->all();
 
+        if(request('td') == 'formtransmittal') {
+            request()->merge([
+                'datefrom' => UserSession::formatDate(request()->datefrom, 'Y-m-d 00:00:00'),
+                'dateto' => UserSession::formatDate(request()->dateto, 'Y-m-d 23:59:59'),
+            ]);
+        }
+        // return request()->all();
         // $data = DB::table(request(''))->select('name', 'email as user_email')->get();
         $sql = "select form.status, form.datefiled, CONCAT(emp.fname, emp.lname) as fullname,
                 dept.deptname, comp.compname, pos.posname, brch.branchname
@@ -141,6 +149,25 @@ class SettingsController extends Controller
                 where form.status = ".request('status')."
                 and form.datefiled between :datefrom and :dateto
                 and form.recstat = 0";
+        
+        if(request('td') == 'formoverride') {
+            $sql = "select form.status, form.dateoverride as datefiled, CONCAT(emp.fname, emp.lname) as fullname,
+            dept.deptname, comp.compname, pos.posname, brch.branchname
+                from ".request('td')." form
+                inner join employee emp
+                    on form.empID_ = emp.empID
+                inner join department dept
+                    on emp.deptID_ = dept.deptID
+                inner join companytbl comp
+                    on emp.compID_ = comp.compID
+                inner join positiontbl pos
+                    on emp.posID_ = pos.posID
+                inner join branchtbl brch
+                    on emp.branchID_ = brch.branchID
+            where form.status = ".request('status')."
+            and DATE(form.dateoverride) between :datefrom and :dateto
+            and form.recstat = 0";
+        }
 
         if(request()->has('recstat')){
            $sql = "select form.status, form.datefiled, CONCAT(emp.fname, emp.lname) as fullname,
@@ -159,6 +186,62 @@ class SettingsController extends Controller
                 where form.recstat = 1
                 and form.datefiled between :datefrom and :dateto";
         }
+
+        if(request()->has('recstat') && request('td') == 'formoverride'){
+            $sql = "select form.status, form.dateoverride as datefiled, CONCAT(emp.fname, emp.lname) as fullname,
+                 dept.deptname, comp.compname, pos.posname, brch.branchname
+                     from ".request('td')." form
+                     inner join employee emp
+                         on form.empID_ = emp.empID
+                     inner join department dept
+                         on emp.deptID_ = dept.deptID
+                     inner join companytbl comp
+                         on emp.compID_ = comp.compID
+                     inner join positiontbl pos
+                         on emp.posID_ = pos.posID
+                     inner join branchtbl brch
+                         on emp.branchID_ = brch.branchID
+                 where form.recstat = 1
+                 and DATE(form.dateoverride) between :datefrom and :dateto";
+         }
+
+        //  enrollment program
+         if(!request()->has('recstat') && request('td') == 'formsalesprogramenrollment'){
+            $sql = "select form.status, form.dateenrolled as datefiled, CONCAT(emp.fname, emp.lname) as fullname,
+                dept.deptname, comp.compname, pos.posname, brch.branchname
+                    from ".request('td')." form
+                    inner join employee emp
+                        on form.empID_ = emp.empID
+                    inner join department dept
+                        on emp.deptID_ = dept.deptID
+                    inner join companytbl comp
+                        on emp.compID_ = comp.compID
+                    inner join positiontbl pos
+                        on emp.posID_ = pos.posID
+                    inner join branchtbl brch
+                        on emp.branchID_ = brch.branchID
+                where form.status = ".request('status')."
+                and form.dateenrolled between :datefrom and :dateto
+                and form.recstat = 0";
+         }
+         if(request()->has('recstat') && request('td') == 'formsalesprogramenrollment'){
+            $sql = "select form.status, form.dateenrolled as datefiled, CONCAT(emp.fname, emp.lname) as fullname,
+                 dept.deptname, comp.compname, pos.posname, brch.branchname
+                     from ".request('td')." form
+                     inner join employee emp
+                         on form.empID_ = emp.empID
+                     inner join department dept
+                         on emp.deptID_ = dept.deptID
+                     inner join companytbl comp
+                         on emp.compID_ = comp.compID
+                     inner join positiontbl pos
+                         on emp.posID_ = pos.posID
+                     inner join branchtbl brch
+                         on emp.branchID_ = brch.branchID
+                 where form.recstat = 1
+                 and DATE(form.dateenrolled) between :datefrom and :dateto";
+         }
+
         $data = DB::select($sql, [
             request('datefrom'),
             request('dateto')
@@ -169,7 +252,19 @@ class SettingsController extends Controller
 
     public function enableFormRecords(){
         $sql = "update ".request('td')." set recstat = 0
-                where datefiled between :datefrom and :dateto";
+                where recstat = 1
+                and datefiled between :datefrom and :dateto";
+
+        if(request('td') == 'formoverride') {
+            $sql = "update ".request('td')." set recstat = 0
+                where DATE(dateoverride) between :datefrom and :dateto";
+        }
+
+        if(request('td') == 'formsalesprogramenrollment') {
+            $sql = "update ".request('td')." set recstat = 0
+                where DATE(dateenrolled) between :datefrom and :dateto";
+        }
+
         DB::statement($sql,  [
             request('datefrom'),
             request('dateto')
@@ -183,6 +278,17 @@ class SettingsController extends Controller
         $sql = "update ".request('td')." set recstat = 1
                     where status = ".request('status')."
                 and datefiled between :datefrom and :dateto";
+        if(request('td') == 'formoverride') {
+        $sql = "update ".request('td')." set recstat = 1
+            where status = ".request('status')."
+            and DATE(dateoverride) between :datefrom and :dateto";
+        }
+
+        if(request('td') == 'formsalesprogramenrollment') {
+            $sql = "update ".request('td')." set recstat = 1
+                where status = ".request('status')."
+                and DATE(dateenrolled) between :datefrom and :dateto";
+        }
         DB::statement($sql,  [
             request('datefrom'),
             request('dateto')
@@ -362,7 +468,7 @@ class SettingsController extends Controller
                 // if(array_key_exists($value->groupname, $nav_list)){
                 //     $nav_list[$value->groupname][] = ['navname'=>$value->navname];
                 // }else{
-                    $nav_list[$value->groupname][] = ['navname'=>$value->navname];
+                    $nav_list[$value->groupname][] = ['navname'=>$value->navname, 'navtitle' => $value->formtitle];
                 // }
 
             }
@@ -391,7 +497,7 @@ class SettingsController extends Controller
                     $formcol = str_replace(' ','0', $value->navname);
                     $formcol = str_replace('-','_', $formcol);
                     $formcol = str_replace('&','8', $formcol);
-                    $nav_list[$value->groupname][] = ['navname'=>$value->navname, 'formcode'=> $value->td, 'col' => $formcol];
+                    $nav_list[$value->groupname][] = ['navname'=>$value->navname, 'formcode'=> $value->td, 'col' => $formcol, 'navtitle' => $value->formtitle];
                 // }
 
             }
@@ -399,7 +505,7 @@ class SettingsController extends Controller
         return $nav_list;
         // return $nav_user;
     }
-
+    
 
     // OVERRIDE SETTINGS
     function getOverrideSetting() {
@@ -417,7 +523,7 @@ class SettingsController extends Controller
             ->select('json')
             ->where('type', request('type'))
             ->get();
-
+        
         if($getData) {
             // return $getData[0]->json;
             $arr = json_decode($getData[0]->json, true);
@@ -450,6 +556,10 @@ class SettingsController extends Controller
             foreach($arr as $item) { //foreach element in $arr
                 if($item['id'] == request('id')) {
                     $item['name'] = request('name');
+                    if(request('type') == 'company'){
+                        $item['user'] = request('user');
+                        $item['pwd'] = request('pwd');
+                    }
                     $temp[] = $item;
                 }else{
                     $temp[] = $item;
@@ -487,5 +597,19 @@ class SettingsController extends Controller
             return request()->all();
             
         }
+    }
+
+
+    /*
+    * MY CALENDAR =================================================
+    */
+    public function getCalendarNotes(){
+        $data = DB::table('general_settings')->select('my_calendar_notes')->first();
+        return $data->my_calendar_notes;
+    }
+
+    public function addCalendarNotes(){
+        DB::table('general_settings')->updateOrInsert(['id'=>1], request()->all());
+        return request()->all();
     }
 }

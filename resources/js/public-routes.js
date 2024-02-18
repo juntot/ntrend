@@ -20,6 +20,11 @@ import UrgentCheck from './views/public/UrgentCheck';
 import SupplierAccreditation from './views/public/SupplierAccreditation';
 import PRS from './views/public/PRS';
 import OverrideForm from './views/public/OverrideForm';
+import Transmittal from './views/public/Transmittal';
+import EnrollmentProgram from './views/public/EnrollmentProgram';
+import DeliverySystem from './views/public/DeliverySystem';
+import MeetingMinute from './views/public/MeetingMinute';
+
 
 // FOR FORM APPROVERS
 import ApproverLeaveForm from './views/approver/ApproverLeaveForm';
@@ -44,6 +49,10 @@ import ApproverTravelForm from './views/approver/ApproverTravelForm';
 import ApproverUrgentCheck from './views/approver/ApproverUrgentCheck';
 import ApproverSupplierAccreditation from './views/approver/ApproverSupplierAccreditation';
 import ApproverPRS from './views/Approver/ApproverPRS';
+import ApproverOverrideForm from './views/Approver/ApproverOverrideForm';
+import ApproverTransmittal from './views/Approver/ApproverTransmittal';
+import ApproverEnrollmentProgramForm from './views/Approver/ApproverEnrollmentProgramForm';
+import ApproverMeetingMinute from './views/Approver/ApproverMeetingMinute';
 
 // REPORTS
 import Reports from './views/public/Reports'
@@ -54,10 +63,12 @@ import JobPosition from './views/JobPosition';
 import Department from './views/Department';
 import Branch from './views/Branch';
 import AdminPaySlip from './views/PaySlip';
+import AdminDtr from './views/AdminDtr';
 // END
 
 import Policy from './views/public/Policy';
 import PaySlip from './views/public/PaySlip';
+import MyCalendar from './views/public/MyCalendar';
 import Directory from './views/Directory';
 import Videos from './views/Videos';
 import CompanyProfile from './views/public/CompanyProfile';
@@ -69,7 +80,7 @@ import PageNotFound from './views/404';
 export default{
 
     mode: 'history',
-    base: '/ntrends/',
+    // base: '/ntrends/',
     routes:[
         {
             path: '/',
@@ -83,7 +94,7 @@ export default{
             component: Supplementary,
             name: 'Supplementary',
             // props: {name: this.$root.name}
-        },
+    },
         // Leave Form
         {
             path: '/leave-form',
@@ -204,6 +215,29 @@ export default{
             component: OverrideForm,
             name: 'Override Request Form'
         },
+        {
+            path: '/enrollment-program',
+            component: EnrollmentProgram,
+            name: 'Sales Program Enrollment Form'
+        },
+        // TRansmittal
+        {
+            path: '/transmittal',
+            component: Transmittal,
+            name: 'Transmittal Form'
+            
+        },
+        {
+            path: '/delivery-system',
+            component: DeliverySystem,
+            name: 'Delivery System'
+        },
+
+        {
+            path: '/minutes-of-meeting',
+            component: MeetingMinute,
+            name: 'Minutes of Meeting'
+        },
 
         // ==================================  FOR FORM APPROVERS  ==================================
 
@@ -216,7 +250,7 @@ export default{
         // Supplementary
         // witness supp
         {
-            path: '/supplemenentary-witness',
+            path: '/supplementary-witness',
             component:  ApproverSupplementaryWitness,
         },
         // approver supp
@@ -334,6 +368,32 @@ export default{
             component: ApproverPRS,
             name: 'Approval Purchase Receiving Slip',
         },
+        // Overtime Form
+        {
+            path: '/approval-override-form',
+            component: ApproverOverrideForm,
+            name: 'Approval Override Request Form'
+        },
+        // TRansmittal
+        {
+            path: '/approval-transmittal',
+            component: ApproverTransmittal,
+            name: 'Approval Transmittal Form'
+            
+        },
+        // Enrollment progral
+        {
+            path: '/approval-enrollment-program',
+            component: ApproverEnrollmentProgramForm,
+            name: 'Approval Sales Program Enrollment Form'
+        },
+
+        {
+            path: '/approval-meeting-minutes',
+            component: ApproverMeetingMinute,
+            name: 'Approval Meeting Minutes'
+        },
+
         // ============================================ REPORTS =====================================================
         {
             path: '/reports',
@@ -360,6 +420,11 @@ export default{
             path: '/manage-branch',
             component: Branch,
         },
+        // DTR ADMIN
+        {
+            path: '/admin-dtr',
+            component: AdminDtr,
+        },
         // PAYSLIP ADMIN
         {
             path: '/admin-payslip',
@@ -370,10 +435,17 @@ export default{
             path: '/policy/:policy_id',
             component: Policy,
         },
+        // MYCALENDAR
+        {
+            path: '/mycalendar',
+            component: MyCalendar,
+            name: 'My Calendar'
+        },
         // PAYSLIP
         {
             path: '/payslip',
-            component: PaySlip
+            component: PaySlip,
+            props: { newsletterPopup: 'false' }
         },
         // DIRECTORY
         {

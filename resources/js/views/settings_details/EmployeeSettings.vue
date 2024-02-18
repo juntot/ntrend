@@ -165,9 +165,27 @@ export default {
                 remove_emp = true;
             });
 
+            // permanent delete
+            $("#manage-employee-settings tbody").on('click', 'button.delete-emp', function(e) {
+                e.stopPropagation();
+                let tr = $(this).closest('tr');
+                let row = table.row( tr );
+                let dataforedit = row.data();
+                let confirmation = confirm('Are you sure to delete this employee permanently?');
+                if(confirmation){
+
+                    axios.post('api/del-permanent-emp',{
+                        empID: dataforedit.empID
+                    })
+                    .then(res=>{
+                        self.delRow(dataforedit.empID);
+                    }).catch(er=>alert('Server Error'))
+                // remove_emp = true;
+                }
+            });
+
             // modal update
             $("#manage-employee-settings tbody").on('click', 'tr', function() {
-
                 if((rows > 0 && !reset) && (rows > 0 && !remove_emp))
                 {
                     var tr = $(this).closest('tr');
@@ -191,6 +209,14 @@ let columnDefs = [{
             data:           'deluser',
             defaultContent: `
                 <button type="button" class="btn btn-primary activate-emp">Activate</button>
+            `
+        },{
+            title: "Permanently Delete",
+            className:      'details-control',
+            orderable:      false,
+            data:           'deluser',
+            defaultContent: `
+                <button type="button" class="btn btn-primary delete-emp">Delete</button>
             `
         },{
             title: "Employee ID", data: 'empID'

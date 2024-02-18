@@ -151,7 +151,7 @@ export default {
                 }
             });
             this.dtHandle=$('#overtimeform').DataTable({
-            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [3] }],
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [4] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
@@ -165,7 +165,7 @@ export default {
                        $(row).addClass("tr-pending");
                     }
                     if (cellValue=="Approved") {
-                       $(row).addClass("tr-approved");
+                       $(row).addClass("tr-verified");
                     }
                     if (cellValue=="Rejected") {
                        $(row).addClass("tr-rejected");

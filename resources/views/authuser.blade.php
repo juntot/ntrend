@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.material.min.css"> -->
 
 	<!-- <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet"> -->
-	<link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+	<link href="{{URL::asset('resources/assets/css/materialdesignicons.min.css')}}" rel="stylesheet">
+	
 	<!-- <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet"> -->
 	<link rel="stylesheet" href="{{URL::to('/public/css/vuetify.css')}}">
 	<!-- veutify -->
@@ -29,6 +30,9 @@
 
   	<link rel="stylesheet" href="{{URL::asset('resources/assets/css/mdbadmin.css')}}">
 	<link rel="stylesheet" href="{{URL::asset('resources/assets/css/image-zoom.css')}}">
+
+	<!-- <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css"> -->
+	<link rel="stylesheet" href="{{URL::asset('resources/assets/css/buttons.dataTables.min.css')}}">
 
     <!-- <link rel="stylesheet" href="./public/css/app.css"> -->
     <link rel="stylesheet" href="{{URL::to('/public/css/app.css')}}">
@@ -73,6 +77,11 @@
 
 					</div>
 					<div class="col-md-9x col-lg-9x col-sm-9x text-right notifs" style="position: relative;">
+							<span class="notif-icon-container">
+							<router-link to="/mycalendar" @click.native="hideMobileNav" class="accordion-menu collapseall">
+									<i class="fas fa-calendar-alt"></i>
+							</router-link>
+							</span>
 							<span @click="hardRefresh" class="notif-icon-container">
 								<i class="fas fa-sync-alt"></i>
 							</span>
@@ -174,48 +183,51 @@
 					</div>
 					<div class="col-md-12 even-padding">
 						<hr>
-						<div class="col-md-6 col-sm-12 text-center">
-							<div class="numeric-leaves">
-								<i class="fas fa-plane-departure"></i>
-								@{{(leaveCredits.VL || userinfo.VL) | leaveCreditFilter}}
+							<div class="credit-count" v-if="userinfo.employee_status == 'Regular'">
+								<div class="col-md-6 col-sm-12 text-center">
+									<div class="numeric-leaves">
+										<i class="fas fa-plane-departure"></i>
+										@{{(leaveCredits.VL || userinfo.VL) | leaveCreditFilter}}
+									</div>
+									<div>
+											<router-link to="/leave-form" @click.native="hideMobileNav" class="accordion-menu collapseall">Vacation Leaves</router-link>
+									</div>
+								</div>
+								<div class="col-md-6 col-sm-12 text-center">
+									<div class="numeric-leaves">
+										<i class="fas fa-sad-tear"></i>
+										@{{(leaveCredits.SL || userinfo.SL) | leaveCreditFilter}}
+									</div>
+									<div>
+											<router-link to="/leave-form" @click.native="hideMobileNav" class="accordion-menu collapseall">Sick Leaves</router-link>
+									</div>
+								</div>
+								<div class="clearfix"></div>
+								<hr>
+								<div class="col-md-6 col-sm-12 text-center">
+									<div class="numeric-leaves">
+										<i class="fas fa-birthday-cake"></i>
+										@{{(leaveCredits.BL || userinfo.BL) | leaveCreditFilter}}
+									</div>
+									<div>
+											Birthday Leaves
+									</div>
+								</div>
+								<div class="col-md-6 col-sm-12 text-center">
+									<div class="numeric-leaves">
+										<i class="fas fa-info-circle"></i>
+										@{{(leaveCredits.DL || userinfo.DL) | leaveCreditFilter}}
+									</div>
+									<div>
+										Discretionary Leaves
+									</div>
+								</div>
+								<div class="clearfix"></div>
+								<hr>
 							</div>
-							<div>
-									Vacation Leaves
-							</div>
-						</div>
-						<div class="col-md-6 col-sm-12 text-center">
-							<div class="numeric-leaves">
-								<i class="fas fa-sad-tear"></i>
-								@{{(leaveCredits.SL || userinfo.SL) | leaveCreditFilter}}
-							</div>
-							<div>
-									Sick Leaves
-							</div>
-						</div>
-						<div class="clearfix"></div>
-						<hr>
-						<div class="col-md-6 col-sm-12 text-center">
-							<div class="numeric-leaves">
-								<i class="fas fa-birthday-cake"></i>
-								@{{(leaveCredits.BL || userinfo.BL) | leaveCreditFilter}}
-							</div>
-							<div>
-									Birthday Leaves
-							</div>
-						</div>
-						<div class="col-md-6 col-sm-12 text-center">
-							<div class="numeric-leaves">
-								<i class="fas fa-info-circle"></i>
-								@{{(leaveCredits.DL || userinfo.DL) | leaveCreditFilter}}
-							</div>
-							<div>
-								Discretionary Leaves
-							</div>
-						</div>
-						<div class="clearfix"></div>
-						<hr>
 						<div>
 							<p>ID No: @{{userinfo.empID}}</p>
+							<p>Status: @{{userinfo.employee_status}}</p>
 							<p>Date Hired: @{{userinfo.dhired}}</p>
 							<!-- <p>Employee Status: </p> -->
 							<p>Job Title: @{{userinfo.posname}}</p>
@@ -269,6 +281,40 @@
 											</h4>
 										</div>
 									</div>
+									<!-- MANAGE DTR -->
+									<div class="panel panel-default" v-if="userinfo.uploadDtr || userinfo.viewDTRReport">
+										<div class="panel-heading">
+											<h4 class="panel-title">
+											<a data-toggle="collapse" data-parent="#accordion" href="#collapsedtr">Manage DTR</a>
+											</h4>
+										</div>
+										<div id="collapsedtr" class="panel-collapse collapse inx">
+											<div class="panel-body">
+												<div class="policy-navs">
+													<a v-if="userinfo.uploadDtr" href="http://ams.northtrend.com/upload" target="_tab" @click.native="hideMobileNav" class="accordion-menu collapseall">Upload Employee Logs</a>
+													<a v-if="userinfo.viewDTRReport" href="http://ams.northtrend.com/report" target="_tab" @click.native="hideMobileNav" class="accordion-menu collapseall">View Employee Log</a>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- end -->
+									<!-- MANAGE DTR -->
+									<div class="panel panel-default" v-if="userinfo.addDelivery">
+										<div class="panel-heading">
+											<h4 class="panel-title">
+											<a data-toggle="collapse" data-parent="#accordion" href="#collapseDS">Delivery System</a>
+											</h4>
+										</div>
+										<div id="collapseDS" class="panel-collapse collapse inx">
+											<div class="panel-body">
+												<div class="policy-navs">
+													<router-link to="/delivery-system" @click.native="hideMobileNav" class="accordion-menu collapseall">Delivery System</router-link>
+												</div>
+											</div>
+										</div>
+									</div>
+									<!-- end -->
+
 									<!-- BRANCH -->
 									<div class="panel panel-default" v-if="userinfo.addPayslip">
 										<div class="panel-heading">
@@ -283,7 +329,7 @@
 										<div class="panel-heading">
 											<h4 class="panel-title">
 											<!-- <a data-toggle="collapse" data-parent="#accordion" href="#collapseemp">MANAGE EMPLOYEE</a> -->
-												<router-link to="/supplemenentary-witness" @click.native="hideMobileNav" class="accordion-menu collapseall">
+												<router-link to="/supplementary-witness" @click.native="hideMobileNav" class="accordion-menu collapseall">
 													Witness Approval
 													<span v-show="witnessNotifs" class="pending-stat-notif">@{{witnessNotifs}}</span>
 
@@ -293,26 +339,28 @@
 									</div>
 									<!-- FORMS -->
 									<div class="panel panel-default">
-									<div class="panel-heading">
-										<h4 class="panel-title">
-										<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">FORMS</a>
-										</h4>
-									</div>
-									<div id="collapse1" class="panel-collapse collapse inx">
-										<div class="panel-body">
-											<div class="policy-navs" v-for="(form, index) in forms" :key="index">
-												<div>@{{index}}</div>
-												<router-link v-for="item in form" :key="item.detail_id" :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall">@{{item.navname}}</router-link>
-											</div>
-											<!-- <ul class="sidebarpanel">
-												<li v-for="item in forms">
-													<router-link :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall">
-														@{{item.navname}}
-													</router-link>
-												</li>
-											</ul> -->
+										<div class="panel-heading">
+											<h4 class="panel-title">
+											<a data-toggle="collapse" data-parent="#accordion" href="#collapse1">FORMS</a>
+											</h4>
 										</div>
-									</div>
+										<div id="collapse1" class="panel-collapse collapse inx">
+											<div class="panel-body">
+												<div class="policy-navs" v-for="(form, index) in forms" :key="index">
+													<div>@{{index}}</div>
+													<router-link v-for="item in form" :key="item.detail_id" :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall title-case">
+														@{{ (item.navname) }} <span v-show="item.count" class="pending-stat-notif">@{{ item.count }}</span>
+													</router-link>
+												</div>
+												<!-- <ul class="sidebarpanel">
+													<li v-for="item in forms">
+														<router-link :to="'/'+(item.navname).replace(/\s+/g, '-').toLowerCase()" @click.native="hideMobileNav" class="accordion-menu collapseall">
+															@{{item.navname}}
+														</router-link>
+													</li>
+												</ul> -->
+											</div>
+										</div>
 									</div>
 									<!-- FORM APPROVAL -->
 									<div class="panel panel-default" v-if="hasForApproval">
@@ -389,6 +437,13 @@
 											quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
 										</div>
 									</div>
+									<!-- <div class="panel panel-default">
+										<div class="panel-heading">
+											<h4 class="panel-title">
+											<router-link to="/mycalendar" @click.native="hideMobileNav" class="accordion-menu collapseall">MY CALENDAR</router-link>
+											</h4>
+										</div>
+									</div> -->
 									<div class="panel panel-default">
 										<div class="panel-heading">
 											<h4 class="panel-title">
@@ -668,7 +723,7 @@
 
 			</section>
 			<section id="content" class="col-md-8 col-lg-9 col-sm-8 col-xs-12 content nopadding relative-pos margin-top-20">
-				<router-view></router-view>
+				<router-view :user-id="userinfo.empID"></router-view>
 			</section>
 
 		</article>
@@ -683,6 +738,8 @@
 	<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script> -->
   	<!-- <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script> -->
 
+		<!-- chart.js -->
+		<script src="{{URL::asset('resources/assets/js/chart/chart.js')}}"></script>
 
 	<!-- <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script> -->
 	<script src="{{URL::asset('resources/assets/js/datatable/jquery.dataTables.js')}}"></script>
@@ -714,17 +771,50 @@
 	<script src="https://unpkg.com/v-tooltip@2.0.2"></script> -->
 	<script src="{{URL::asset('resources/assets/js/velocity/velocity.min.js')}}"></script>
 
-	<script src="{{URL::asset('resources/assets/js/pdfJS/pdf.min.js')}}"></script>
+	<!-- <script src="{{URL::asset('resources/assets/js/pdfJS/pdf.min.js')}}"></script> -->
 	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.6.347/pdf.min.js"></script> -->
-	<script src="{{URL::asset('resources/assets/js/pdfJS/pdf.worker.min.js')}}"></script>
+	<!-- <script src="{{URL::asset('resources/assets/js/pdfJS/pdf.worker.min.js')}}"></script> -->
+
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.worker.min.js" integrity="sha512-rbVtx+EMuGKVSQEruVomHnv+X9xKJ/zc9seGck0x/0GgLmaWrKcKqnxPUkGFWgCHWBQQ44DkOCSe9DNcwsaJ7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf_viewer.min.js" integrity="sha512-u73EQIcgaUO+rlqp5rLbzK2d/hIOwV6kkHSpvceuoFc0zFJ3jp70N5Hv+RKenAMoIiEBD9f4b9zZKmChTRaXqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+
+	<script src="{{ URL::asset('resources/assets/js/pdfJS/3.7.107pdf.min.js') }}"></script>
+	<script src="{{ URL::asset('resources/assets/js/pdfJS/3.7.107pdf.worker.min.js') }}" integrity="sha512-rbVtx+EMuGKVSQEruVomHnv+X9xKJ/zc9seGck0x/0GgLmaWrKcKqnxPUkGFWgCHWBQQ44DkOCSe9DNcwsaJ7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="{{ URL::asset('resources/assets/js/pdfJS/3.7.107pdf_viewer.min.js') }}" integrity="sha512-u73EQIcgaUO+rlqp5rLbzK2d/hIOwV6kkHSpvceuoFc0zFJ3jp70N5Hv+RKenAMoIiEBD9f4b9zZKmChTRaXqg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
 	<!-- <script src="{{URL::asset('resources/assets/js/zoom/image-zoom.js')}}"></script> -->
 	<script src="{{URL::asset('resources/assets/js/zoom/image-zoom.min.js')}}"></script>
 
+	<!-- confetti & fireworks -->
+	<!-- <script src="https://cdn.jsdelivr.net/npm/confetti-js@0.0.18/dist/index.min.js"></script> -->
+	<script src="{{URL::asset('resources/assets/js/confetti/confetti.js')}}"></script>
+	<!-- <script src="https://unpkg.com/fireworks-js@latest/dist/fireworks.js"></script> -->
+
+
+
+<!-- <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.colVis.min.js"></script> -->
+
+
+<script type="text/label" src="{{URL::asset('resources/assets/js/datatable/2.2.2dataTables.buttons.min.js')}}"></script>
+<script type="text/label" src="{{URL::asset('resources/assets/js/datatable/2.2.2buttons.bootstrap4.min.js')}}"></script>
+<script type="text/label" src="{{URL::asset('resources/assets/js/datatable/3.1.3jszip.min.js')}}"></script>
+<script type="text/label" src="{{URL::asset('resources/assets/js/datatable/0.1.53pdfmake.min.js')}}"></script>
+<script type="text/label" src="{{URL::asset('resources/assets/js/datatable/0.1.53vfs_fonts.js')}}"></script>
+<script type="text/label" src="{{URL::asset('resources/assets/js/datatable/2.2.2buttons.html5.min.js')}}"></script>
+<script type="text/label" src="{{URL::asset('resources/assets/js/datatable/2.2.2buttons.print.min.js')}}"></script>
+<script type="text/label" src="{{URL::asset('resources/assets/js/datatable/2.2.2buttons.colVis.min.js')}}"></script>
 
 	<script src="{{URL::to('/public/js/public-app.js')}}"></script>
 	<!-- <script src="./public/js/public-app.js"></script> -->
-
+	
 
 
 <script>

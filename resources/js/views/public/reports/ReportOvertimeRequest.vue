@@ -194,7 +194,20 @@ export default {
             "sPaginationType": "simple_numbers",
             "dom": '<"top with-margin-bottom"f>rt<"mdl-grid"<"mdl-cell mdl-cell--4-col"i><"mdl-cell mdl-cell--8-col"p>><"clear">',
             "scrollX": true,
-            "order": [[0, "desc"]]
+            "order": [[0, "desc"]],
+            "rowCallback": function(row, data, index) {
+                var cellValue = status.indexOf(data["status"]);
+                    if (cellValue==1) { // approved
+                       $(row).addClass("tr-verified");
+                    }
+                    if (cellValue==2) { // rejected
+                       $(row).addClass("tr-rejected");
+                    }
+                    if (cellValue==3) { // executed
+                       $(row).addClass("tr-executed");
+                    }
+
+                }
             });
 
             let table = this.dtHandle;

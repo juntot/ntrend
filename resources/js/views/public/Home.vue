@@ -1,6 +1,85 @@
 <template>
-
+		
     <div>
+				<!-- fireworks & confetti -->
+			<div style="position: relative" v-show="showGreeting">
+					
+					<canvas id="my-canvas" 
+					style="top:0; position: fixed; left:0; width: 100%; z-index: 9
+					"></canvas>
+					<div class="fireworks-container" 
+					@click="hideGreetings"
+					style="
+					left: 0;
+					top: 0;
+					width: 100%;
+					height: 100%;
+					position: fixed;
+					z-index: 9;
+					background: rgba(0,0,0,.4);
+					"
+					></div>
+					<div class="birthday-list" style="
+					position: fixed; 
+					z-index: 9;
+					left: 50%;
+					top: 50%;
+    			transform: translate(-50%, -50%);
+					box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 8px;
+					border-radius: 2px;
+					padding: 15px;
+					min-width: 350px;
+					background: white;
+					border: 10px solid;
+					border-image-slice: 1;
+					border-width: 5px;
+					border-image-source: linear-gradient(to right, red, orange);
+					max-height: 500px;
+					overflow: auto;
+					">
+							<h4
+							style="
+							font-size: 3rem;
+							background: -webkit-linear-gradient(#e73827, #f85032);
+							font-weight: bold;
+							-webkit-background-clip: text;
+							-webkit-text-fill-color: transparent;
+							text-align: center;
+							line-height: 150%;
+							position: static;
+							top: 0;
+							"
+							>HAPPY BIRTHDAY</h4>
+							<ul style="list-style: none">
+								<li v-for="(birthday, idx) in birthdays" :key="idx">
+									<div class="dflex d-align-center">
+										<div class="post-avatar avatar align-self-start">
+											<img id="avatar-sm" :src="birthday.avatar? 'storage/app/'+birthday.avatar :'public/images/priemer_jacket.jpg'" alt="Avatar" style="width:50px; height: 50px; object-fit: cover;">
+										</div>
+										<div class="flex-grow-1" style="width: 100%;">
+											<h5 class="avatar-name">{{birthday.fullName}} <br>
+												<small>{{birthday.birthdate | filterBirthDate}}</small><br>
+												<small>{{birthday.posname}}</small><br>
+												<small>{{birthday.deptname}}</small><br>
+												<small>{{birthday.branchname}}</small><br>
+											</h5>
+										</div>
+									</div>
+								</li>
+							</ul>
+							<div class="text-center">
+									<i
+							style="
+							font-size: 12px;
+							background: -webkit-linear-gradient(#e73827, #f85032);
+							-webkit-background-clip: text;
+							-webkit-text-fill-color: transparent;
+							"
+							>Greetings from: Exceltrend Family</i>
+							</div>
+					</div>
+			</div>
+			<!-- end -->
 		<div id="loader-announcement">
 			<div class="loader-fixed">
 				<div class="dot"></div>
@@ -27,7 +106,7 @@
 								    <img id="post-avatar" class="avatar-status" :src="$root.userinfo.avatar? 'storage/app/'+$root.userinfo.avatar : 'public/images/priemer_jacket.jpg'" alt="Avatar" style="width:50px; height: 50px; object-fit: cover;">
 							    </div>
 							    <div class="post-textarea flex-grow-8">
-								    <textarea ref="search" id="textarea-post" class="autoExpand" v-model="posts.message" name="post-message" data-autoresize rows="1" cols="500" data-min-rows='1' :placeholder="placeholder" v-validate="'max:65520'" ></textarea>
+								    <textarea ref="search" id="textarea-post" class="autoExpand" v-model="posts.message" name="post-message" data-autoresize rows="1" cols="500" data-min-rows='1' :placeholder="placeholder" v-validate="'max:777215'" ></textarea>
 
 									<div id="attachment-container">
 										<!-- videos preview-->
@@ -54,7 +133,12 @@
 										<label for="file-attachment" class="btn btn-info round">
 											photos/videos
 										</label>
+										<!-- <label class="btn btn-info round" data-toggle="modal" data-target="#myModalPoll" >
+											Poll
+										</label> -->
+										 
 										<input id="file-attachment" type="file" style="display: none;" @change.prevent="newFile">
+									
 										<!-- employee tags -->
 										<!-- <button class="btn btn-info round"
 											id="btn-popupover-employee"
@@ -232,13 +316,16 @@
 													<!-- commentator name -->
 													<span class="avatar-name">{{comment.fullname || ''}}</span><br/>
 													{{comment.text_comment || ''}}
+
+													<div class="comment-actionx" v-if="comment.commentBy_ == $root.userinfo.empID">
+														<span @click="deleteComment(comment)">
+															<i class="fas fa-trash color-redorange" title="tag by users"></i>
+														</span>
+													</div>
 												</div>
 											</div>
 										</div>
-										<div class="comment-action" v-if="comment.commentBy_ == $root.userinfo.empID">
-											<!-- <span data-toggle="modal" data-target="#myModal" @click="editMsg(index)">edit</span> &nbsp;|&nbsp; -->
-											<span @click="deleteComment(comment)">delete</span>
-										</div>
+										
 									</div>
 									
 								</div>
@@ -250,7 +337,7 @@
 											style="width:35px; height: 35px; object-fit: cover; border-radius: 50%">
 										</div>
 										<div style="margin-left: 8px; flex: 1">
-											<textarea name="comment" @keyup="showBtnComment" :data-postid="val.postID" placeholder="Write a comment.." id="textarea-comment" data-autoresizecomment class="noborder txtarea-comment width-100" rows="1" v-validate="'max:65520'">
+											<textarea name="comment" @keyup="showBtnComment" :data-postid="val.postID" placeholder="Write a comment.." id="textarea-comment" data-autoresizecomment class="noborder txtarea-comment width-100" rows="1" v-validate="'max:777215'">
 											</textarea>
 										</div>
 									</div>
@@ -305,7 +392,7 @@
                         <div class="modal-body">
 							<!-- error -->
 							<span class="errors" v-show="errors.has('message-update')">{{ errors.first('message-update') }} Total characters: {{countPostUpdateString}}/65520</span>
-                            <textarea name="message-update" id="textarea-postxxxx" data-autoresizetextarea class="noborder width-100" rows="1" v-model="formUpdate.message" v-validate="'max:65520'"
+                            <textarea name="message-update" id="textarea-postxxxx" data-autoresizetextarea class="noborder width-100" rows="1" v-model="formUpdate.message" v-validate="'max:777215'"
 								:disabled="formUpdate.postedby_ != $root.userinfo.empID || daysDif > 1"></textarea>
 
 							<!-- videos -->
@@ -335,13 +422,19 @@
 											<div class="comment-list">
 												<span class="avatar-name">{{comment.fullname || ''}}</span><br/>
 												{{comment.text_comment || ''}}
+												
+												
+												<div class="comment-actionx" v-if="comment.commentBy_ == $root.userinfo.empID">
+													<span @click="deleteComment(comment)">
+														<i class="fas fa-trash color-redorange" title="tag by users"></i>
+													</span>
+												</div>
 											</div>
 										</div>
 									</div>
-									<div class="comment-action" v-if="comment.commentBy_ == $root.userinfo.empID">
-										<!-- <span data-toggle="modal" data-target="#myModal">edit</span> &nbsp;|&nbsp; -->
+									<!-- <div class="comment-action" v-if="comment.commentBy_ == $root.userinfo.empID">
 										<span @click.prevent="deleteComment(comment)">delete</span>
-									</div>
+									</div> -->
 								</div>
 									<!-- comment textarea -->
 								<div style="padding-bottom: 15px; text-align: right;">
@@ -351,7 +444,7 @@
 											style="width:35px; height: 35px; object-fit: cover; border-radius: 50%">
 										</div>
 										<div style="margin-left: 8px; flex: 1">
-											<textarea name="comment" @keyup="showBtnCommentModal" :data-postid="formUpdate.postID" placeholder="Write a comment.." id="textarea-comment" data-autoresizecomment class="noborder txtarea-comment width-100" rows="1" v-validate="'max:65520'">
+											<textarea name="comment" @keyup="showBtnCommentModal" :data-postid="formUpdate.postID" placeholder="Write a comment.." id="textarea-comment" data-autoresizecomment class="noborder txtarea-comment width-100" rows="1" v-validate="'max:777215'">
 											</textarea>
 										</div>
 									</div>
@@ -397,68 +490,153 @@
 				</div>
 			<!-- END -->
 
+			<!-- POLL -->
+			<!-- Modal -->
+				<div class="modal fade" id="myModalPoll" role="dialog">
+					<div class="modal-dialog modal-md">
+					<div class="modal-content">
+						<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						 Create a Poll
+						</div>
+						<div class="modal-body">
+							
+							<div class="col-md-12">
+									<div class="mdb-form-field form-group-limitx">
+											<div class="form-field__control">
+													<input type="text" v-validate="''" class="form-field__input" name="poll-title">
+													<label class="form-field__label">Poll Question</label>
+													<div class="form-field__bar"></div>
+											</div>
+											<span class="errors">{{ errors.first('poll-title') }}</span>
+									</div>
+							</div>
+							<div class="col-md-12">
+									<div class="mdb-form-field">
+													<div class="form-field__control mdb-bgcolor">
+															<textarea class="form-field__textarea" id="" cols="4" rows="4" name="poll-description"></textarea>
+															<label class="form-field__label">Poll Description</label>
+															<div class="form-field__bar"></div>
+													</div>
+									</div>
+							</div>
+							<div class="clearfix"></div>
+							<div class="col-lg-12">
+                    <h5 class="form-subtitle"><em>Poll Choices</em></h5>
+							</div>
+							<div class="col-md-12">
+									<button class="btn btn-primary">Add Choices</button>
+							</div>
+							<div class="col-md-12">
+									<div class="mdb-form-field form-group-limitx">
+											<div class="form-field__control">
+													<input type="text" v-validate="''" class="form-field__input" name="poll-title">
+													<label class="form-field__label">Choice 1</label>
+													<div class="form-field__bar"></div>
+											</div>
+											<span class="errors">{{ errors.first('poll-title') }}</span>
+									</div>
+									<div class="mdb-form-field form-group-limitx">
+											<div class="form-field__control">
+													<input type="text" v-validate="''" class="form-field__input" name="poll-title">
+													<label class="form-field__label">Choice 1</label>
+													<div class="form-field__bar"></div>
+											</div>
+											<span class="errors">{{ errors.first('poll-title') }}</span>
+									</div>
+							</div>
+							<div class="clearfix"></div>
+							<div class="col-md-12">
+								<div class="checkbox">
+									<label>
+										<input type="checkbox" v-model="isallowmultipleselectpoll" value="true">Allow Multiple Selection?
+									</label>
+								</div>
+							</div>
+							<div class="clearfix"></div>
+						</div>
+						<div class="modal-footer">
+								<button class="btn btn-primary">Save</button>
+							</div>
+					</div>
+					</div>
+				</div>
+			<!-- END -->
     </div>
 </template>
 
 <script>
+let defaultCompList = [];
+let fireworks;
 
 export default {
 
     data(){
         return{
             posts:{
-				message: '',
-				dateposted: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
-			},
-			formUpdate:{
-				attachment:'',
-				avatar:'',
-				dateposted:'',
-				fullname:'',
-				message:'',
-				postID:'',
-				postedby_:'',
-				status:'',
-				taggedepts:'',
-				taggednames:'',
-				type:'',
+						message: '',
+						dateposted: moment(new Date()).format('YYYY-MM-DD HH:mm:ss'),
+					},
+					formUpdate:{
+						attachment:'',
+						avatar:'',
+						dateposted:'',
+						fullname:'',
+						message:'',
+						postID:'',
+						postedby_:'',
+						status:'',
+						taggedepts:'',
+						taggednames:'',
+						type:'',
 
-			},
-			showCommentBtn: {
-				display: false,
-				id:''
-			},
-			showCommentBtnModal: {
-				display: false,
-				id:''
-			},
-			comment: [],
-			announcement: [],
-			// postmsg: '',
-			page: 1,
-			attachmentNames: '',
-			type: '',
-				// search for tags
-			searchEmp: '',
-			searchDept: '',
-			searchComp: '',
-				// array result for search
-			empList: [],
-			deptList: [],
-			compList: [],
-				// tags
-			checkedNames: [],
-			checkedDepts: [],
-			checkedComps: [],
+					},
+					showCommentBtn: {
+						display: false,
+						id:''
+					},
+					showCommentBtnModal: {
+						display: false,
+						id:''
+					},
+					comment: [],
+					announcement: [],
+					// postmsg: '',
+					page: 1,
+					attachmentNames: '',
+					type: '',
+						// search for tags
+					searchEmp: '',
+					searchDept: '',
+					searchComp: '',
+						// array result for search
+					empList: [],
+					deptList: [],
+					compList: [],
+						// tags
+					checkedNames: [],
+					checkedDepts: [],
+					checkedComps: [],
 
-			tagwithEmp: [],
-			tagwithDept: [],
-			tagwithComp: [],
+					tagwithEmp: [],
+					tagwithDept: [],
+					tagwithComp: [],
 
-			disableBtn:  false,
-			// for modal show small
-			tagLists: [],
-			isNoPost: false,
+					disableBtn:  false,
+					// for modal show small
+					tagLists: [],
+					isNoPost: false,
+
+					// greetings
+					showGreeting: false,
+					birthdays: [],
+
+
+					// poll
+					isallowmultipleselectpoll: false,
+					pollquestion: '',
+					pollchoices:{},
+					polldata: [],
         };
 	},
 	methods:{
@@ -491,9 +669,18 @@ export default {
 			formData.append('taggedepts', arrDept);
 
 			let arrComp = [];
-			this.checkedComps.forEach(obj => {
-				arrComp.push('comp'+obj);
-			});
+			if(this.checkedComps.length){
+				this.checkedComps.forEach(obj => {
+					arrComp.push('comp'+obj);
+				});
+			}else{
+				// this will be use to tag all post to all company by default
+				// check the tag with comp below similar code
+				defaultCompList.forEach(obj => {
+					arrComp.push('comp'+obj.compID);
+				});
+			}
+			
 			// formData.append('taggedepts', this.checkedDepts);
 			formData.append('taggedcomps', arrComp);
 
@@ -513,12 +700,17 @@ export default {
 			});
 			formData.append('tagwith_dept', arrTagDept);
 
-
 			// TAG WITH COMP
 			let arrTagComp = [];
-			this.tagwithComp.forEach(obj => {
-				arrTagComp.push(obj.compname);
-			});
+			if(this.checkedComps.length) {
+				this.tagwithComp.forEach(obj => {
+					arrTagComp.push(obj.compname);
+				});
+			}else{
+				defaultCompList.forEach(obj => {
+					arrTagComp.push('comp'+obj.compname);
+				});
+			}
 			formData.append('tagwith_comp', arrTagComp);
 
 			axios.post('api/addAnnouncement', formData).then((response)=>{
@@ -602,11 +794,12 @@ export default {
 			let offset = this.offsetHeight - this.clientHeight;
             $('textarea#textarea-post').css('height', 'auto').css({'height': $('textarea#textarea-post').scrollHeight + offset, "max-height": '200px'});
 		},
-		handleScroll () {
-			// console.log($(window).scrollTop() + $(window).height(), ($(document).height()-10));
-			 if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+		handleScroll (e) {
+			// console.log(Math.abs($(window).scrollTop() + $(window).height()), ($(document).height()-10));
+			if(Math.abs(window.innerHeight + window.scrollY) >= Math.abs(document.body.offsetHeight-10)){
+			// if($(window).scrollTop() + $(window).height() == $(document).height()) {
+			//  if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
 				 	$('#loader-announcement').show();
-
 					this.page++;
 					axios.get('api/getAnnouncement?page='+this.page).then((response)=>{
 						setTimeout(function(){
@@ -705,7 +898,7 @@ export default {
 			if(regex.test((this.searchEmp))){
 				// let search = (this.searchEmp).replace(/[^a-zA-Z0-9-. ]/g, '');
 				let search = this.searchEmp;
-				axios.get('api/search-emp/'+search).then(res=>{
+				axios.post('api/search-emp', {keyword: search}).then(res=>{
 					if(res.data.length > 0 && res.status == 200){
 						this.empList = res.data;
 					}
@@ -720,7 +913,7 @@ export default {
 			if(regex.test((this.searchDept))){
 				// let search = (this.searchDept).replace(/[^a-zA-Z0-9-. ]/g, '');
 				let search = this.searchDept;
-				axios.get('api/search-dept/'+search).then(res=>{
+				axios.post('api/search-dept',{keyword: search}).then(res=>{
 					if(res.data.length > 0 && res.status == 200){
 						this.deptList = res.data;
 					}
@@ -736,9 +929,24 @@ export default {
 
 				// let search = (this.searchComp).replace(/[^a-zA-Z0-9-. ]/g, '');
 				let search = this.searchComp;
-				axios.get('api/search-comp/'+search).then(res=>{
+				axios.post('api/search-comp',{keyword: search}).then(res=>{
 					if(res.data.length > 0 && res.status == 200){
 						this.compList = res.data;
+					}
+				})
+				.catch(err => console.log(err));
+			}
+		},
+		loadCompany(val){
+			let validSearch = /^[a-zA-Z0-9 Ññ&)\._-]+$/g
+			let regex = RegExp(validSearch);
+			if(regex.test((val))){
+
+				// let search = (val).replace(/[^a-zA-Z0-9-. ]/g, '');
+				let search = val;
+				axios.post('api/search-comp',{keyword: search}).then(res=>{
+					if(res.data.length > 0 && res.status == 200){
+						defaultCompList = res.data;
 					}
 				})
 				.catch(err => console.log(err));
@@ -902,14 +1110,77 @@ export default {
 
 			}
 			
-		}
+		},
 
+		// birthday greetings
+		getBirthdays(){
+				axios.get('api/birthdays').then((response)=>{
+					if(response.status == 200 && response.data.length > 0){
+						this.birthdays = response.data;
+						if(!localStorage.getItem('greetings')){
+							this.showGreeting = true;
+							this.greetingConfetti();
+						}else{
+							const cacheDate = localStorage.getItem('greetings');
+							const currentDate = moment().format('YYYY-MM-DD');
+							if(cacheDate != currentDate){
+								this.showGreeting = true;
+								localStorage.setItem('greetings', currentDate);
+								this.greetingConfetti();
+							}
+						}
+					}
+				})
+				.catch((err)=>{ console.log(err); });
+		},
+		hideGreetings(){
+			this.showGreeting = false;
+			localStorage.setItem('greetings', moment().format('YYYY-MM-DD'));
+			
+		},
+		// greetings confeeit
+		greetingConfetti(){
+			// if(!localStorage.getItem('greetings') || this.showGreeting) {	
+					var confettiElement = document.getElementById('my-canvas');
+					var confettiSettings = { target: confettiElement, rotate: true, size: 2 };
+					var confetti = new ConfettiGenerator(confettiSettings);
+					confetti.render();
+
+			// }
+		},
+
+		MDBINPUT(){
+				this.$nextTick(() => {
+						[].forEach.call(
+										document.querySelectorAll('.form-field__input, .form-field__textarea'),
+										(el) => {
+												el.onblur = () => {
+														setActive(el, false)
+												}
+												el.onfocus = () => {
+														setActive(el, true)
+												}
+												if(el.value !='')
+												{
+														// console.log(el);
+														if(!el.parentNode.classList.contains('form-field__control')){
+																el.parentNode.classList.add('form-field__control');
+														}
+														el.parentNode.parentNode.classList.add('form-field--is-filled');
+												}
+										}
+								);
+					});
+		},
 
 	},
 	filters:{
 		moment: function (date) {
     		return moment(date).fromNow();
-  		}
+		},
+		filterBirthDate: function(date) {
+			return moment(date).format('MMMM D');
+		}
 	},
 	computed:{
 		daysDif(){
@@ -936,9 +1207,7 @@ export default {
                 return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },
 	},
-	created () {
- 		// window.addEventListener('scroll', this.handleScroll);
-	},
+	
 	beforeDestroy(){
 		document.getElementById('content').className += " content";
 	},
@@ -947,20 +1216,27 @@ export default {
 	},
 
 	updated(){
-		jQuery.each(jQuery('textarea[data-autoresizecomment]'), function() {
+			jQuery.each(jQuery('textarea[data-autoresizecomment]'), function() {
 
-			let offset = this.offsetHeight - this.clientHeight;
+				let offset = this.offsetHeight - this.clientHeight;
 
-			let resizeTextarea3 = function(el) {
-				jQuery(el).css('height', 'auto').css({'height': el.scrollHeight + offset, "max-height": '200px'});
-			};
-			jQuery(this).on('keyup input', function() {
-				resizeTextarea3(this);
-			}).removeAttr('data-autoresizecomment');
+				let resizeTextarea3 = function(el) {
+					jQuery(el).css('height', 'auto').css({'height': el.scrollHeight + offset, "max-height": '200px'});
+				};
+				jQuery(this).on('keyup input', function() {
+					resizeTextarea3(this);
+				}).removeAttr('data-autoresizecomment');
 
-		});
-	},
-    mounted(){
+			});
+		},
+		created () {
+ 		// window.addEventListener('scroll', this.handleScroll);
+		 this.getBirthdays();
+		 this.loadCompany(' ');
+		},
+    mounted(){	
+		// scroll
+		// window.addEventListener('scroll', this.handleScroll);
 		window.addEventListener('scroll', this.handleScroll);
 		// remove white background for content
 		document.getElementById('content').classList.remove("content");
@@ -1003,14 +1279,26 @@ export default {
 		})
 		.catch((err)=>{ console.log(err); });
 
-
-
 		$('#myModal').on("hidden.bs.modal", this.closeModal);
 		$(document).on('shown.bs.modal','#myModal', this.openModal);
 
-		// tags
+			// tags
 		$('#myModalSmall').on("hidden.bs.modal", this.clearTags);
 
+		this.MDBINPUT();
+    }
+}
+
+
+const setActive = (el, active) => {
+    const formField = el.parentNode.parentNode
+    if (active) {
+        formField.classList.add('form-field--is-active')
+    } else {
+        formField.classList.remove('form-field--is-active')
+        el.value === '' ?
+        formField.classList.remove('form-field--is-filled') :
+        formField.classList.add('form-field--is-filled')
     }
 }
 </script>

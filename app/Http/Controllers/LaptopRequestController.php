@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\UserSession;
+use App\Services\FormApproverService;
 use DB;
 
 class LaptopRequestController extends Controller
@@ -48,7 +49,9 @@ class LaptopRequestController extends Controller
     // GET LaptopRequest FORM EMPLOYEE APPROVERS
     public function getLaptopRequestApprover(){
         // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformuser eform right join employee emp on eform.empID_ = emp.empID where eform.Laptop0Form = 1');
-        $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Laptop0Form = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+        // $data = DB::select('select CONCAT(emp.fname," ",emp.lname) as approvers from eformapproverbyemp eform right join employee emp on eform.approverID_ = emp.empID where eform.Laptop0Form = 1 and eform.empID_ = :empiD', [UserSession::getSessionID()]);
+
+        $data = FormApproverService::getFormApproverByUser('Laptop0Form');
         return $data;
     }
 

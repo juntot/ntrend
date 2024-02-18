@@ -19,12 +19,18 @@
                         <div class="dflex">
                             <div class="tabbable tabs-left">
                                     <ul class="nav nav-tabs nav-tabs-settings" style="margin-right: 3px;">
-                                        <li class="active"><a href="#home" data-toggle="tab" @click.prevent="addClass" >General</a></li>
+                                        <li><a href="#services" data-toggle="tab" @click.prevent="removeClass">E-Forms Maintenance</a></li>
+                                        <li class="active"><a href="#home" data-toggle="tab" @click.prevent="addClass" >Company Logo</a></li>
                                         <li><a href="#post" data-toggle="tab" @click.prevent="removeClass">Post</a></li>
-                                        <li><a href="#about" data-toggle="tab" @click.prevent="removeClass(), initTablePos">SL/VL</a></li>
-                                        <li><a href="#services" data-toggle="tab" @click.prevent="removeClass">Forms</a></li>
-                                        <li><a href="#override" data-toggle="tab" @click.prevent="removeClass">Override Form</a></li>
-                                        <li><a href="#contact" data-toggle="tab" @click.prevent="removeClass">Employees</a></li>
+                                        <li><a href="#about" data-toggle="tab" @click.prevent="removeClass(), initTablePos">Leave Balance</a></li>
+                                        
+                                        <li><a href="#supplementaryForm" data-toggle="tab" @click.prevent="removeClass">Supplementary Form</a></li>
+                                        <li><a href="#sap_setting" data-toggle="tab" @click.prevent="removeClass">API Settings</a></li>
+                                        <li><a href="#override" data-toggle="tab" @click.prevent="removeClass">Override Settings</a></li>
+                                        <li><a href="#transmittalSett" data-toggle="tab" @click.prevent="removeClass">Transmittal Address</a></li>
+                                        <li><a href="#ARdelivery" data-toggle="tab" @click.prevent="removeClass">A/R Delivery</a></li>
+                                        <li><a href="#SOautoClose" data-toggle="tab" @click.prevent="removeClass">Auto Close SAP Documents</a></li>
+                                        <!-- <li><a href="#contact" data-toggle="tab" @click.prevent="removeClass">Employees</a></li> -->
                                         
                                     </ul>
                             </div>
@@ -54,13 +60,38 @@
 
                                         <div class="tab-pane" id="contact">
                                             <div class="">
-                                                <EmployeeSettings/>
+                                                <!-- <EmployeeSettings/> -->
                                             </div>
                                         </div>
-
+                                        <div class="tab-pane" id="supplementaryForm">
+                                            <div class="">
+                                                <AdminWitnessSup/>
+                                                <!-- <EmployeeSettings/> -->
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="sap_setting">
+                                            <div class="">
+                                                <SAPSettings/>
+                                            </div>
+                                        </div>
                                         <div class="tab-pane" id="override">
                                             <div class="">
                                                 <OverrideSettings/>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="transmittalSett">
+                                            <div class="">
+                                                <transmittalSett/>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="ARdelivery">
+                                            <div>
+                                                <ARDeliverySetting/>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane" id="SOautoClose">
+                                            <div>
+                                                <SOAutoClose/>
                                             </div>
                                         </div>
                                     </div>
@@ -80,17 +111,27 @@
 import GeneralSettings from './settings_details/GeneralSettings'
 import SL_VLSettings from './settings_details/SL_VLSettings'
 import FormSettings from './settings_details/FormSettings'
-import EmployeeSettings from './settings_details/EmployeeSettings'
+// import EmployeeSettings from './settings_details/EmployeeSettings'
 import Posts from './settings_details/Posts'
+import SAPSettings from './settings_details/SAPSettings'
 import OverrideSettings from './settings_details/OverrideSettings'
+import AdminWitnessSup from './AdminWitnessSup'
+import transmittalSett from './settings_details/TransmittalAdressSettings.vue'
+import ARDeliverySetting from './settings_details/ARDeliverySetting.vue'
+import SOAutoClose from './settings_details/SOAutoClose'
 export default {
     components:{
         GeneralSettings,
         SL_VLSettings,
         FormSettings,
-        EmployeeSettings,
+        // EmployeeSettings,
+        SAPSettings,
+        AdminWitnessSup,
         Posts,
         OverrideSettings,
+        transmittalSett,
+        ARDeliverySetting,
+        SOAutoClose
     },
     data(){
         return{

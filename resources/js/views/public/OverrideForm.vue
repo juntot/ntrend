@@ -1,3 +1,4 @@
+
 <template>
     <div>
         <div id="loader2" v-if="loader">
@@ -10,7 +11,7 @@
             <div class="col-lg-6 col-md-6  with-margin-bottom nopadding">
                 <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">ADD NEW</button>
             </div>
-            <table id="undertimeform" class="mdl-data-table" style="width:100%"></table>
+            <table id="overrideform" class="mdl-data-table" style="width:100%"></table>
 
             <!-- Modal -->
             <div id="myModal" class="modal fade" role="dialog" ref="vuemodal">
@@ -34,7 +35,6 @@
 </template>
 <script>
 import ManageOverrideForm from '../../components/public/ManageOverrideForm';
-let leavetype = ['Sick Leave', 'Birthday Leave', 'Leave w/o Pay', 'Bereavement Leave', 'Vacation Leave', 'Others'];
 let status = ['Pending', 'Approved', 'Rejected'];
 
 export default {
@@ -57,14 +57,6 @@ export default {
     watch:{
         rows(val, old){
             let row = val;
-
-            row.forEach((item, index)=>{
-                if(!isNaN(item.status)){
-                    row[index]['status'] = status[item.status];
-                }
-                row[index]['starttime'] = moment((row[index]['starttime']), ["h:mm A"]).format('hh:mm A');
-                row[index]['endtime'] = moment((row[index]['endtime']), ["h:mm A"]).format('hh:mm A');
-            });
             this.dtHandle.clear();
             this.dtHandle.rows.add(row);
             this.dtHandle.draw();
@@ -84,7 +76,7 @@ export default {
         {
             let row = this.$data.rows;
             row.forEach((item, index)=>{
-                if(item.undertimeID == val)
+                if(item.overrideID == val)
                 {
                     this.$data.rows.splice(index, 1);
                     $("#myModal").modal("hide");
@@ -97,7 +89,7 @@ export default {
         {
             let row = this.$data.rows;
             row.forEach((item, index)=>{
-                if(item.undertimeID == val.undertimeID)
+                if(item.overrideID == val.overrideID)
                 {
                     this.$data.rows.splice(index, 1);
                     this.$data.rows.unshift(val);
@@ -116,9 +108,14 @@ export default {
 
     },
     created(){
-
+         // SAP API
+        // axios.get(SAP+'/login')
+        // .then(({data})=>{
+        //     console.log(data);
+        //     // ?$select=CardCode,CardName,CardType&$filter=startswith(CardCode, 'C') &$orderby=CardCode&$top=10&$skip=1,
+        //     // this.customer_list = data.value;
+        // });
     },
-
     mounted(){
 
 
@@ -140,7 +137,8 @@ export default {
                         var month = parseInt(dateA[0], 10);
                         var year = parseInt(dateA[2], 10);
                         var date = new Date(year, month - 1, day)
-                        x = date.getTime();
+                        // x = date.getTime();
+                        x = moment(a).valueOf();
                     }
                     catch (err) {
                         x = new Date().getTime();
@@ -157,8 +155,8 @@ export default {
                     return b - a;
                 }
             });
-            this.dtHandle=$('#undertimeform').DataTable({
-            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [0] }],
+            this.dtHandle=$('#overrideform').DataTable({
+            aoColumnDefs: [{ "sType": "date-uk", "aTargets": [2] }],
             "sPaginationType": "simple_numbers",
             data: [],
             columns: columnDefs,
@@ -167,14 +165,17 @@ export default {
             "scrollX": true,
             "order": [[ 0, "desc" ]],
             "rowCallback": function(row, data, index) {
-                var cellValue = data["status"];
-                    if (cellValue=="Pending") {
+                var cellValue = data.status;
+                    if (cellValue==0) {
                        $(row).addClass("tr-pending");
                     }
-                    if (cellValue=="Approved") {
+                    if (cellValue==1) {
+                       $(row).addClass("tr-verified");
+                    }
+                    if (cellValue==2) {
                        $(row).addClass("tr-approved");
                     }
-                    if (cellValue=="Rejected") {
+                    if (cellValue==3) {
                        $(row).addClass("tr-rejected");
                     }
 
@@ -185,20 +186,19 @@ export default {
             let rows = this.rows.length;
             let self = this;
             // Add event listener for opening and closing details
-            $("#undertimeform tbody").on('click', 'tr', function() {
+            $("#overrideform tbody").on('click', 'tr', function() {
                 var tr = $(this).closest('tr');
                 var row = table.row( tr );
-                if(row.data().status.toLowerCase() == 'approved' ||
-                   row.data().status.toLowerCase() == 'rejected')
+                if(
+                    row.data().status == 1 ||
+                   row.data().status == 2 ||
+                   row.data().status == 3)
                 {
                     self.disabledinput = true;
                     // return;
                 }
-
                 let dataforedit = row.data();
                 self.selected = row.data();
-                dataforedit['endtime'] = moment(dataforedit.endtime, ["h:mm A"]).format("HH:mm")
-                dataforedit['starttime'] = moment(dataforedit.starttime, ["h:mm A"]).format("HH:mm")
 
                 self.setUpdate(dataforedit);
 
@@ -210,32 +210,36 @@ export default {
         });
 
         // APPROVERS
-        axios.get('api/getUndertimeApprover').then((response)=>{
+        axios.get('api/getOverrideApprover').then((response)=>{
             this.approvers =  response.data;
         })
         .catch((err)=>{});
 
         let columnDefs = [
             {
-            title: "Undertime ID", data: 'undertimeID', visible: false,
+            title: "Override #", data: 'overrideID', visible: true,
+        },{
+            title: "Division", data: 'division'
+        },
+        {
+            title: "Date Override", data: 'dateoverride',
+        },
+        {
+            title: "Customer Name", data: 'customer_name'
         },
         // {
-        //     title: "Employee ID", data: 'empID_'
+        //     title: "Creator", data: 'empID_'
         // },
         {
-            title: "Date Override", data: 'datefiled'
-        }, {
-            title: "Date Undertime", data: 'date_undertime'
-        }, {
-            title: "Start Time", data: 'starttime'
-        },{
-            title: "End Time", data: 'endtime'
-        },{
-            title: "Total(hrs)", data: 'totalhrs'
-        },{
-            title: "Reason", data: 'reason', className: "row-limit"
-        },{
-            title: "Status", data: 'status'
+            title: 'Amount of order', data: 'amount_order'
+        },
+        {
+            title: "Status", data: 'status',
+            render: function(data){
+                return data == 0? 'Pending':
+                       data == 1 ? 'Endorsed':
+                       data == 2 ? 'Approved': 'Rejected'
+            }
         }];
 
         // MODAL

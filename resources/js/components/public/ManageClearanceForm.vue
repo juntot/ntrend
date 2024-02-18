@@ -322,7 +322,7 @@
             </div>
             <div class="clearfix"></div>
             <div class="modal-footer">
-                <input type="submit" class="btn btn-primary" value="Submit" :disabled="isDisable || !isFormValid">
+                <input type="submit" class="btn btn-primary" value="Submit" :disabled="disabledIfNoApprover || isDisable || !isFormValid">
             </div>
         </form>
     </div>
@@ -458,7 +458,9 @@ export default {
 
     },
     computed:{
-
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         getDiff(){
             this.datestart =  moment(this.datestart).format('YYYY-MM-DD');
             this.dateend = moment(this.dateend).format('YYYY-MM-DD');

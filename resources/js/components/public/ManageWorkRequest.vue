@@ -1,13 +1,13 @@
 <template>
     <div>
-
+        <h4 class="text-right" style="color: #3f51b5">{{workID ? 'Ticket# '+workID: ''}}</h4>
         <form method="post">
             <h3 class="text-center form-title"><span class="dblUnderlined">WORK REQUEST FORM</span></h3>
                 <div class="col-md-4">
                     <div class="mdb-form-field form-group-limit">
                         <div class="form-field__control">
-                            <input type="text" class="form-field__input" :value="datefiled" name="Date requested" readonly="true">
-                            <label class="form-field__label">Date requested</label>
+                            <input type="text" class="form-field__input" :value="datefiled_datetime" name="Date requested" readonly="true">
+                            <label class="form-field__label">Date & Time requested</label>
                             <div class="form-field__bar"></div>
                         </div>
                     </div>
@@ -40,7 +40,8 @@
                 <div class="col-md-4">
                     <div class="mdb-form-field">
                         <div class="form-field__control">
-                            <input type="text" class="form-field__input" :value="computedfullname +' '+userinfo.mname" name="Name" :readonly="true">
+                            <!-- <input type="text" class="form-field__input" :value="computedfullname +' '+userinfo.mname" name="Name" :readonly="true"> -->
+                             <input type="text" class="form-field__input" :value="computedfullname" name="Name" :readonly="true">
                             <label class="form-field__label">Full Name</label>
                             <div class="form-field__bar"></div>
                         </div>
@@ -121,6 +122,28 @@
                         <span class="checkmark"></span>
                     </label>
                 </div>
+                <!-- <div class="col-md-8">
+                    <div class="mdb-form-field">
+                        <div class="form-field__control">
+                             <input type="text" class="form-field__input" v-model="preferredIT" name="Preferred IT" >
+                            <label class="form-field__label">Preferred IT</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="col-md-6">
+                    <div class="mdb-form-field form-group-limitx">
+                        <div class="form-field__control">
+                            <select id="posname" v-model="preferredIT" name="position" class="form-field__input" >
+                                <option :value="item.preferredIT" v-for="(item, key) in preferredITList" :key="key">{{ item.preferredIT || '' }}</option>
+                            </select>
+                            <label class="form-field__label">Preferred IT</label>
+                            <div class="form-field__bar"></div>
+                        </div>
+                        <span class="errors">{{ errors.first('position') }}</span>
+                    </div>
+
+                </div>
                 <div class="clearfix"></div>
                 <div v-show="worktype==1">
                     <div class="col-md-4">
@@ -149,232 +172,132 @@
                 <div class="col-md-12">
                     <div class="col-md-4">
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">System Access (SAP, HRIS etc.)</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="1" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">System Access
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Access" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Access" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Borrow item</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="2" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Borrow item
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Borrow item" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Borrow item" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">System Autorization</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="3" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">System Autorization
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Autorization" v-model="request_type">
+                            <label class="mdblbl inline-blocklbl mdblblradio">System Authorization
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Autorization" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">RDP Access</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="4" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">RDP Access
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="RDP Access" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="RDP Access" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Password Reset</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="5" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Password Reset
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Password Reset" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Password Reset" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Internet Access</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="6" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Internet Access
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Internet Access" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Internet Access" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Email Setup</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="7" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Email Setup
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Email Setup" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Email Setup" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Install APPS (Spark, Skype etc.)</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="8" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Install APPS (Spark, Skype etc.)
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Install APPS (Spark, Skype etc.)" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Install APPS (Spark, Skype etc.)" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Setup Workstation</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="9" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Setup Workstation
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Setup Workstation" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Setup Workstation" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Setup Printer</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="10" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Setup Printer
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Setup Printer" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Setup Printer" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Setup Telephone</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="11" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">Setup Telephone
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Setup Telephone" v-model="request_type">
+                            <label class="mdblbl inline-blocklbl mdblblradio">Layout Design
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Layout Design" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Cleaning / Maintenance</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="12" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Cleaning / Maintenance
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Cleaning / Maintenance" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Cleaning / Maintenance" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Repair</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="13" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Repair
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Repair" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Repair" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Format</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="14" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Format
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Format" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Format" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">System Report</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="15" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">System Report
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Report" v-model="request_type">
+                            <label class="mdblbl inline-blocklbl mdblblradio">System Report & Layout
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Report & Layout" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">System Layout</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="16" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
-                            <label class="mdblbl inline-blocklbl mdblblradio">System Layout
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Layout" v-model="request_type">
+                            <label class="mdblbl inline-blocklbl mdblblradio">System Development
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="System Development" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">GPS Report</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="17" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">GPS Report
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="GPS Report" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="GPS Report" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">Conversation History</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="18" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">Conversation History
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Conversation History" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Conversation History" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">CCTV Report</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="19" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">CCTV Report
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="CCTV Report" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="CCTV Report" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
-                            <!-- <label class="mdblblradio">
-                            <span class="checklbl">File & Data Recovery</span>
-                            <input :disabled="$parent.disabledinput" type="radio" v-model="worktype" value="20" name="radio" >
-                            <span class="checkmark"></span>
-                            </label> -->
                             <label class="mdblbl inline-blocklbl mdblblradio">File & Data Recovery
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="File & Data Recovery" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="File & Data Recovery" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
                         <div class="group">
                             <label class="mdblbl inline-blocklbl mdblblradio">Assistance
-                            <input :disabled="$parent.disabledinput" type="checkbox" value="Assistance" v-model="request_type">
+                            <input :disabled="$parent.disabledinput" type="checkbox" value="Assistance" v-model="request_type" @change="updateWorkRequestType">
                             <span class="mdbcheckmark"></span>
                             </label>
                         </div>
@@ -460,7 +383,7 @@
                 <div class="modal-footer">
 
 
-                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addWorkRequest" :disabled="isDisable || !isFormValid || !request_type.length > 0" v-if="!workID && $parent.$data.forapprover != 'approval'">
+                    <input type="submit" class="btn btn-primary" value="Submit" @click.prevent="addWorkRequest" :disabled="disabledIfNoApprover || isDisable || !isFormValid || !request_type.length > 0" v-if="!workID && $parent.$data.forapprover != 'approval'">
                     <input type="submit" class="btn btn-primary" value="Update" @click.prevent="updateWorkRequest" :disabled="isDisable || !isFormValid" v-if="workID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput">
                     <input type="submit" class="btn btn-primary" value="Delete" @click.prevent="deleteWorkRequest" :disabled="isDisable" v-if="workID && $parent.$data.forapprover != 'approval' && !$parent.disabledinput ">
                     <input type="submit" class="btn btn-primary" value="Approve" @click.prevent="requestActionWorkRequest(1)" v-if="workID && $parent.$data.forapprover == 'approval' && selected.status == 0">
@@ -479,26 +402,28 @@
     </div>
 </template>
 <script>
-// let worktype = ['System Access (SAP, HRIS etc.)',
-//                 'Borrow item',
-//                 'System Autorization',
-//                 'RDP Access',
-//                 'Password Reset',
-//                 'Internet Access',
-//                 'Email Setup',
-//                 'Install Apps(Spark, Skype, etc.)',
-//                 'Setup Workstation',
-//                 'Setup Printer'
-//                 ,'Setup Telephone',
-//                 'Cleaning / Maintenance',
-//                 'Repair',
-//                 'Format',
-//                 'System Report',
-//                 'System Layout',
-//                 'GPS Report',
-//                 'Conversation History',
-//                 'CCTV Report',
-//                 'File & Data Recovery'];
+// let worktypeFilter = ['system access',
+//                 'borrow item',
+//                 'system autorization',
+//                 'rdp access',
+//                 'password reset',
+//                 'internet access',
+//                 'email setup',
+//                 'install apps (spark, skype etc.)',
+//                 'setup workstation',
+//                 'setup printer',
+//                 'layout design',
+//                 'cleaning / maintenance',
+//                 'repair',
+//                 'format',
+//                 'system report',
+//                 'system layout',
+//                 'gps report',
+//                 'conversation history',
+//                 'cctv report',
+//                 'file & data recovery',
+//                 'assistance',
+//                 ];
 
 let status = ['Pending', 'Approved', 'Rejected'];
 export default {
@@ -508,25 +433,27 @@ export default {
         status: 0,
         empID_: '',
         work_attachment: '',
-        datefiled: moment(new Date()).format('MM/DD/YYYY'),
+        datefiled_datetime: moment(new Date()).format('MM/DD/YYYY HH:mm:ss'),
+        datefiled: moment(new Date()).format('MM/DD/YYYY HH:mm:ss'),
 		dateneed: moment(moment(new Date()).add(1, 'days')).format('MM/DD/YYYY'),
         date_from: moment(new Date()).format('MM/DD/YYYY'),
         date_to: moment(new Date()).format('MM/DD/YYYY'),
-		worktype: 1, //1 sickleave, 2birth leave, 3leave without pay, 4breavementleave, 5vacationleave, 6others
+		worktype: '', //1 sickleave, 2birth leave, 3leave without pay, 4breavementleave, 5vacationleave, 6others
         reason: '',
         isDisable: false,
         workID:'',
         approvedby: '',
         remarks: '',
         urgency: 'Medium',
-        request_type: [],
-
+        request_type: ['System Access'],
+        preferredIT: '',
+        preferredITList: [],
 		}
     },
     watch:{
         userinfo(val, old){
             this.MDBINPUT();
-        }
+        },
 
     },
     filters:{
@@ -539,6 +466,11 @@ export default {
         },
     },
     methods:{
+        updateWorkRequestType(e){
+            $('[type=checkbox]').prop( "checked", false );
+            $(e.target).prop( "checked", true );
+            this.request_type[0] = e.target.value;
+        },
         attachFile(){
             if(document.querySelector('input#work__attachment[type=file]').value != ''){
 			    let file    = document.querySelector('input#work__attachment[type=file]').files[0]; //sames as here
@@ -672,12 +604,15 @@ export default {
 
                 if(key != 'datefiled' && key != 'dateneed' && key != 'worktype'
                 && key != 'urgency' && key != 'date_from' && key != 'date_to'
-                && key != 'request_type'
+                && key != 'request_type' && key != 'preferredITList'
                 ){
                     this.$data[key] =  '';
                 }
                 if(key=='isDisable'){
                     this.$data[key] = false;
+                }
+                if(key == 'request_type'){
+                    this.$data[key] = ['System Access'];
                 }
             });
             $("#myModal").modal("hide");
@@ -685,12 +620,14 @@ export default {
         setDataForEdit(data = null){
             for(let i in this.$data)
             {
-                if(i != 'isDisable')
+                if(i != 'isDisable' && i != 'preferredIT' && i!= 'preferredITList')
                 this.$data[i] = data[i];
                 if(i == 'request_type' && typeof data[i] == 'string')
                 this.$data[i] = (data[i]).split(",");
 
-
+                if(i == 'datefiled_datetime')
+                this.$data[i] = moment(data[i]).format('DD/MM/YYYY HH:mm:ss');
+                
                 // if(i == 'worktype')
                 // this.$data[i] = (worktype.indexOf(data[i]) + 1);
 
@@ -724,6 +661,9 @@ export default {
         }
     },
     computed:{
+        disabledIfNoApprover(){
+            return this.$parent.$data.forapprover != 'approval' && this.$parent.approvers && this.$parent.approvers.length < 1;
+        },
         isFormValid(){
             return !Object.keys(this.fields).some(key => this.fields[key].invalid);
         },
@@ -775,7 +715,14 @@ export default {
     },
     mounted(){
 
-        this.MDBINPUT();
+        axios.get('api/getListITPersonnel').then((response)=>{
+            if(response.data.length > 0)
+            this.preferredIT = response.data[0].preferredIT;
+            this.preferredITList = response.data;
+            
+            this.MDBINPUT();
+        });
+        
         // MODAL
         $('#myModal').on("hidden.bs.modal", this.closeModal);
         // EVENT BUS

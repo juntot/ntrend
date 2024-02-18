@@ -46,7 +46,7 @@ class ReportController extends Controller
         $forms = [];
         if(count($data)>0):
             foreach ($data[0] as $key=>$value) {
-                if($value != 0 && $key != 'empID_'):
+                if($value != 0 && $key != 'empID_' && $key != 'DTR_Report'):
                     $navname = str_replace('0', ' ', (str_replace('_' ,'-' , (str_replace('8','&', $key)) )) );
                     $forms[] = ['formtitle' => $navname];
                 endif;
@@ -119,7 +119,7 @@ class ReportController extends Controller
             // Supplementary
             // old use datefiled as paramter
             case 'supplementary':
-                    $data  = DB::select('select DISTINCT esup.supID, esup.empID_, esup.datefiled, esup.brand, esup.witnesses, esup.remarks, esup.approveddate, esup.remarks, esup.status,
+                    $data  = DB::select('select DISTINCT esup.supID, esup.empID_, esup.datefiled, esup.brand, esup.witnesses, esup.remarks, esup.approveddate, esup.remarks, esup.detailedreason, esup.status,
                     DATE_FORMAT(esup.datefiled, "%m/%d/%Y") as datefiled,
                     CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname, dept.deptname, comp.compname,
                     (
@@ -148,7 +148,7 @@ class ReportController extends Controller
                     AND
                         esup.status IN('.$status.')
                     AND esup.status IN('.$status.')
-                    AND esup.recstat != 1',
+                    AND esup.recstat = 0',
                     [
                         $datefrom, $dateto,
                     ]);
@@ -201,7 +201,7 @@ class ReportController extends Controller
                             AND
                                 esup.status IN('.$status.')
                             AND
-                                esup.recstat != 1',
+                                esup.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -247,14 +247,18 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eccard.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 eccard.status IN('.$status.')
                             AND
-                                eccard.recstat != 1',
+                                eccard.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -287,14 +291,18 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eformloan.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 eformloan.status IN('.$status.')
                             AND
-                                eformloan.recstat != 1',
+                                eformloan.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -307,7 +315,11 @@ class ReportController extends Controller
             // FA
             case 'financialadvance':
                 $data = DB::select('select efadvantage.*,
-                            DATE_FORMAT(efadvantage.datefiled, "%m/%d/%Y") as datefiled,
+                            DATE_FORMAT(efadvantage.datefiled, "%m/%d/%Y %h:%i %p") as datefiled,
+                            DATE_FORMAT(efadvantage.inclusiveDateFrom, "%m/%d/%Y") as inclusiveDateFrom,
+                            DATE_FORMAT(efadvantage.inclusiveDateTo, "%m/%d/%Y") as inclusiveDateTo,
+                            DATE_FORMAT(efadvantage.liqDate, "%m/%d/%Y") as liqDate,
+                            DATE_FORMAT(efadvantage.approveddate, "%m/%d/%Y %h:%i %p") as approveddate,
                             CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname , dept.deptname,
                             (
                                 select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
@@ -321,16 +333,21 @@ class ReportController extends Controller
                                 on branch.branchID = emp.branchID_
                             inner join department dept
                                 on dept.deptID = emp.deptID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (efadvantage.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 efadvantage.status IN('.$status.')
                             AND
-                                efadvantage.recstat != 1',
+                                efadvantage.recstat = 0
+                            ORDER BY efadvantage.faID',
                             [
-                                $datefrom, $dateto,
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
                                 // $branch,
                                 // $status
                                 // UserSession::getSessionID()
@@ -339,13 +356,39 @@ class ReportController extends Controller
                 break;
             // Incident Report
             case 'incidentreport':
+                
+                if (str_contains($status, '9')) { 
+                    $status = $status.","."1";
+                }
+                if (str_contains($status, '8')) { 
+                    $status = $status.","."1".","."2";
+                    
+                }
                 $data = DB::select('select eIReport.*,
                             DATE_FORMAT(eIReport.datefiled, "%m/%d/%Y") as datefiled,
+                            eIReport.datefiled as raw_datefiled,
                             CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname, dept.deptname,
                             (
                                 select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
                                 where subemp.empID = eIReport.approvedby
-                            ) as approvedby
+                            ) as approvedby,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = eIReport.personsinvolve
+                            ) as search_employee,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = eIReport.empID_
+                            ) as reportedby,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = eIReport.endorse1
+                            ) as search_endorse_employee,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = eIReport.endorse2
+                            ) as search_endorse_employee2
+
                             from formincidentreport eIReport right join employee emp
                                 on emp.empID = eIReport.empID_
                             inner join positiontbl pos
@@ -354,14 +397,18 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eIReport.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 eIReport.status IN('.$status.')
                             AND
-                                eIReport.recstat != 1',
+                                eIReport.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -389,7 +436,7 @@ class ReportController extends Controller
                 //             AND
                 //                 eIReport.status IN('.$status.')
             //             AND
-                //                 eIReport.recstat != 1',
+                //                 eIReport.recstat = 0',
                 //             [
                 //                 $datefrom, $dateto,
                  //               $branch,
@@ -423,7 +470,7 @@ class ReportController extends Controller
                 //             AND
                 //                 eleave.status IN('.$status.')
                 //             AND
-                //                 eleave.recstat != 1',
+                //                 eleave.recstat = 0',
                 //             [
                 //                 $datefrom, $dateto,
                 //                $branch,
@@ -460,7 +507,7 @@ class ReportController extends Controller
 
                     eleave.status IN('.$status.')
                 AND
-                    eleave.recstat != 1',
+                    eleave.recstat = 0',
                 [
                     $datefrom, $dateto,
                     // $branch,
@@ -483,14 +530,18 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (emiis.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 emiis.status IN('.$status.')
                             AND
-                                emiis.recstat != 1',
+                                emiis.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -521,14 +572,18 @@ class ReportController extends Controller
                                 on branch.branchID = emp.branchID_
                             inner join department dept
                                 on dept.deptID = emp.deptID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eprf.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 eprf.status IN('.$status.')
                             AND
-                                eprf.recstat != 1',
+                                eprf.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -569,14 +624,18 @@ class ReportController extends Controller
                                 on branch.branchID = emp.branchID_
                             inner join department dept
                                 on dept.deptID = emp.deptID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                             (ecanvas.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 ecanvas.status IN('.$status.')
                             AND
-                                ecanvas.recstat != 1',
+                                ecanvas.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -617,14 +676,18 @@ class ReportController extends Controller
                             on dept.deptID = emp.deptID_
                         inner join branchtbl branch
                             on branch.branchID = emp.branchID_
+                        inner join companytbl comp
+                            on comp.compID = emp.compID_
                         WHERE
                             (esaldisc.discrepancydate BETWEEN :dateFrom AND :dateTo)
                         AND
                             emp.branchID_ IN('.$branch.')
                         AND
+                            emp.compID_ IN('.$company.')
+                        AND
                             esaldisc.status IN('.$status.')
                         AND
-                            esaldisc.recstat != 1',
+                            esaldisc.recstat = 0',
                         [
                             $datefrom, $dateto,
                             // $branch,
@@ -651,14 +714,18 @@ class ReportController extends Controller
                         on branch.branchID = emp.branchID_
                     inner join department dept
                         on dept.deptID = emp.deptID_
+                    inner join companytbl comp
+                        on comp.compID = emp.compID_
                     WHERE
                         (eaccredit.datefiled BETWEEN :dateFrom AND :dateTo)
                     AND
                         emp.branchID_ IN('.$branch.')
                     AND
+                        emp.compID_ IN('.$company.')
+                    AND
                         eaccredit.status IN('.$status.')
                     AND
-                        eaccredit.recstat != 1',
+                        eaccredit.recstat = 0',
                     [
                         $datefrom, $dateto,
                         // $branch,
@@ -687,14 +754,18 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (etravel.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 etravel.status IN('.$status.')
                             AND
-                                etravel.recstat != 1',
+                                etravel.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -733,7 +804,7 @@ class ReportController extends Controller
                             AND
                                 eundertime.status IN('.$status.')
                             AND
-                                eundertime.recstat != 1',
+                                eundertime.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -760,14 +831,18 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eurgent.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 eurgent.status IN('.$status.')
                             AND
-                                eurgent.recstat != 1',
+                                eurgent.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -795,14 +870,18 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (eoffset.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 eoffset.status IN('.$status.')
                             AND
-                                eoffset.recstat != 1',
+                                eoffset.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -850,14 +929,18 @@ class ReportController extends Controller
                                 on dept.deptID = emp.deptID_
                             inner join branchtbl branch
                                 on emp.branchID_ = branch.branchID
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
                             WHERE
                                 (ework.datefiled BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
+                                emp.compID_ IN('.$company.')
+                            AND
                                 ework.status IN('.$status.')
                             AND
-                                ework.recstat != 1',
+                                ework.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -886,7 +969,7 @@ class ReportController extends Controller
                             inner join companytbl comp
                                 on comp.compID = emp.compID_
                             WHERE
-                                (overtime.datefiled BETWEEN :dateFrom AND :dateTo)
+                                (overtime.date_overtime BETWEEN :dateFrom AND :dateTo)
                             AND
                                 emp.branchID_ IN('.$branch.')
                             AND
@@ -894,7 +977,7 @@ class ReportController extends Controller
                             AND
                                 overtime.status IN('.$status.')
                             AND
-                                overtime.recstat != 1',
+                                overtime.recstat = 0',
                             [
                                 $datefrom, $dateto,
                                 // $branch,
@@ -902,6 +985,281 @@ class ReportController extends Controller
                                 // UserSession::getSessionID()
 
                             ]);
+                return $data;
+                break;
+
+            // override form
+            case 'overrideform':
+                $data = DB::select('select overtime.*,
+                            CONCAT(emp.fname," ",emp.lname) as fullname, branch.branchname, pos.posname, dept.deptname, comp.compname,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = overtime.approvedby
+                            ) as approvedby,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = 
+                                IF(LOCATE(",",
+                                    overtime.endorsedby_),
+                                    SUBSTRING_INDEX(overtime.endorsedby_, ",", 1),
+                                    overtime.endorsedby_
+                                )
+                            ) as endorsedby_,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = 
+                                IF(LOCATE(",",
+                                    overtime.endorsedby_),
+                                    SUBSTR(overtime.endorsedby_, ((POSITION("," in overtime.endorsedby_)-1) * -1)),
+                                    ""
+                                )
+                            ) as endorsedby2_,
+                            (
+                                CONCAT(
+                                    IF(overtime.reason IS NOT NULL OR overtime.reason <> "" OR overtime.current_stat IS NOT NULL, "ON HOLD," ,""),
+                                    IF(overtime.comment IS NOT NULL OR overtime.comment <> "" OR overtime.overdue_tbl <> "[]", "OVERDUE," ,""),
+                                    IF( overtime.excess IS NOT NULL or overtime.excess <> ""
+                                        OR
+                                        overtime.percent IS NOT NULL or overtime.percent <> ""
+                                        OR
+                                        overtime.last_cl IS NOT NULL or overtime.last_cl <> ""
+                                        OR 
+                                        overtime.commit_cl IS NOT NULL or overtime.commit_cl <> ""
+                                        , "OVER/NO CREDIT LIMIT,", ""
+                                    ),
+                                    IF(
+                                        overtime.check_type IS NOT NULL
+                                        OR
+                                        overtime.check_tbl <> "[]"
+                                        OR 
+                                        overtime.paying_habit IS NOT NULL OR overtime.paying_habit <> "",
+                                        "UNSETTLED CHECK MOVEMENT", ""
+                                    )
+                                )
+                            ) as reasons
+                            from formoverride overtime right join employee emp
+                                on emp.empID = overtime.empID_
+                            inner join positiontbl pos
+                                on pos.posID = emp.posID_
+                            inner join department dept
+                                on dept.deptID = emp.deptID_
+                            inner join branchtbl branch
+                                on branch.branchID = emp.branchID_
+                            inner join companytbl comp
+                                on comp.compID = emp.compID_
+                            WHERE
+                                (overtime.dateoverride BETWEEN :dateFrom AND :dateTo)
+                            AND
+                                emp.branchID_ IN('.$branch.')
+                            AND
+                                emp.compID_ IN('.$company.')
+                            AND
+                                overtime.status IN('.$status.')
+                            AND
+                                overtime.recstat = 0',
+                            [
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
+                                // $branch,
+                                // $status
+                                // UserSession::getSessionID()
+
+                            ]);
+                return $data;
+                break;
+
+            case 'transmittal':
+                $data = DB::select('select trans.*,
+                            DATE_FORMAT(trans.datefiled, "%m/%d/%Y %h:%i %p") as datefiled,
+                            CONCAT(emp.fname," ",emp.lname) as fullname, 
+                            emp.mobile, emp.lname, emp.fname, emp.email,
+                            branch.branchname, pos.posname, dept.deptname,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = trans.approvedby
+                            ) as search_employee,
+                            (
+                                select sub.posname from positiontbl sub 
+                                inner join employee subemp
+                                    on sub.posID = subemp.posID_
+                                where subemp.empID = trans.approvedby
+                            ) as receiver_pos,
+                            (
+                                select sub.deptname from department sub 
+                                inner join employee subemp
+                                    on sub.deptID = subemp.deptID_
+                                where subemp.empID = trans.approvedby
+                            ) as receiver_dept,
+                            (
+                                select sub.branchname from branchtbl sub 
+                                inner join employee subemp
+                                    on sub.branchID = subemp.branchID_
+                                where subemp.empID = trans.approvedby
+                            ) as receiver_branch
+
+                            from formtransmittal trans right join employee emp
+                                on emp.empID = trans.empID_
+                            inner join positiontbl pos
+                                on pos.posID = emp.posID_
+                            inner join department dept
+                                on dept.deptID = emp.deptID_
+                            inner join branchtbl branch
+                                on branch.branchID = emp.branchID_
+                            WHERE
+                                (trans.datefiled BETWEEN :dateFrom AND :dateTo)
+                            AND
+                                emp.branchID_ IN('.$branch.')
+                            AND
+                                trans.status IN('.$status.')
+                            AND
+                                trans.recstat = 0',
+                            [
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
+                                // $branch,
+                                // $status
+                                // UserSession::getSessionID()
+
+                            ]);
+                // $data = DB::select('select eccard.*,
+                // DATE_FORMAT(eccard.datefiled, "%m/%d/%Y") as datefiled,
+                // CONCAT(emp.fname," ",emp.lname) as fullname, emp.mobile, emp.lname, emp.fname, emp.email,
+                // branch.branchname, pos.posname, dept.deptname,
+                //             (
+                //     select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                //     where subemp.empID = eccard.approvedby
+                // ) as approvedby
+                // from formcallingcard eccard right join employee emp
+                //     on emp.empID = eccard.empID_
+                // inner join positiontbl pos
+                //     on pos.posID = emp.posID_
+                // inner join department dept
+                //     on dept.deptID = emp.deptID_
+                // inner join branchtbl branch
+                //     on branch.branchID = emp.branchID_
+                // WHERE
+                //     (eccard.datefiled BETWEEN :dateFrom AND :dateTo)
+                // AND
+                //     emp.branchID_ IN('.$branch.')
+                // AND
+                //     eccard.status IN('.$status.')
+                // AND
+                //     eccard.recstat = 0',
+                // [
+                //     $datefrom, $dateto,
+                //     // $branch,
+                //     // $status
+                //     // UserSession::getSessionID()
+
+                // ]);
+                return $data;
+                break;
+
+            case 'enrollmentprogram':
+                // return [];
+                $data = DB::select('select enrolprog.*,
+                            enrolprog.dateenrolled as dateenrolled,
+                            CONCAT(emp.fname," ",emp.lname) as fullname, 
+                            emp.mobile, emp.lname, emp.fname, emp.email,
+                            branch.branchname, pos.posname, dept.deptname,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = enrolprog.approvedby
+                            ) as approvedby
+
+                            from formsalesprogramenrollment enrolprog right join employee emp
+                                on emp.empID = enrolprog.empID_
+                            inner join positiontbl pos
+                                on pos.posID = emp.posID_
+                            inner join department dept
+                                on dept.deptID = emp.deptID_
+                            inner join branchtbl branch
+                                on branch.branchID = emp.branchID_
+                            WHERE
+                                (enrolprog.dateenrolled BETWEEN :dateFrom AND :dateTo)
+                            AND
+                                emp.branchID_ IN('.$branch.')
+                            AND
+                                enrolprog.status IN('.$status.')
+                            AND
+                                enrolprog.recstat = 0',
+                            [
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
+                                // $branch,
+                                // $status
+                                // UserSession::getSessionID()
+
+                            ]);
+                
+                return $data;
+                break;
+            case 'enrollmentprogram':
+                // return [];
+                $data = DB::select('select enrolprog.*,
+                            enrolprog.dateenrolled as dateenrolled,
+                            CONCAT(emp.fname," ",emp.lname) as fullname, 
+                            emp.mobile, emp.lname, emp.fname, emp.email,
+                            branch.branchname, pos.posname, dept.deptname,
+                            (
+                                select CONCAT(subemp.fname," ", subemp.lname) from employee subemp
+                                where subemp.empID = enrolprog.approvedby
+                            ) as approvedby
+
+                            from formsalesprogramenrollment enrolprog right join employee emp
+                                on emp.empID = enrolprog.empID_
+                            inner join positiontbl pos
+                                on pos.posID = emp.posID_
+                            inner join department dept
+                                on dept.deptID = emp.deptID_
+                            inner join branchtbl branch
+                                on branch.branchID = emp.branchID_
+                            WHERE
+                                (enrolprog.dateenrolled BETWEEN :dateFrom AND :dateTo)
+                            AND
+                                emp.branchID_ IN('.$branch.')
+                            AND
+                                enrolprog.status IN('.$status.')
+                            AND
+                                enrolprog.recstat = 0',
+                            [
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
+                                // $branch,
+                                // $status
+                                // UserSession::getSessionID()
+
+                            ]);
+                
+                return $data;
+                break;
+            case 'minutesofmeeting':
+                // return [];
+                $data = DB::select('select enrolprog.*,
+                            enrolprog.datefiled as datefiled,
+                            CONCAT(emp.fname," ",emp.lname) as fullname, 
+                            emp.mobile, emp.lname, emp.fname, emp.email,
+                            branch.branchname, pos.posname, dept.deptname
+                            from formmeetingminutes enrolprog right join employee emp
+                                on emp.empID = enrolprog.empID_
+                            inner join positiontbl pos
+                                on pos.posID = emp.posID_
+                            inner join department dept
+                                on dept.deptID = emp.deptID_
+                            inner join branchtbl branch
+                                on branch.branchID = emp.branchID_
+                            WHERE
+                                (enrolprog.datefiled BETWEEN :dateFrom AND :dateTo)
+                            AND
+                                emp.branchID_ IN('.$branch.')
+                            AND
+                                enrolprog.status IN('.$status.')
+                            AND
+                                enrolprog.recstat = 0',
+                            [
+                                $datefrom.' 00:00:00', $dateto.' 23:59:59',
+                                // $branch,
+                                // $status
+                                // UserSession::getSessionID()
+
+                            ]);
+                
                 return $data;
                 break;
         endswitch;

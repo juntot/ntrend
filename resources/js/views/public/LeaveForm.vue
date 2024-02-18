@@ -248,7 +248,12 @@ export default {
             title: "type of leave", data: 'leavetype'
         },
         {
-            title: "Total(days)", data: 'totaldays'
+            title: "Total(days)", 
+            data: 'totaldays',
+            render: function(data){
+                return Number(data).valueOf();
+            }
+
         },
         {
             title: "Reason", data: 'reason', className: "row-limit"
