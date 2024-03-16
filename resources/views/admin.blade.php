@@ -220,6 +220,7 @@
 																	<li><router-link @click.native="hideMobileNav" to="/manage-form">Department Access</router-link></li>
 																	<li><router-link @click.native="hideMobileNav" to="/manage-user-form">User Access</router-link></li>
 																	<li><router-link @click.native="hideMobileNav" to="/form-approver">Form Approver Accesss</router-link></li>
+																	<li><router-link @click.native="hideMobileNav" to="/form-approver-bydept">Approver Per Department</router-link></li>
 																	<li><router-link @click.native="hideMobileNav" to="/form-approver-byuser">Approver Per Users</router-link></li>
 																	
 																	<li><router-link @click.native="hideMobileNav" to="/terms-conditions">Terms and Conditions</router-link></li>

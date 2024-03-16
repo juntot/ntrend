@@ -126,7 +126,7 @@ export default {
               this.holidayEvents = res.data;
           });
                 
-        axios.post('https://ams.northtrend.com/dtr-user-report',{
+        axios.post('https://www.ams.northtrend.com/dtr-user-report',{
                 start: from,
                 end: to,
                 user: userid_

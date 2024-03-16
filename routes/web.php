@@ -150,6 +150,8 @@ Route::group(['middleware' => 'prevent-back-history'], function(){
             Route::get('/api/getFormApproversByEmployee/{empid?}', 'FormController@getFormApproversByEmployee'); //SETTING APPROVAL PER USERS
             Route::get('/api/getformnavapproval', 'FormController@getFormNavApproval'); //navigation for approval
 
+            Route::get('/api/getformapproverbydept', 'FormController@getFormApproverByDept');
+            
             Route::get('/api/updateformapprover/{empid?}/{formname?}/{status?}', 'FormController@updateFormApprover');
             Route::get('/api/updateformapproverByEmployee/{empid?}/{approverid}/{formname?}/{status?}', 'FormController@updateFormApproverByEmployee');
 

@@ -11,6 +11,7 @@ import ManageForm from './views/ManageForm';
 import ManageUsersForm from './views/ManageUsersForm';
 import FormApprover from './views/FormApprover';
 import FormApproverByUser from './views/FormApproverByUser';
+import FormApproverByDept from './views/FormApproverByDept';
 import ReportByUsers from './views/ReportByUsers';
 
 import AdminFormGroup from './views/AdminFormGroup'
@@ -28,7 +29,7 @@ import EmployeeSettings from './views/settings_details/EmployeeSettings'
 export default{
 
     mode: 'history',
-    // base: '/ntrends/',
+    base: '/ntrends/',
     routes:[
         // graph
         {
@@ -97,6 +98,10 @@ export default{
         {
             path: '/form-approver',
             component: FormApprover,
+        },
+        {
+            path: '/form-approver-bydept',
+            component: FormApproverByDept,
         },
         {
             path: '/form-approver-byuser',

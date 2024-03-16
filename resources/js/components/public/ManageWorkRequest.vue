@@ -135,6 +135,7 @@
                     <div class="mdb-form-field form-group-limitx">
                         <div class="form-field__control">
                             <select id="posname" v-model="preferredIT" name="position" class="form-field__input" >
+                                <option :value="'Any IT'" >Any IT</option>
                                 <option :value="item.preferredIT" v-for="(item, key) in preferredITList" :key="key">{{ item.preferredIT || '' }}</option>
                             </select>
                             <label class="form-field__label">Preferred IT</label>
@@ -446,7 +447,7 @@ export default {
         remarks: '',
         urgency: 'Medium',
         request_type: ['System Access'],
-        preferredIT: '',
+        preferredIT: 'Any IT',
         preferredITList: [],
 		}
     },
@@ -614,14 +615,20 @@ export default {
                 if(key == 'request_type'){
                     this.$data[key] = ['System Access'];
                 }
+                if(key == 'preferredIT'){
+                    this.$data[key] = 'Any IT';
+                }
             });
             $("#myModal").modal("hide");
         },
         setDataForEdit(data = null){
             for(let i in this.$data)
             {
-                if(i != 'isDisable' && i != 'preferredIT' && i!= 'preferredITList')
+                if(i != 'isDisable' && i!= 'preferredITList')
                 this.$data[i] = data[i];
+                if(i == 'preferredIT' && (data[i] == '' || data[i] == null))
+                this.$data[i] = 'Any IT';
+
                 if(i == 'request_type' && typeof data[i] == 'string')
                 this.$data[i] = (data[i]).split(",");
 
@@ -717,7 +724,7 @@ export default {
 
         axios.get('api/getListITPersonnel').then((response)=>{
             if(response.data.length > 0)
-            this.preferredIT = response.data[0].preferredIT;
+            // this.preferredIT = response.data[0].preferredIT;
             this.preferredITList = response.data;
             
             this.MDBINPUT();

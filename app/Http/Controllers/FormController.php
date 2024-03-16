@@ -105,7 +105,7 @@ class FormController extends Controller
             ->update([$formname => $status]);
     }
 
-
+// ========= APPROVERS ========
     // APPROVERS GENERAL
     public function getFormApprovers()
     {
@@ -114,6 +114,13 @@ class FormController extends Controller
         inner join employee emp 
             on form.empID_ = emp.empID 
         and emp.status = 1');
+        return $data;
+    }
+
+    // approvers by department
+    public function getFormApproverByDept()
+    {
+        $data = DB::select('select * from eformapproverbydept where status = 1');
         return $data;
     }
 

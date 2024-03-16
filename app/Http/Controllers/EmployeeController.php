@@ -26,6 +26,7 @@ class EmployeeController extends Controller
             $deptname = str_replace('-','_',$deptname);
             $deptname = str_replace('&','8',$deptname);
 
+            // ordinary users access
             $eforms = DB::select('select navname from eforms where '.$deptname.' = 1');
 
             foreach ($eforms as $key => $value) {
@@ -35,6 +36,10 @@ class EmployeeController extends Controller
                 $formnav = str_replace('&','8', $formnav);
                 $setdefaultforms[$formnav] = 1;
             }
+
+            // approvers by set department
+
+
 
         }
         return $setdefaultforms;
@@ -50,6 +55,7 @@ class EmployeeController extends Controller
         request()->merge(['avatar' => $path]);
     	$data = DB::table('employee')->insertOrIgnore(request()->except(['isDisable', 'image']));
 
+        // ordinary users access
         $deptname = DB::select('select deptname from department where deptid = :deptid', [request('deptID_')]);
         if(count($deptname)>0)
         {
@@ -68,6 +74,8 @@ class EmployeeController extends Controller
                 $formnav = str_replace('&','8', $formnav);
                 $setdefaultforms[$formnav] = 1;
             }
+
+            // approvers by set department
 
         }
 

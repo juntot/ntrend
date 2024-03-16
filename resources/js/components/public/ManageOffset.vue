@@ -127,7 +127,7 @@
                 <div class="col-md-4">
                         <div class="mdb-form-field form-group-limit">
                             <div class="form-field__control">
-                                <input type="text" class="form-field__input" :value="datefiled" name="datefiled">
+                                <input type="text" class="form-field__input" :value="datefiled" name="datefiled" :readonly="true">
                                 <label class="form-field__label">Date filed</label>
                                 <div class="form-field__bar"></div>
                             </div>
@@ -346,6 +346,10 @@ export default {
                 {
                     this.$data[key] = [];
                 }
+                if(key == 'datefiled'){
+                    this.$data[key] = moment(new Date()).format('MM/DD/YYYY');
+                }
+                
 
             });
 
